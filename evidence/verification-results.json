@@ -1,45 +1,45 @@
 {
-  "completedAt": "2026-09-23T14:42:11.034Z",
+  "completedAt": "2026-09-23T18:13:34.016Z",
   "results": [
     {
       "test": "real UI replay uses a fresh authenticated session and zero LLM calls",
       "passed": true,
-      "runId": "14d3df39-b7a9-4d99-9da3-0515cec99469"
+      "runId": "ab551dad-7a61-459a-a4b6-e12590cd112c"
     },
     {
       "test": "missing member is a business outcome",
       "passed": true,
-      "runId": "de514722-84bc-45ce-9e47-26d3715190a4"
+      "runId": "0105e7b9-d7e3-4823-bba8-56c0cfad2ebd"
     },
     {
       "test": "restricted member is a hard permission failure",
       "passed": true,
-      "runId": "b2c6a070-1786-4720-a437-77a999f584fb"
+      "runId": "6bc0b461-cc30-407b-91d2-4caf52645cc3"
     },
     {
       "test": "empty login form reports UI validation failure",
       "passed": true,
-      "runId": "bee71ab5-5af1-4961-9de5-fd14cce8dc13"
+      "runId": "36da89fa-c315-40b0-856b-0dabb930d1b5"
     },
     {
       "test": "invalid credentials are rejected through actual login UI",
       "passed": true,
-      "runId": "437837a7-d142-40aa-ac83-418767c188c8"
+      "runId": "a004cd91-e413-4bfb-9f03-7a530a4474c3"
     },
     {
       "test": "session ends through Sign out UI and is not silently reauthenticated",
       "passed": true,
-      "runId": "4227d07c-e01b-445d-a5a5-b258168d2ee7"
+      "runId": "c967bbd4-492d-446f-9e7b-9345ae4fbd78"
     },
     {
       "test": "bounded recovery retries a simulated transient UI error once",
       "passed": true,
-      "runId": "fdb22476-c0cd-4acb-aff8-9c5612837825"
+      "runId": "90469f68-92b6-410c-bb1a-23c026fa2cd1"
     },
     {
       "test": "same-session takeover and resume (explicitly simulated operator)",
       "passed": true,
-      "runId": "7d3788e5-39e9-4796-9516-b0b17c30682c"
+      "runId": "e594221d-7112-44fe-a27b-241964235e97"
     }
   ]
 }

@@ -70,9 +70,16 @@ export class OpenAIProvider implements DecisionProvider {
         },
       }),
       signal: AbortSignal.timeout(120000),
-    }).catch((error:unknown)=>{
-      const timedOut=error instanceof Error && ['TimeoutError','AbortError'].includes(error.name);
-      throw new RuntimeCondition(timedOut?'MODEL_TIMEOUT':'MODEL_REQUEST_FAILED',timedOut?'Model decision exceeded 120 seconds':'Model transport failed; remote diagnostics omitted');
+    }).catch((error: unknown) => {
+      const timedOut =
+        error instanceof Error &&
+        ["TimeoutError", "AbortError"].includes(error.name);
+      throw new RuntimeCondition(
+        timedOut ? "MODEL_TIMEOUT" : "MODEL_REQUEST_FAILED",
+        timedOut
+          ? "Model decision exceeded 120 seconds"
+          : "Model transport failed; remote diagnostics omitted",
+      );
     });
     if (!response.ok)
       throw new RuntimeCondition(
@@ -185,5 +192,5 @@ Return {kind,summary,stepJson}; summary is a short action explanation, not hidde
 Step shape: {id:unique-kebab-case,description,action:click|fill|select|navigate|wait|extract,target?:{description,locators:[...]},value?:{source:secret|input|literal,key?:...,value?:...},output?:savings_balance,risk:read_only|reversible,precondition?:Checkpoint,expectedState:Checkpoint,retry:{maxAttempts:2,safeToRepeat:true}}.
 Copy target locators from the observation. Checkpoint is {kind:authenticated}, {kind:route,path:"/path/{{member_id}}"}, {kind:visible,target:...}, or {kind:output,key:savings_balance,type:money}.
 Login is mandatory. Fill Username with {source:secret,key:RFCU_STAFF_USERNAME}, Password with {source:secret,key:RFCU_STAFF_PASSWORD}, then click Sign in with expectedState {kind:authenticated}. Never request or emit resolved credentials. Login fill checkpoints should verify the corresponding field is visible. Never click Show password.
-Member search must use {source:input,key:member_id}. All member IDs in targets/routes/descriptions must use {{member_id}}, never a literal ID. Search through the UI, open the matching member, then the primary savings S00 account. Current balance is different from available balance. Use the supplied Current balance value target to extract savings_balance with the money output checkpoint. The adapter independently verifies ownership, S00, and the current-balance label.
-Prefer clicking observed links over navigating. Use a visible checkpoint on the matching member link after Search. Use route checkpoints after links. No account opening, notes, transfers, SSN reveal, approval or password display. Escalate on unknown dialogs; blocked on impossible goal. Finish only once login, member search, correct account extraction and output checkpoint have completed. Do not repeat successful fills. Avoid wait unless the observation is still loading. This focused implementation supports savings balance lookup only.`;
+Member search must use the supplied input key: {source:input,key:member_id} OR {source:input,key:member_name}. For name lookup, click Search with expectedState {kind:member_resolved}. This checkpoint binds {{member_id}} from exactly one visible search result. Do not navigate to a member or try to extract an ID before this checkpoint. Never place a resolved name in a step: use {{member_name}}. All member IDs in targets/routes/descriptions must use {{member_id}}, never a literal ID. Search through the UI, open the matching member, then the primary savings S00 account. Current balance is different from available balance. Use the supplied Current balance value target to extract savings_balance with the money output checkpoint. The adapter independently verifies ownership, S00, and the current-balance label.
+Prefer clicking observed links over navigating. For ID lookup use a visible checkpoint on the matching member link after Search; for name lookup use member_resolved. Use route checkpoints after links. No account opening, notes, transfers, SSN reveal, approval or password display. Escalate on unknown dialogs; blocked on impossible goal. Finish only once login, member search, correct account extraction and output checkpoint have completed. Do not repeat successful fills. Avoid wait unless the observation is still loading. This focused implementation supports savings balance lookup only.`;

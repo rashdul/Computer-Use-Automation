@@ -1,5 +1,7 @@
 # Requirement audit
 
+Name/deployment update: configured remote HTTPS RFCU origins are supported while each run remains restricted to its selected origin. Name lookup has a separate schema 1.1 capability and unique-result checkpoint; ambiguity is a business outcome. Genuine discovery and different-name replay were verified against the Netlify deployment, with no LLM calls in replay. See [name verification](../evidence/name-lookup-verification.json). Existing schema 1.0 ID capabilities remain supported.
+
 Audited against implemented code, actual run evidence and tests on September 23, 2026. A check means the stated implementation was exercised; qualifications identify the limits. The original target-app source remains unchanged.
 
 - [x] Starts from RFCU login page
@@ -43,6 +45,6 @@ Audited against implemented code, actual run evidence and tests on September 23,
 
 ## Validation and deliberate limits
 
-The 15 unit/DOM/provider-contract tests, eight browser integration cases, console takeover test, typecheck and target build pass. A clean source copy installed both dependency trees, built and passed tests under Node 22, then replayed successfully and returned the expected not-found outcome without model credentials. It reused the existing configured synthetic Supabase backend; provisioning a new database from scratch was not independently repeated.
+The 19 unit/DOM/provider-contract tests, eight browser integration cases, console takeover test, typecheck and target build pass. A clean source copy installed both dependency trees, built and passed tests under Node 22, then replayed successfully and returned the expected not-found outcome without model credentials. It reused the existing configured synthetic Supabase backend; provisioning a new database from scratch was not independently repeated.
 
 OpenAI API support is implemented and transport/schema/error handling are contract-tested, but live API discovery is unverified without a developer-provided key. Real admin-driven idle expiry/revocation was not exercised; UI session loss and state classification were. Desktop/native adapters, tenant overrides, account opening, production operator authentication and distributed execution are intentionally omitted. See [REPORT.md](../REPORT.md) and the [evidence index](../evidence/README.md).

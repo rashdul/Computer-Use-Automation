@@ -1,0 +1,2 @@
+{"timestamp":"2026-09-23T18:11:38.577Z","runId":"157bedc0-b95f-4790-bc04-427b30bb5df5","type":"run_started","mode":"replay","goal":"Integration verification","startUrl":"http://localhost:5173/login","inputs":{"member_id":"{{member_id}}"},"cleanContext":true}
+{"timestamp":"2026-09-23T18:11:47.560Z","runId":"157bedc0-b95f-4790-bc04-427b30bb5df5","type":"run_finished","result":{"status":"failure","errorType":"START_FAILED","stepId":"start","message":"RFCU login page could not be opened","runId":"157bedc0-b95f-4790-bc04-427b30bb5df5"},"modelCalls":0}

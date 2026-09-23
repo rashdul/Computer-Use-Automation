@@ -16,7 +16,8 @@
     "build": "npm run typecheck && npm --prefix target-app run build",
     "audit:secrets": "tsx automation/audit-secrets.ts",
     "test:integration": "tsx automation/tests/integration.ts",
-    "test:operator": "tsx automation/tests/operator-ui.ts"
+    "test:operator": "tsx automation/tests/operator-ui.ts",
+    "test:names": "tsx automation/tests/name-integration.ts"
   },
   "dependencies": {
     "dotenv": "16.6.1",

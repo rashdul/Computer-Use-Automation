@@ -1,0 +1,7 @@
+{
+  "status": "failure",
+  "errorType": "MODEL_REQUEST_FAILED",
+  "stepId": "sign-in-staff",
+  "message": "Codex exited with code 1; run codex login status",
+  "runId": "f0dd0d74-0d91-44d8-b228-652e7ffb28cd"
+}

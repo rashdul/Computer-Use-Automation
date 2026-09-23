@@ -91,6 +91,29 @@ The adapter uses [Responses structured output](https://developers.openai.com/api
 
 ## Exact demo path
 
+### Local or deployed RFCU
+
+`RFCU_ORIGIN` selects the single application the automation may operate. It defaults to `http://localhost:5173`; it can also be the **HTTPS origin of your deployed RFCU**, for example `https://your-rfcu.example`. A trailing slash is accepted. Do not include `/login` in this environment value. Remote HTTP is rejected. An optional comma-separated `RFCU_ALLOWED_ORIGINS` further restricts which configured deployment may be selected; it does not permit a run to move between origins.
+
+The operator console stays on localhost. For a deployed target, `npm run operator` is sufficient. Set `RFCU_BACKEND_ORIGIN` if that deployment uses a different backend from `target-app/.env.local`. The adapter still expects the RFCU application, its routes and its semantic controls; this is not unrestricted automation of arbitrary websites. Credentials must belong to that target deployment.
+
+Restart the operator after environment changes. Capabilities remain bound to the origin where they were discovered: rediscover on a new deployment before replaying there. A localhost artifact is intentionally rejected against a different origin.
+
+### Search by member name
+
+In the console choose **Search by → Name**, enter the member's name, then choose discovery or replay. The default name capability is `get-member-savings-balance-by-name`; the existing `get-member-savings-balance` capability continues to use a seven-digit ID.
+
+```sh
+npm run discovery -- --goal "Log in to RFCU and return the current savings balance for the supplied member name" --member-name "FULL MEMBER NAME" --capability get-member-savings-balance-by-name
+npm run replay -- --capability get-member-savings-balance-by-name --member-name "ANOTHER MEMBER NAME"
+```
+
+Use an actual name from your synthetic RFCU data. First name, last name or a fuller name can be searched, but execution proceeds only when the UI reports **exactly one match**. A partial name returning several members produces `MEMBER_AMBIGUOUS`; retry with a more specific name or use the member-number capability. No result produces `MEMBER_NOT_FOUND`. The adapter reads the member ID from that unique rendered result and then restricts all member/account routes to it. It does not choose the first result or query the database.
+
+Name capabilities use schema `1.1` and an explicit `member_resolved` checkpoint. The member name and resolved member number are parameterized in artifacts/logs; resolved names are not sent to the model. Schema `1.0` ID capabilities remain supported. Supply exactly one of `member_id` and `member_name` through the API; the CLI equivalent is `--member-id` or `--member-name`.
+
+### Start and run the ID demonstration
+
 Terminal 1, from the root:
 
 ```sh
@@ -112,7 +135,12 @@ Discovery really observes the page after each executed action; it does not gener
 The first discovery in the evidence returned USD `23693.68`; replay for the different seeded member returned USD `1663.00`. These are observed synthetic balances, not hard-coded expected values. The nonexistent member returns:
 
 ```json
-{"status":"business_outcome","code":"MEMBER_NOT_FOUND","message":"No member matches the requested ID","runId":"..."}
+{
+  "status": "business_outcome",
+  "code": "MEMBER_NOT_FOUND",
+  "message": "No member matches the requested ID",
+  "runId": "..."
+}
 ```
 
 A restricted record demonstrates a hard failure:
@@ -150,7 +178,7 @@ No automation actions execute while the human owns the page. Operator clicks and
 {
   "mode": "replay",
   "capabilityId": "get-member-savings-balance",
-  "inputs": {"member_id": "1000021"},
+  "inputs": { "member_id": "1000021" },
   "evidenceGroup": "replay-success"
 }
 ```
@@ -165,10 +193,13 @@ npm run typecheck
 npm run build
 npm run test:integration
 npm run test:operator
+npm run test:names
 npm run audit:secrets
 ```
 
 `npm test` requires the installed browser but no RFCU backend or model. Integration tests require RFCU running, seeded scenarios and local staff credentials; they perform real UI login/replay and cover not-found, permission denial, empty/invalid login, session ending and a labeled transient UI fault with bounded recovery. They do not reset scenarios, open accounts, or change the database directly.
+
+`npm run test:names` verifies name replay, ambiguity and not-found against the configured RFCU deployment, using names read through the actual UI and kept only in memory. It requires a name capability discovered for that deployment. To generate it first using the configured model and then run these checks, use `npm run test:names -- --discover`; this performs genuine discovery and may incur model usage.
 
 `npm run test:operator` also requires the operator server running with no active job. It drives the console’s Start/Take control/live-image click/Resume controls using a **simulated operator**, records that provenance, and verifies successful continuation with zero model calls. This does not claim that a human performed the test.
 
@@ -183,6 +214,6 @@ Raw Playwright traces/HAR, storage state and full DOM snapshots are deliberately
 
 ## Security and limits
 
-This is a local synthetic-UAT demonstration, not a production banking integration. The policy binds the run to one local origin, the supplied member, read-only member routes, approved controls and symbolic credential targets. Risky actions stop before execution. Page content is untrusted, and model decisions are validated before execution. The operator server is loopback-only, without production operator authentication or distributed persistence. Do not expose it to a network. Live frames contain synthetic member information for the authorized local operator and are not saved. The focused observation/redaction profile is RFCU-specific; another application needs its own tested profile.
+This is a local synthetic-UAT demonstration, not a production banking integration. The policy binds the run to one configured RFCU origin, the supplied or uniquely resolved member, read-only member routes, approved controls and symbolic credential targets. Risky actions stop before execution. Page content is untrusted, and model decisions are validated before execution. The operator server is loopback-only, without production operator authentication or distributed persistence. Do not expose it to a network. Live frames contain synthetic member information for the authorized local operator and are not saved. The focused observation/redaction profile is RFCU-specific; another application needs its own tested profile.
 
 Account opening, desktop adapters, automatic artifact repair, cross-tenant deployment, raw traces and automatic reauthentication are intentionally omitted. See the seven-section [REPORT.md](REPORT.md) for trade-offs and next steps.

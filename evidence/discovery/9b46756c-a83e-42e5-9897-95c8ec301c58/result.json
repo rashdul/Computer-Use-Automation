@@ -1,0 +1,23 @@
+{
+  "status": "failure",
+  "errorType": "ACTION_FAILED",
+  "stepId": "fill-staff-password",
+  "expected": {
+    "kind": "visible",
+    "target": {
+      "description": "Password",
+      "locators": [
+        {
+          "kind": "label",
+          "label": "Password"
+        }
+      ]
+    }
+  },
+  "observed": {
+    "session": "authenticating",
+    "path": "unavailable"
+  },
+  "message": "Browser action did not complete within its bounds",
+  "runId": "9b46756c-a83e-42e5-9897-95c8ec301c58"
+}

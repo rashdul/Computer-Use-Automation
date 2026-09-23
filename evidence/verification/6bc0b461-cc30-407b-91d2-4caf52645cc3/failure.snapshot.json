@@ -1,0 +1,76 @@
+{
+  "observation": {
+    "path": "/members/{{member_id}}",
+    "session": "authenticated",
+    "controls": [
+      {
+        "name": "Member search",
+        "target": {
+          "description": "Member search",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "link",
+              "name": "Member search",
+              "exact": true
+            },
+            {
+              "kind": "attribute",
+              "tag": "a",
+              "attribute": "href",
+              "value": "/members"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Members",
+        "target": {
+          "description": "Members",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "link",
+              "name": "Members",
+              "exact": true
+            },
+            {
+              "kind": "attribute",
+              "tag": "a",
+              "attribute": "href",
+              "value": "/members"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Member search",
+        "target": {
+          "description": "Member search",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "link",
+              "name": "Member search",
+              "exact": true
+            },
+            {
+              "kind": "attribute",
+              "tag": "a",
+              "attribute": "href",
+              "value": "/members"
+            }
+          ]
+        }
+      }
+    ],
+    "signals": [
+      "Permission denied"
+    ]
+  },
+  "currentStep": "open-matching-member",
+  "session": "authenticated",
+  "owner": "automation",
+  "contextId": "21a4a6f7-19cf-4fc4-8330-91e88e6659bf",
+  "pageId": "69e10c03-8f51-4c8d-8295-d0fd2fc71307"
+}

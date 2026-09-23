@@ -1,0 +1,158 @@
+{
+  "observation": {
+    "path": "/members/{{member_id}}/accounts/{{member_id}}-S00",
+    "session": "authenticated",
+    "controls": [
+      {
+        "name": "Member search",
+        "target": {
+          "description": "Member search",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "link",
+              "name": "Member search",
+              "exact": true
+            },
+            {
+              "kind": "attribute",
+              "tag": "a",
+              "attribute": "href",
+              "value": "/members"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Members",
+        "target": {
+          "description": "Members",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "link",
+              "name": "Members",
+              "exact": true
+            },
+            {
+              "kind": "attribute",
+              "tag": "a",
+              "attribute": "href",
+              "value": "/members"
+            }
+          ]
+        }
+      },
+      {
+        "name": "{{member_id}}",
+        "target": {
+          "description": "{{member_id}}",
+          "locators": [
+            {
+              "kind": "attribute",
+              "tag": "a",
+              "attribute": "href",
+              "value": "/members/{{member_id}}"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Accounts",
+        "target": {
+          "description": "Accounts",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "link",
+              "name": "Accounts",
+              "exact": true
+            },
+            {
+              "kind": "attribute",
+              "tag": "a",
+              "attribute": "href",
+              "value": "/members/{{member_id}}/accounts"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Overview",
+        "target": {
+          "description": "Overview",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "link",
+              "name": "Overview",
+              "exact": true
+            },
+            {
+              "kind": "attribute",
+              "tag": "a",
+              "attribute": "href",
+              "value": "/members/{{member_id}}"
+            }
+          ]
+        }
+      },
+      {
+        "name": "All accounts",
+        "target": {
+          "description": "All accounts",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "link",
+              "name": "All accounts",
+              "exact": true
+            },
+            {
+              "kind": "attribute",
+              "tag": "a",
+              "attribute": "href",
+              "value": "/members/{{member_id}}/accounts"
+            }
+          ]
+        }
+      },
+      {
+        "name": "{{member_id}}",
+        "target": {
+          "description": "{{member_id}}",
+          "locators": [
+            {
+              "kind": "attribute",
+              "tag": "a",
+              "attribute": "href",
+              "value": "/members/{{member_id}}"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Current balance value",
+        "target": {
+          "description": "Current balance in Account summary",
+          "locators": [
+            {
+              "kind": "css",
+              "selector": "section[aria-label=\"Account summary\"] .account-balances > div:has(.account-balances__label:text-is(\"Current balance\")) .account-balances__value"
+            }
+          ]
+        }
+      }
+    ],
+    "signals": [],
+    "accountSummary": "Account summary | S00"
+  },
+  "contextId": "548cc071-b1d2-4266-8547-efa32b90e2a5",
+  "pageId": "ed1c2fab-86ea-4f1c-8958-909f949ab92f",
+  "outputs": {
+    "savings_balance": {
+      "amount": "23693.68",
+      "currency": "USD"
+    }
+  }
+}

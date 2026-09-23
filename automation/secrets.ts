@@ -49,9 +49,18 @@ export class Secrets {
     return "[SECRET_PROVIDER]";
   }
 }
-export function parameterize(text: string, inputs: Record<string, string>) {
+export function parameterize(
+  text: string,
+  inputs: Record<string, string | undefined>,
+) {
   for (const [key, value] of Object.entries(inputs))
-    text = text.split(value).join("{{" + key + "}}");
+    if (value) {
+      text = text.split(value).join("{{" + key + "}}");
+      text = text.split(encodeURIComponent(value)).join("{{" + key + "}}");
+      text = text
+        .split(new URLSearchParams({ q: value }).toString().slice(2))
+        .join("{{" + key + "}}");
+    }
   return text;
 }
 export function redactPII(text: string) {

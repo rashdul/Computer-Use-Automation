@@ -13,7 +13,7 @@ export function classifyText(text: string): RuntimeCondition | undefined {
   if (/No members match|Member not found/i.test(text))
     return new RuntimeCondition(
       "MEMBER_NOT_FOUND",
-      "No member matches the requested ID",
+      "No member matches the requested search",
       "business",
     );
   if (

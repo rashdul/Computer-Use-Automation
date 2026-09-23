@@ -1,0 +1,11 @@
+{
+  "observation": {
+    "condition": "OBSERVATION_UNAVAILABLE",
+    "session": "authenticating"
+  },
+  "currentStep": "fill-staff-password",
+  "session": "authenticating",
+  "owner": "automation",
+  "contextId": "84197215-d099-4f11-a32c-6f772f75558d",
+  "pageId": "627c970f-c831-485b-98c0-c32c61d8a70f"
+}

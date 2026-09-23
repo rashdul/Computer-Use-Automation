@@ -68,7 +68,7 @@ const Request = z
     capabilityId: z
       .string()
       .regex(/^[a-z][a-z0-9-]{0,80}$/)
-      .default("get-member-savings-balance"),
+      .optional(),
     headed: z.boolean().default(false),
     handoffDemo: z.boolean().default(false),
     evidenceGroup: z
@@ -84,6 +84,9 @@ const Request = z
   .strict();
 app.post("/api/runs", async (req, res) => {
   const input = Request.parse(req.body);
+  input.capabilityId ??= input.inputs.member_name
+    ? "get-member-savings-balance-by-name"
+    : "get-member-savings-balance";
   if (
     input.mode === "discovery" &&
     input.goal &&
@@ -118,12 +121,10 @@ app.post("/api/runs", async (req, res) => {
   // Setup above awaits local files; another request may have started meanwhile.
   // Recheck immediately before registration, with no intervening await.
   if ([...runs.values()].some((r) => !r.result)) {
-    res
-      .status(409)
-      .json({
-        error: "RUN_ACTIVE",
-        message: "Finish or resume the active run first",
-      });
+    res.status(409).json({
+      error: "RUN_ACTIVE",
+      message: "Finish or resume the active run first",
+    });
     return;
   }
   const run = new Run(
@@ -132,7 +133,7 @@ app.post("/api/runs", async (req, res) => {
     secrets,
     policy,
     input.goal ??
-      "Log in to RFCU, look up member {{member_id}}, and return their current savings balance.",
+      `Log in to RFCU, look up member {{${input.inputs.member_name ? "member_name" : "member_id"}}}, and return their current savings balance.`,
     input,
   );
   runs.set(run.runId, run);

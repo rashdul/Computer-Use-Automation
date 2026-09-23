@@ -18,6 +18,7 @@ import { resolveTarget } from "./locators.js";
 import { SessionManager } from "./session.js";
 import { RuntimeCondition, classifyText } from "./errors.js";
 import { allowResource, targetBackendOrigin } from "./network.js";
+import { resolveNameSearch } from "./member-search.js";
 
 export interface Observation {
   path: string;
@@ -64,12 +65,19 @@ export class PlaywrightSurface implements SurfaceAdapter {
     inputs: InputValues,
     headed = false,
   ) {
-    const browser = await chromium.launch({
-      headless: !headed,
-      ...(process.env.RFCU_BROWSER_CHANNEL
-        ? { channel: process.env.RFCU_BROWSER_CHANNEL }
-        : {}),
-    }).catch(()=>{throw new RuntimeCondition('BROWSER_UNAVAILABLE','Install Chromium with npx playwright install chromium, or configure an installed RFCU_BROWSER_CHANNEL');});
+    const browser = await chromium
+      .launch({
+        headless: !headed,
+        ...(process.env.RFCU_BROWSER_CHANNEL
+          ? { channel: process.env.RFCU_BROWSER_CHANNEL }
+          : {}),
+      })
+      .catch(() => {
+        throw new RuntimeCondition(
+          "BROWSER_UNAVAILABLE",
+          "Install Chromium with npx playwright install chromium, or configure an installed RFCU_BROWSER_CHANNEL",
+        );
+      });
     const context = await browser.newContext({
       viewport: { width: 1440, height: 900 },
       serviceWorkers: "block",
@@ -109,8 +117,13 @@ export class PlaywrightSurface implements SurfaceAdapter {
     page.on("download", (d) => void d.cancel());
     page.on("dialog", (d) => void d.dismiss());
     try {
-      await page.goto(policy.url("/login"), { waitUntil: "domcontentloaded" });
-      await page.getByLabel("Username", { exact: true }).waitFor({timeout:30000});
+      await page.goto(policy.url("/login"), {
+        waitUntil: "domcontentloaded",
+        timeout: 30000,
+      });
+      await page
+        .getByLabel("Username", { exact: true })
+        .waitFor({ timeout: 30000 });
     } catch {
       await browser.close();
       throw new RuntimeCondition(
@@ -219,7 +232,7 @@ export class PlaywrightSurface implements SurfaceAdapter {
           href.pathname === `/members/${this.inputs.member_id}` &&
           !known.test(name)
         )
-          name = this.inputs.member_id;
+          name = this.inputs.member_id!;
         if (href.pathname.endsWith(`/${this.inputs.member_id}-S00`))
           name = "Primary savings share S00";
         if (
@@ -266,6 +279,8 @@ export class PlaywrightSurface implements SurfaceAdapter {
       }
     }
     const signals = [...raw.signals];
+    if (this.inputs.member_name && this.inputs.member_id)
+      signals.push("MEMBER_RESOLVED");
     if (raw.dialog) signals.push("MODAL_PRESENT");
     if (raw.loading) signals.push("LOADING");
     // Strip account numbers/nicknames/owners. Only product identity and labeled balances are exposed.
@@ -360,6 +375,8 @@ export class PlaywrightSurface implements SurfaceAdapter {
             ? this.inputs[value.key]
             : value.value;
       if (value.source === "secret") this.session.authenticating();
+      if (resolved === undefined)
+        throw new RuntimeCondition("INVALID_PARAMETER", "Input is not bound");
       await locator.fill(resolved);
     } else if (step.action === "select") {
       const value = step.value!;
@@ -427,6 +444,23 @@ export class PlaywrightSurface implements SurfaceAdapter {
     const deadline = Date.now() + 12000;
     do {
       await this.condition();
+      if (cp.kind === "member_resolved") {
+        if (!this.inputs.member_name)
+          throw new RuntimeCondition(
+            "INVALID_PARAMETER",
+            "Name resolution requires member_name",
+          );
+        const id = await resolveNameSearch(this.page, this.inputs.member_name);
+        if (id) {
+          if (this.inputs.member_id && this.inputs.member_id !== id)
+            throw new RuntimeCondition(
+              "MEMBER_CHANGED",
+              "Resolved member changed during this run",
+            );
+          this.inputs.member_id = id;
+          return;
+        }
+      }
       if (cp.kind === "authenticated" && this.session.state === "authenticated")
         return;
       if (

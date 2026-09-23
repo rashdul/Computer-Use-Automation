@@ -189,7 +189,11 @@
             ><label for="goal">Goal</label
             ><textarea id="goal">
 Log in to RFCU, look up member {{member_id}}, and return their current savings balance.</textarea
-            ><label for="member">Member number</label
+            ><label for="lookup">Search by</label
+            ><select id="lookup">
+              <option value="member_id">Member number</option>
+              <option value="member_name">Name</option></select
+            ><label id="member-label" for="member">Member number</label
             ><input
               id="member"
               value="1030966"
@@ -299,6 +303,22 @@ Log in to RFCU, look up member {{member_id}}, and return their current savings b
           : "No saved artifact yet.";
       }
       el("catalog").onchange = showArtifact;
+      el("lookup").onchange = () => {
+        const byName = el("lookup").value === "member_name";
+        el("member-label").textContent = byName
+          ? "Member name"
+          : "Member number";
+        el("member").value = "";
+        if (byName) el("member").removeAttribute("pattern");
+        else el("member").pattern = "[0-9]{7}";
+        el("capability").value = byName
+          ? "get-member-savings-balance-by-name"
+          : "get-member-savings-balance";
+        el("goal").value =
+          "Log in to RFCU, look up member {{" +
+          el("lookup").value +
+          "}}, and return their current savings balance.";
+      };
       el("start").onsubmit = async (e) => {
         e.preventDefault();
         el("error").textContent = "";
@@ -307,7 +327,7 @@ Log in to RFCU, look up member {{member_id}}, and return their current savings b
           const r = await api("/api/runs", {
             mode,
             goal: el("goal").value,
-            inputs: { member_id: el("member").value },
+            inputs: { [el("lookup").value]: el("member").value },
             capabilityId: el("capability").value,
             headed: el("headed").checked,
             handoffDemo: el("handoff").checked,

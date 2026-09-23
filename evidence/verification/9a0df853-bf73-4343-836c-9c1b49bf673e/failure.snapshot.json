@@ -1,0 +1,11 @@
+{
+  "observation": {
+    "condition": "SESSION_EXPIRED",
+    "session": "expired"
+  },
+  "currentStep": "sign-in-staff",
+  "session": "expired",
+  "owner": "automation",
+  "contextId": "08987cce-58a5-4816-8018-a8c34fa764f2",
+  "pageId": "9982287a-5eb4-4ecb-8ce2-ddb673875c08"
+}

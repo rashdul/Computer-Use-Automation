@@ -1,0 +1,34 @@
+{
+  "origin": "https://rashed-federal-credit-union.netlify.app",
+  "checks": [
+    {
+      "case": "existing ID steps through real UI",
+      "runId": "9655b602-b3b6-40e3-8177-2385fe53bd89",
+      "status": "success"
+    },
+    {
+      "case": "existing ID steps through real UI",
+      "runId": "f15cd7f9-f81d-4e62-bc45-504abc52da8b",
+      "status": "success"
+    },
+    {
+      "case": "different name replay",
+      "status": "success",
+      "runId": "4d4167ce-96b7-44e0-8953-493eebe8b51e",
+      "modelCalls": 0
+    },
+    {
+      "case": "MEMBER_AMBIGUOUS",
+      "status": "business_outcome",
+      "runId": "b944a35b-dce4-4fac-b1da-acb4c5f5f872",
+      "modelCalls": 0
+    },
+    {
+      "case": "MEMBER_NOT_FOUND",
+      "status": "business_outcome",
+      "runId": "158b6a70-482f-45c2-91b3-6ee23668ac62",
+      "modelCalls": 0
+    }
+  ],
+  "discoveryRunId": "6e6a10ee-c183-4412-94f6-73f1e4e753ca"
+}

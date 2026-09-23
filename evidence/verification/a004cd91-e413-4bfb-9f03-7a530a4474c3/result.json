@@ -1,0 +1,14 @@
+{
+  "status": "failure",
+  "errorType": "AUTHENTICATION_REJECTED",
+  "stepId": "sign-in-staff",
+  "expected": {
+    "kind": "authenticated"
+  },
+  "observed": {
+    "session": "blocked",
+    "path": "/login"
+  },
+  "message": "Staff authentication was rejected",
+  "runId": "a004cd91-e413-4bfb-9f03-7a530a4474c3"
+}

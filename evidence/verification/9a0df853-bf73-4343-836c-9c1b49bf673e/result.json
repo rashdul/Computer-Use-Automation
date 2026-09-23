@@ -1,0 +1,7 @@
+{
+  "status": "failure",
+  "errorType": "SESSION_EXPIRED",
+  "stepId": "sign-in-staff",
+  "message": "Integration test: UI sign-out ended session",
+  "runId": "9a0df853-bf73-4343-836c-9c1b49bf673e"
+}

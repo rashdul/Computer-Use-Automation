@@ -13,13 +13,19 @@ export async function loadCapability(id: string) {
   } catch {
     throw new RuntimeCondition(
       "INVALID_CAPABILITY",
-      "Capability is missing or does not satisfy schema 1.0",
+      "Capability is missing or does not satisfy a supported schema",
     );
   }
 }
 export async function replay(run: Run, artifact: CapabilityArtifact) {
   try {
     Capability.parse(artifact);
+    const inputKey = run.inputs.member_name ? "member_name" : "member_id";
+    if (artifact.inputs[0].key !== inputKey)
+      throw new RuntimeCondition(
+        "INPUT_CAPABILITY_MISMATCH",
+        "Choose a capability discovered for this search type (member number or name)",
+      );
     if (artifact.target.startUrl !== run.policy.origin + "/login")
       throw new RuntimeCondition(
         "POLICY_DENIED",

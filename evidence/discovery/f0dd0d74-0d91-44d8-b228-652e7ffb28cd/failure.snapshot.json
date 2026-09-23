@@ -1,0 +1,120 @@
+{
+  "observation": {
+    "path": "/members",
+    "session": "authenticated",
+    "controls": [
+      {
+        "name": "Member search",
+        "target": {
+          "description": "Member search",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "link",
+              "name": "Member search",
+              "exact": true
+            },
+            {
+              "kind": "attribute",
+              "tag": "a",
+              "attribute": "href",
+              "value": "/members"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Search",
+        "target": {
+          "description": "Search",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "searchbox",
+              "name": "Search",
+              "exact": true
+            },
+            {
+              "kind": "label",
+              "label": "Search"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Status",
+        "target": {
+          "description": "Status",
+          "locators": [
+            {
+              "kind": "label",
+              "label": "Status"
+            },
+            {
+              "kind": "role",
+              "role": "combobox",
+              "name": "Status",
+              "exact": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "Branch",
+        "target": {
+          "description": "Branch",
+          "locators": [
+            {
+              "kind": "label",
+              "label": "Branch"
+            },
+            {
+              "kind": "role",
+              "role": "combobox",
+              "name": "Branch",
+              "exact": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "Sort by",
+        "target": {
+          "description": "Sort by",
+          "locators": [
+            {
+              "kind": "label",
+              "label": "Sort by"
+            },
+            {
+              "kind": "role",
+              "role": "combobox",
+              "name": "Sort by",
+              "exact": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "Search",
+        "target": {
+          "description": "Search",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "button",
+              "name": "Search",
+              "exact": true
+            }
+          ]
+        }
+      }
+    ],
+    "signals": []
+  },
+  "currentStep": "sign-in-staff",
+  "session": "authenticated",
+  "owner": "automation",
+  "contextId": "93d64206-c1dc-4350-abc6-65af9ec30617",
+  "pageId": "9ad4eac3-c087-4ced-9127-76dbf189cadd"
+}

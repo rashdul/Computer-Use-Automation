@@ -2,6 +2,7 @@ import { mkdir, writeFile, readFile } from "node:fs/promises";
 import path from "node:path";
 import {
   Capability,
+  NAME_PATTERN,
   Step,
   type CapabilityArtifact,
   type CapabilityStep,
@@ -17,6 +18,7 @@ export async function discover(
   capabilityId = "get-member-savings-balance",
 ) {
   const steps: CapabilityStep[] = [];
+  const inputKey = run.inputs.member_name ? "member_name" : "member_id";
   try {
     await run.start();
     await run.evidence.event("discovery_provider", {
@@ -31,7 +33,7 @@ export async function discover(
       const prompt = JSON.stringify(
         run.evidence.clean({
           goal: run.goal,
-          inputs: { member_id: "{{member_id}}" },
+          inputs: { [inputKey]: "{{" + inputKey + "}}" },
           observation,
           completedSteps: steps,
           outputs: run.outputs,
@@ -82,7 +84,7 @@ export async function discover(
             ).metadata.artifactVersion + 1;
         } catch {}
         const artifact = Capability.parse({
-          schemaVersion: "1.0",
+          schemaVersion: inputKey === "member_name" ? "1.1" : "1.0",
           capabilityId,
           name: "Get member savings balance",
           description:
@@ -96,11 +98,14 @@ export async function discover(
           },
           inputs: [
             {
-              key: "member_id",
+              key: inputKey,
               type: "string",
-              pattern: "^\\d{7}$",
+              pattern: inputKey === "member_id" ? "^\\d{7}$" : NAME_PATTERN,
               required: true,
-              description: "Seven-digit RFCU member number",
+              description:
+                inputKey === "member_id"
+                  ? "Seven-digit RFCU member number"
+                  : "Member name (2-100 characters); must resolve to exactly one search result",
             },
           ],
           outputs: [

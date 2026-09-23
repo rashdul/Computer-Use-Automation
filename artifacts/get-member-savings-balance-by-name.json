@@ -1,0 +1,350 @@
+{
+  "schemaVersion": "1.1",
+  "capabilityId": "get-member-savings-balance-by-name",
+  "name": "Get member savings balance",
+  "description": "Authenticate through RFCU and return the requested member’s primary savings share (S00) current balance.",
+  "target": {
+    "application": "RFCU Member Services",
+    "vendor": "RFCU",
+    "applicationVersion": "4.12.2",
+    "startUrl": "https://rashed-federal-credit-union.netlify.app/login",
+    "surface": "web"
+  },
+  "inputs": [
+    {
+      "key": "member_name",
+      "type": "string",
+      "pattern": "^[\\p{L}\\p{M}][\\p{L}\\p{M} .'\\u2019-]{1,99}$",
+      "required": true,
+      "description": "Member name (2-100 characters); must resolve to exactly one search result"
+    }
+  ],
+  "outputs": [
+    {
+      "key": "savings_balance",
+      "type": "money",
+      "currency": "USD",
+      "description": "Primary savings S00 current balance, decimal string preserving cents"
+    }
+  ],
+  "steps": [
+    {
+      "id": "fill-staff-username",
+      "description": "Fill Username",
+      "action": "fill",
+      "target": {
+        "description": "Username",
+        "locators": [
+          {
+            "kind": "role",
+            "role": "textbox",
+            "name": "Username",
+            "exact": true
+          },
+          {
+            "kind": "label",
+            "label": "Username"
+          }
+        ]
+      },
+      "value": {
+        "source": "secret",
+        "key": "RFCU_STAFF_USERNAME"
+      },
+      "risk": "reversible",
+      "expectedState": {
+        "kind": "visible",
+        "target": {
+          "description": "Username",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "textbox",
+              "name": "Username",
+              "exact": true
+            },
+            {
+              "kind": "label",
+              "label": "Username"
+            }
+          ]
+        }
+      },
+      "retry": {
+        "maxAttempts": 2,
+        "safeToRepeat": true
+      }
+    },
+    {
+      "id": "fill-staff-password",
+      "description": "Fill Password",
+      "action": "fill",
+      "target": {
+        "description": "Password",
+        "locators": [
+          {
+            "kind": "label",
+            "label": "Password"
+          }
+        ]
+      },
+      "value": {
+        "source": "secret",
+        "key": "RFCU_STAFF_PASSWORD"
+      },
+      "risk": "reversible",
+      "expectedState": {
+        "kind": "visible",
+        "target": {
+          "description": "Password",
+          "locators": [
+            {
+              "kind": "label",
+              "label": "Password"
+            }
+          ]
+        }
+      },
+      "retry": {
+        "maxAttempts": 2,
+        "safeToRepeat": true
+      }
+    },
+    {
+      "id": "sign-in-staff",
+      "description": "Click Sign in",
+      "action": "click",
+      "target": {
+        "description": "Sign in",
+        "locators": [
+          {
+            "kind": "role",
+            "role": "button",
+            "name": "Sign in",
+            "exact": true
+          }
+        ]
+      },
+      "risk": "reversible",
+      "expectedState": {
+        "kind": "authenticated"
+      },
+      "retry": {
+        "maxAttempts": 2,
+        "safeToRepeat": true
+      }
+    },
+    {
+      "id": "fill-member-name-search",
+      "description": "Search for {{member_name}}",
+      "action": "fill",
+      "target": {
+        "description": "Search",
+        "locators": [
+          {
+            "kind": "role",
+            "role": "searchbox",
+            "name": "Search",
+            "exact": true
+          },
+          {
+            "kind": "label",
+            "label": "Search"
+          }
+        ]
+      },
+      "value": {
+        "source": "input",
+        "key": "member_name"
+      },
+      "risk": "reversible",
+      "precondition": {
+        "kind": "authenticated"
+      },
+      "expectedState": {
+        "kind": "visible",
+        "target": {
+          "description": "Search",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "searchbox",
+              "name": "Search",
+              "exact": true
+            },
+            {
+              "kind": "label",
+              "label": "Search"
+            }
+          ]
+        }
+      },
+      "retry": {
+        "maxAttempts": 2,
+        "safeToRepeat": true
+      }
+    },
+    {
+      "id": "submit-member-name-search",
+      "description": "Search for {{member_name}}",
+      "action": "click",
+      "target": {
+        "description": "Search",
+        "locators": [
+          {
+            "kind": "role",
+            "role": "button",
+            "name": "Search",
+            "exact": true
+          }
+        ]
+      },
+      "risk": "read_only",
+      "precondition": {
+        "kind": "authenticated"
+      },
+      "expectedState": {
+        "kind": "member_resolved"
+      },
+      "retry": {
+        "maxAttempts": 2,
+        "safeToRepeat": true
+      }
+    },
+    {
+      "id": "open-matching-member",
+      "description": "Open member {{member_id}}",
+      "action": "click",
+      "target": {
+        "description": "{{member_id}}",
+        "locators": [
+          {
+            "kind": "role",
+            "role": "link",
+            "name": "{{member_id}}",
+            "exact": true
+          },
+          {
+            "kind": "attribute",
+            "attribute": "href",
+            "value": "/members/{{member_id}}",
+            "tag": "a"
+          }
+        ]
+      },
+      "risk": "read_only",
+      "precondition": {
+        "kind": "authenticated"
+      },
+      "expectedState": {
+        "kind": "route",
+        "path": "/members/{{member_id}}"
+      },
+      "retry": {
+        "maxAttempts": 2,
+        "safeToRepeat": true
+      }
+    },
+    {
+      "id": "open-primary-savings-s00",
+      "description": "Open primary savings S00 for member {{member_id}}",
+      "action": "click",
+      "target": {
+        "description": "Primary savings share S00",
+        "locators": [
+          {
+            "kind": "attribute",
+            "attribute": "href",
+            "value": "/members/{{member_id}}/accounts/{{member_id}}-S00",
+            "tag": "a"
+          }
+        ]
+      },
+      "risk": "read_only",
+      "precondition": {
+        "kind": "authenticated"
+      },
+      "expectedState": {
+        "kind": "route",
+        "path": "/members/{{member_id}}/accounts/{{member_id}}-S00"
+      },
+      "retry": {
+        "maxAttempts": 2,
+        "safeToRepeat": true
+      }
+    },
+    {
+      "id": "extract-savings-current-balance",
+      "description": "Extract current savings balance for member {{member_id}}",
+      "action": "extract",
+      "target": {
+        "description": "Current balance in Account summary",
+        "locators": [
+          {
+            "kind": "css",
+            "selector": "section[aria-label=\"Account summary\"] .account-balances > div:has(.account-balances__label:text-is(\"Current balance\")) .account-balances__value"
+          }
+        ]
+      },
+      "output": "savings_balance",
+      "risk": "read_only",
+      "precondition": {
+        "kind": "route",
+        "path": "/members/{{member_id}}/accounts/{{member_id}}-S00"
+      },
+      "expectedState": {
+        "kind": "output",
+        "key": "savings_balance",
+        "type": "money"
+      },
+      "retry": {
+        "maxAttempts": 2,
+        "safeToRepeat": true
+      }
+    }
+  ],
+  "successCondition": [
+    {
+      "kind": "authenticated"
+    },
+    {
+      "kind": "route",
+      "path": "/members/{{member_id}}/accounts/{{member_id}}-S00"
+    },
+    {
+      "kind": "output",
+      "key": "savings_balance",
+      "type": "money"
+    }
+  ],
+  "safety": {
+    "allowedOrigins": [
+      "https://rashed-federal-credit-union.netlify.app"
+    ],
+    "allowedRoutes": [
+      "/login",
+      "/session-expired",
+      "/members",
+      "/members/{{member_id}}",
+      "/members/{{member_id}}/accounts",
+      "/members/{{member_id}}/accounts/{{member_id}}-S00"
+    ],
+    "allowedActions": [
+      "click",
+      "fill",
+      "select",
+      "navigate",
+      "wait",
+      "extract"
+    ],
+    "riskLevel": "safe"
+  },
+  "metadata": {
+    "createdAt": "2026-09-23T18:11:29.472Z",
+    "source": "llm-discovery",
+    "artifactVersion": 1,
+    "discoveryRunId": "6e6a10ee-c183-4412-94f6-73f1e4e753ca",
+    "modelProvider": "codex-cli",
+    "model": "codex-default"
+  }
+}

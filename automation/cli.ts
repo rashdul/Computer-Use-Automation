@@ -6,6 +6,7 @@ const { values } = parseArgs({
   options: {
     goal: { type: "string" },
     "member-id": { type: "string" },
+    "member-name": { type: "string" },
     capability: { type: "string" },
     "start-url": { type: "string" },
     headed: { type: "boolean" },
@@ -14,10 +15,13 @@ const { values } = parseArgs({
   },
   strict: true,
 });
-const member_id = values["member-id"] ?? values.goal?.match(/\b\d{7}\b/)?.[0];
-if (!["discovery", "replay"].includes(mode) || !member_id) {
+const member_name = values["member-name"];
+const member_id =
+  values["member-id"] ??
+  (!member_name ? values.goal?.match(/\b\d{7}\b/)?.[0] : undefined);
+if (!["discovery", "replay"].includes(mode) || (!member_id && !member_name)) {
   console.error(
-    'Usage: npm run discovery -- --goal "Log in to RFCU and return savings balance" --member-id 1030966 | npm run replay -- --capability get-member-savings-balance --member-id 1000021',
+    'Usage: npm run discovery -- --goal "Return savings balance" --member-id 1030966 (or --member-name "Full Name") | npm run replay -- --capability CAPABILITY_ID --member-id 1000021 (or --member-name "Full Name")',
   );
   process.exit(2);
 }
@@ -32,7 +36,7 @@ try {
     body: JSON.stringify({
       mode,
       goal: values.goal,
-      inputs: { member_id },
+      inputs: { member_id, member_name },
       capabilityId: values.capability,
       startUrl: values["start-url"],
       headed: values.headed,

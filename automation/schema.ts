@@ -48,7 +48,10 @@ export const Target = z
   .strict();
 export const ValueRef = z.discriminatedUnion("source", [
   z
-    .object({ source: z.literal("input"), key: z.literal("member_id") })
+    .object({
+      source: z.literal("input"),
+      key: z.enum(["member_id", "member_name"]),
+    })
     .strict(),
   z
     .object({
@@ -66,6 +69,7 @@ export const Checkpoint = z.discriminatedUnion("kind", [
     .object({ kind: z.literal("route"), path: z.string().startsWith("/") })
     .strict(),
   z.object({ kind: z.literal("authenticated") }).strict(),
+  z.object({ kind: z.literal("member_resolved") }).strict(),
   z
     .object({
       kind: z.literal("output"),
@@ -103,16 +107,32 @@ export const Step = z
     if (s.value?.source === "secret" && s.action !== "fill")
       ctx.addIssue({ code: "custom", message: "Secrets only support fill" });
   });
+export const NAME_PATTERN = "^[\\p{L}\\p{M}][\\p{L}\\p{M} .'\\u2019-]{1,99}$";
+export const MemberName = z
+  .string()
+  .trim()
+  .min(2)
+  .max(100)
+  .regex(
+    new RegExp(NAME_PATTERN, "u"),
+    "Use a name containing letters, spaces, apostrophes or hyphens",
+  );
 export const Inputs = z
   .object({
     member_id: z
       .string()
-      .regex(/^\d{7}$/, "member_id must contain exactly seven digits"),
+      .regex(/^\d{7}$/, "member_id must contain exactly seven digits")
+      .optional(),
+    member_name: MemberName.optional(),
   })
-  .strict();
+  .strict()
+  .refine(
+    (v) => Boolean(v.member_id) !== Boolean(v.member_name),
+    "Supply exactly one of member_id or member_name",
+  );
 export const Capability = z
   .object({
-    schemaVersion: z.literal("1.0"),
+    schemaVersion: z.enum(["1.0", "1.1"]),
     capabilityId: z.string().regex(/^[a-z][a-z0-9-]{0,80}$/),
     name: z.string().min(1),
     description: z.string().min(1),
@@ -129,9 +149,9 @@ export const Capability = z
       .array(
         z
           .object({
-            key: z.literal("member_id"),
+            key: z.enum(["member_id", "member_name"]),
             type: z.literal("string"),
-            pattern: z.literal("^\\d{7}$"),
+            pattern: z.string(),
             required: z.literal(true),
             description: z.string(),
           })
@@ -173,6 +193,35 @@ export const Capability = z
   })
   .strict()
   .superRefine((a, ctx) => {
+    const byName = a.inputs[0].key === "member_name";
+    if (
+      (byName && a.schemaVersion !== "1.1") ||
+      (!byName && a.inputs[0].pattern !== "^\\d{7}$")
+    )
+      ctx.addIssue({
+        code: "custom",
+        message: "Input contract does not match schema version",
+      });
+    if (byName && a.inputs[0].pattern !== NAME_PATTERN)
+      ctx.addIssue({
+        code: "custom",
+        message: "Unsupported member-name pattern",
+      });
+    const resolutionIndex = a.steps.findIndex(
+      (s) => s.expectedState.kind === "member_resolved",
+    );
+    const searchIndex = a.steps.findIndex(
+      (s) => s.action === "fill" && s.value?.source === "input",
+    );
+    const extractionIndex = a.steps.findIndex((s) => s.action === "extract");
+    if (
+      byName &&
+      (resolutionIndex <= searchIndex || resolutionIndex >= extractionIndex)
+    )
+      ctx.addIssue({
+        code: "custom",
+        message: "Name search requires a unique-member checkpoint",
+      });
     if (new Set(a.steps.map((s) => s.id)).size !== a.steps.length)
       ctx.addIssue({ code: "custom", message: "Duplicate step IDs" });
     for (const key of ["RFCU_STAFF_USERNAME", "RFCU_STAFF_PASSWORD"])
@@ -197,7 +246,7 @@ export const Capability = z
         (s) =>
           s.action === "fill" &&
           s.value?.source === "input" &&
-          s.value.key === "member_id",
+          s.value.key === a.inputs[0].key,
       )
     )
       ctx.addIssue({

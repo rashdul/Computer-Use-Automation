@@ -1,0 +1,14 @@
+{
+  "status": "failure",
+  "errorType": "LOGIN_VALIDATION_FAILED",
+  "stepId": "sign-in-staff",
+  "expected": {
+    "kind": "authenticated"
+  },
+  "observed": {
+    "session": "blocked",
+    "path": "/login"
+  },
+  "message": "Login form validation failed",
+  "runId": "36da89fa-c315-40b0-856b-0dabb930d1b5"
+}

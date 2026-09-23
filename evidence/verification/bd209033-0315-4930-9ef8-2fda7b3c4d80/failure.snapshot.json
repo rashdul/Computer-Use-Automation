@@ -1,0 +1,60 @@
+{
+  "observation": {
+    "path": "/login",
+    "session": "blocked",
+    "controls": [
+      {
+        "name": "Username",
+        "target": {
+          "description": "Username",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "textbox",
+              "name": "Username",
+              "exact": true
+            },
+            {
+              "kind": "label",
+              "label": "Username"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Password",
+        "target": {
+          "description": "Password",
+          "locators": [
+            {
+              "kind": "label",
+              "label": "Password"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Sign in",
+        "target": {
+          "description": "Sign in",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "button",
+              "name": "Sign in",
+              "exact": true
+            }
+          ]
+        }
+      }
+    ],
+    "signals": [
+      "username or password"
+    ]
+  },
+  "currentStep": "sign-in-staff",
+  "session": "blocked",
+  "owner": "automation",
+  "contextId": "a0cada19-6c49-47cd-9ff5-b42ed9382365",
+  "pageId": "896c75c4-995b-4eb3-b176-6aa18d656571"
+}

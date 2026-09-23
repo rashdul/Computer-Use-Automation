@@ -1,0 +1,11 @@
+{
+  "status": "success",
+  "outputs": {
+    "savings_balance": {
+      "amount": "23693.68",
+      "currency": "USD"
+    }
+  },
+  "runId": "6e6a10ee-c183-4412-94f6-73f1e4e753ca",
+  "humanInterventions": 0
+}

@@ -11,12 +11,15 @@ export const ROUTES = [
 ];
 export function interpolate(text: string, inputs: InputValues) {
   return text.replace(/\{\{(\w+)\}\}/g, (_, key) => {
-    if (key !== "member_id")
+    if (
+      !["member_id", "member_name"].includes(key) ||
+      !inputs[key as keyof InputValues]
+    )
       throw new RuntimeCondition(
         "INVALID_PARAMETER",
         "Unknown parameter reference",
       );
-    return inputs.member_id;
+    return inputs[key as keyof InputValues]!;
   });
 }
 export class Policy {
@@ -26,15 +29,25 @@ export class Policy {
     public inputs: InputValues,
     public routes = ROUTES,
     public actions = ["click", "fill", "select", "navigate", "wait", "extract"],
+    allowedOrigins = (
+      process.env.RFCU_ALLOWED_ORIGINS ?? origin.replace(/\/$/, "")
+    )
+      .split(",")
+      .map((s) => s.trim()),
   ) {
     const u = new URL(origin);
+    const local = ["localhost", "127.0.0.1", "[::1]"].includes(u.hostname);
     if (
-      !["localhost", "127.0.0.1", "[::1]"].includes(u.hostname) ||
-      !["http:", "https:"].includes(u.protocol)
+      u.href !== u.origin + "/" ||
+      u.username ||
+      u.password ||
+      !["http:", "https:"].includes(u.protocol) ||
+      (!local && u.protocol !== "https:") ||
+      !allowedOrigins.includes(u.origin)
     )
       throw new RuntimeCondition(
         "POLICY_DENIED",
-        "This demo only supports local RFCU origins",
+        "RFCU origin must be explicitly allowlisted; remote origins require HTTPS",
       );
     this.origin = u.origin;
     this.origins = [u.origin];
@@ -46,14 +59,24 @@ export class Policy {
       u.origin !== this.origin ||
       u.username ||
       u.password ||
-      !this.routes.some((p) => interpolate(p, this.inputs) === path)
+      !this.routes.some((p) => {
+        try {
+          return interpolate(p, this.inputs) === path;
+        } catch {
+          return false;
+        }
+      })
     )
       throw new RuntimeCondition(
         "POLICY_DENIED",
         "Origin or route is outside the configured scope",
       );
     for (const [key, val] of u.searchParams) {
-      if (key !== "q" || val !== this.inputs.member_id || path !== "/members")
+      if (
+        key !== "q" ||
+        val !== (this.inputs.member_name ?? this.inputs.member_id) ||
+        path !== "/members"
+      )
         throw new RuntimeCondition(
           "POLICY_DENIED",
           "Unexpected query parameters",
@@ -107,6 +130,8 @@ export class Policy {
       step.value?.source !== "secret" &&
       !(
         step.value?.source === "input" &&
+        step.value.key ===
+          (this.inputs.member_name ? "member_name" : "member_id") &&
         step.target?.locators.every((l) =>
           l.kind === "label"
             ? l.label === "Search"

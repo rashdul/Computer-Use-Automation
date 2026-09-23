@@ -36,6 +36,7 @@ export class Run {
       evidenceGroup?: string;
     } = {},
   ) {
+    policy.inputs = inputs; // Share the UI-resolved member binding across policy, surface and redaction.
     this.evidence = new Evidence(
       this.runId,
       path.join("evidence", options.evidenceGroup ?? mode, this.runId),
@@ -178,7 +179,7 @@ export class Run {
           path: path.join(this.evidence.directory, `${label}.png`),
           mask: [
             this.surface.page.locator(
-              "input,.topbar,.sidebar__foot,.member-band,.crumbs,.recent-list,.tips,.grid-12,tbody,.account-head__number,.account-head__title .muted,.alert-strip,.user-menu,.stats,.empty-state",
+              "input,.topbar,.sidebar__foot,.member-band,.crumbs,.recent-list,.tips,.grid-12,tbody,.account-head__number,.account-head__title .muted,.alert-strip,.user-menu,.stats,.empty-state,.empty,.empty__title",
             ),
           ],
           maskColor: "#c9d6e6",

@@ -15,6 +15,7 @@ import { resolveTarget } from "../locators.js";
 import { parseMoney } from "../surface.js";
 import { OpenAIProvider, providerFromEnv } from "../providers.js";
 import { allowResource } from "../network.js";
+import { resolveNameSearch } from "../member-search.js";
 
 const inputs = { member_id: "1234567" };
 const fill: CapabilityStep = {
@@ -45,6 +46,104 @@ test("input validation rejects invalid IDs and extra fields", () => {
     { ...inputs, password: "no" },
   ])
     assert.equal(Inputs.safeParse(value).success, false);
+});
+
+test("name inputs are exclusive, typed and redacted including URL encodings", () => {
+  assert.deepEqual(Inputs.parse({ member_name: "  Jordan O'Neil  " }), {
+    member_name: "Jordan O'Neil",
+  });
+  for (const v of [
+    {},
+    { member_name: "a" },
+    { member_name: "1234567" },
+    { member_name: "x?" },
+    { member_name: "../admin" },
+    { member_name: "Jane", member_id: "1234567" },
+  ])
+    assert.equal(Inputs.safeParse(v).success, false);
+  const v = { member_name: "Jordan Smith" };
+  assert.equal(
+    parameterize(
+      "Jordan Smith /members?q=Jordan+Smith /members?q=Jordan%20Smith",
+      v,
+    ),
+    "{{member_name}} /members?q={{member_name}} /members?q={{member_name}}",
+  );
+  const p = new Policy("http://localhost:5173", v);
+  assert.doesNotThrow(() => p.url("/members?q=Jordan+Smith"));
+  assert.throws(() => p.url("/members/1234567"));
+});
+
+test("configured HTTPS target is supported while cross-origin, credentials and insecure remote targets are denied", () => {
+  const p = new Policy("https://rfcu.example/", inputs, undefined, undefined, [
+    "https://rfcu.example",
+  ]);
+  assert.equal(p.url("/login"), "https://rfcu.example/login");
+  assert.throws(() => p.url("https://other.example/login"));
+  assert.throws(() => new Policy("http://rfcu.example", inputs));
+  assert.throws(() => new Policy("https://user:pass@rfcu.example", inputs));
+  assert.throws(() => new Policy("https://rfcu.example/admin", inputs));
+  assert.throws(
+    () =>
+      new Policy("https://rfcu.example", inputs, undefined, undefined, [
+        "https://other.example",
+      ]),
+  );
+});
+
+test("rendered name search resolves only one matching result and rejects ambiguity, stale queries and unrelated names", async () => {
+  const browser = await chromium.launch({ headless: true });
+  try {
+    const page = await browser.newPage();
+    let total = 1,
+      name = "Jordan Smith",
+      loading = false;
+    await page.route("https://rfcu.example/**", (route) =>
+      route.fulfill({
+        contentType: "text/html",
+        body: `
+      ${loading ? '<div class="top-progress" data-active="true"></div>' : ""}
+      <section class="panel"><h2>Results <span class="panel__count">${total}</span></h2>
+      <table><caption>Members matching the search</caption><tbody>
+      <tr data-href="/members/1234567"><td class="col-primary">${name}</td></tr>
+      </tbody></table></section>`,
+      }),
+    );
+    const load = () => page.goto("https://rfcu.example/members?q=Jordan+Smith");
+    await load();
+    assert.equal(await resolveNameSearch(page, "Jordan Smith"), "1234567");
+    assert.equal(await resolveNameSearch(page, "Other Name"), undefined);
+    loading = true;
+    await load();
+    assert.equal(await resolveNameSearch(page, "Jordan Smith"), undefined);
+    loading = false;
+    total = 26;
+    await load();
+    await assert.rejects(
+      () => resolveNameSearch(page, "Jordan Smith"),
+      (e: unknown) =>
+        e instanceof RuntimeCondition &&
+        e.code === "MEMBER_AMBIGUOUS" &&
+        e.category === "business",
+    );
+    total = 0;
+    await load();
+    await assert.rejects(
+      () => resolveNameSearch(page, "Jordan Smith"),
+      (e: unknown) =>
+        e instanceof RuntimeCondition && e.code === "MEMBER_NOT_FOUND",
+    );
+    total = 1;
+    name = "Unrelated Person";
+    await load();
+    await assert.rejects(
+      () => resolveNameSearch(page, "Jordan Smith"),
+      (e: unknown) =>
+        e instanceof RuntimeCondition && e.code === "MEMBER_NAME_MISMATCH",
+    );
+  } finally {
+    await browser.close();
+  }
 });
 test("schema requires typed actions, target, checkpoints and bounded retry", () => {
   assert.ok(Step.safeParse(fill).success);
@@ -367,6 +466,37 @@ test("saved real capability is valid and rejects missing login/search/output con
     assert.equal(Capability.safeParse(changed).success, false);
   }
 });
+test("name capability requires schema 1.1 and unique resolution between search and extraction", async () => {
+  const raw = JSON.parse(
+    await readFile("artifacts/get-member-savings-balance-by-name.json", "utf8"),
+  );
+  assert.ok(Capability.safeParse(raw).success);
+  assert.doesNotMatch(JSON.stringify(raw), /\b\d{7}\b/);
+  for (const mutate of [
+    (a: any) => {
+      a.schemaVersion = "1.0";
+    },
+    (a: any) => {
+      a.inputs[0].pattern = ".*";
+    },
+    (a: any) => {
+      a.steps = a.steps.filter(
+        (s: any) => s.expectedState.kind !== "member_resolved",
+      );
+    },
+    (a: any) => {
+      const i = a.steps.findIndex(
+        (s: any) => s.expectedState.kind === "member_resolved",
+      );
+      a.steps.push(a.steps.splice(i, 1)[0]);
+    },
+  ]) {
+    const changed = structuredClone(raw);
+    mutate(changed);
+    assert.equal(Capability.safeParse(changed).success, false);
+  }
+});
+
 test("OpenAI transport contract validates decisions, redacts remote failures and uses store:false", async () => {
   const originalFetch = globalThis.fetch,
     originalKey = process.env.OPENAI_API_KEY,
