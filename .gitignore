@@ -1,0 +1,26 @@
+# Secrets and machine-local config — never commit
+.env
+.env.*
+!.env.example
+*.local
+*.local.*
+**/.generated/
+
+# Node
+node_modules/
+dist/
+*.tsbuildinfo
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Test output
+target-app/test-output/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

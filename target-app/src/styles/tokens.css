@@ -1,0 +1,109 @@
+/*
+ * Rashed FCU — Member Services Console design tokens.
+ * Ink navy + cool grays; one brass accent reserved for the mark and the
+ * active navigation rule. Public Sans (civic UI), Libre Caslon Text (identity
+ * moments only), IBM Plex Mono (member numbers, suffixes, references).
+ */
+:root {
+  /* ink navy */
+  --ink-950: #0b1b30;
+  --ink-900: #0f2744;
+  --ink-850: #133054;
+  --ink-800: #173a63;
+  --ink-700: #1f4b7f;
+  --ink-600: #2c5f9e;
+  --ink-300: #9fb4cf;
+  --ink-200: #c9d6e6;
+  --ink-100: #e6edf6;
+  --ink-50: #f1f5fa;
+
+  /* cool grays */
+  --gray-0: #ffffff;
+  --gray-25: #fafbfc;
+  --gray-50: #f3f5f8;
+  --gray-100: #eaeef2;
+  --gray-150: #e1e6ec;
+  --gray-200: #d6dde5;
+  --gray-300: #bfc8d3;
+  --gray-400: #97a2b0;
+  --gray-500: #6a7584;
+  --gray-600: #515b69;
+  --gray-700: #394250;
+  --gray-800: #252d38;
+  --gray-900: #151c26;
+
+  /* brass — mark and active rule only */
+  --brass-500: #b08a3e;
+  --brass-400: #c9a45c;
+
+  /* status */
+  --ok-700: #1b6441;
+  --ok-100: #e3f1e9;
+  --ok-200: #bfdecb;
+  --warn-700: #85560a;
+  --warn-100: #fbf0d8;
+  --warn-200: #efd79f;
+  --bad-700: #a3281d;
+  --bad-100: #fbe9e6;
+  --bad-200: #f0c2bb;
+  --info-700: #1f4b7f;
+  --info-100: #e6edf6;
+  --info-200: #c9d6e6;
+
+  /* roles */
+  --page: var(--gray-50);
+  --surface: var(--gray-0);
+  --surface-sunk: var(--gray-25);
+  --line: var(--gray-200);
+  --line-soft: var(--gray-150);
+  --text: var(--gray-900);
+  --text-2: var(--gray-600);
+  --text-3: var(--gray-500);
+  --link: var(--ink-700);
+  --focus: var(--ink-600);
+  --row-hover: #f4f7fb;
+  --row-selected: var(--ink-50);
+
+  /* type */
+  --font-ui: "Public Sans", "Segoe UI", system-ui, sans-serif;
+  --font-display: "Libre Caslon Text", Georgia, "Times New Roman", serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+
+  --fs-2xs: 10.5px;
+  --fs-xs: 11px;
+  --fs-sm: 12px;
+  --fs-base: 13px;
+  --fs-md: 14px;
+  --fs-lg: 16px;
+  --fs-xl: 19px;
+  --fs-2xl: 23px;
+  --lh-tight: 1.25;
+  --lh: 1.45;
+
+  /* space (4px grid) */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 20px;
+  --s-6: 24px;
+  --s-8: 32px;
+
+  --r-sm: 3px;
+  --r-md: 5px;
+  --r-lg: 7px;
+
+  --shadow-pop: 0 10px 28px rgba(11, 27, 48, 0.18), 0 2px 6px rgba(11, 27, 48, 0.1);
+  --shadow-raise: 0 1px 2px rgba(11, 27, 48, 0.06);
+
+  --ease: cubic-bezier(0.2, 0, 0, 1);
+  --t-fast: 150ms;
+  --t-med: 200ms;
+  --t-slow: 250ms;
+
+  --sidebar-w: 224px;
+  --sidebar-w-collapsed: 60px;
+  --topbar-h: 48px;
+  --control-h: 32px;
+  --control-h-sm: 26px;
+}
