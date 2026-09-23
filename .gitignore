@@ -4,6 +4,9 @@
 !.env.example
 *.local
 *.local.*
+**/STAFF_CREDENTIALS.local.md
+automation.env.local
+.runtime/
 **/.generated/
 
 # Node

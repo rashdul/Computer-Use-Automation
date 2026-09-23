@@ -1,0 +1,11 @@
+{
+  "observation": {
+    "condition": "OBSERVATION_UNAVAILABLE",
+    "session": "unauthenticated"
+  },
+  "currentStep": "fill-staff-username",
+  "session": "unauthenticated",
+  "owner": "automation",
+  "contextId": "854f165d-d707-40db-bbf7-a73f0c46fb8d",
+  "pageId": "05fb97a7-b898-47fb-b5f5-ea822f87969a"
+}

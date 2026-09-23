@@ -1,0 +1,49 @@
+# 1. Architecture
+
+The existing React/Vite RFCU target and its Supabase backend are unchanged. A separate TypeScript package adds a loopback operator server/CLI, discovery, deterministic replay, and shared execution services. This avoids adding automation shortcuts to the application. Inspection findings and the existing routes/data/authentication model are in `docs/REPOSITORY_INSPECTION.md`.
+
+Discovery repeatedly observes a privacy-filtered rendered DOM, requests **one** decision, validates and executes it, then observes again. The developer chooses Codex CLI or the OpenAI Responses API in `automation.env.local`. Codex runs ephemerally in an empty directory without shell/web tools. The genuine recorded discovery used Codex; OpenAI live execution was not tested because no API key was provided. Replay imports no discovery/provider module and invokes no model. Both paths use the same policy, locator resolver, checkpoints and browser session. One process and one active operator job are sufficient here; no queue or microservices are needed.
+
+The vertical slice is primary savings S00 **current balance** lookup. Its final checks bind the visible account to the runtime member and distinguish current from available balance. The discovery chose the S00 preview link on the member overview; it did not need the intermediate Accounts tab. The DOM projection and money interpretation are deliberately RFCU-specific, while the decision/artifact/execution boundaries are reusable.
+
+# 2. Artifact schema
+
+Zod validates schema `1.0` at runtime, with TypeScript types derived from it. A capability declares identity, vendor/application/version, login entry URL, a required seven-digit `member_id`, a money output (decimal amount string and USD), ordered steps, success conditions, safety scope and discovery provenance. Artifact versions increment on successful rediscovery; run evidence preserves the exact generated version.
+
+Each step has semantic intent, an action, ordered target alternatives, symbolic value, risk classification, optional precondition, mandatory expected state and bounded repeat policy. Locators describe role/name, associated label, visible text, semantic attribute or constrained CSS. The resolver implements those representations independently. The balance value has no standalone accessible name in RFCU, so it uses a constrained selector anchored to the Account summary region and Current balance label, with an independent label/value cross-check. This is an explicit surface limitation, not a generated positional selector.
+
+Login uses `{source:"secret",key:"RFCU_STAFF_PASSWORD"}` and a matching username reference. Resolution occurs only at execution. Member routes and search values are parameterized; neither discovered member PII nor credential values enter the capability. Schema and secret checks run before serialization. Raw model transcripts cannot serve as capabilities: they mix exploratory decisions, observed values and failures with execution intent, without a validated input/output contract or independently verified checkpoints.
+
+# 3. Determinism & error handling
+
+Replay opens a fresh context at `/login`, executes the saved login actions, verifies authentication, performs parameterized UI search, opens the member/S00 detail and extracts a typed result. It resolves targets in fixed order and rejects ambiguous matches rather than selecting the first. Playwright actionability waits, bounded locator polling, RFCU’s visible loading signal and explicit checkpoints govern progress. There is no model repair during replay.
+
+`MEMBER_NOT_FOUND` is a business outcome, not a crash. Temporary UI service/timeout conditions support bounded recovery through Try again and a repeat-safe step. Invalid credentials, empty login validation, permission denial, unsafe actions, wrong account/balance and failed success checks stop with a classified result, step, expected/observed context and redacted evidence. Missing or ambiguous controls and unknown dialogs can pause for intervention; there is only one post-intervention retry per blocked step. Discovery has a 30-decision limit and repeated-action detection.
+
+Session state is explicit: unauthenticated, authenticating, authenticated, expired, blocked. Login success requires the protected app shell. Expiry or an unexpected login redirect stops as `SESSION_EXPIRED`; no storage/cookie/backend shortcut or blind reauthentication is attempted. Tests exercise real login validation/rejection, permission denial, missing members, UI sign-out/session loss and a labeled simulated transient error. UI drift fails locators/checkpoints visibly; the artifact is not silently rewritten.
+
+# 4. Heterogeneity & multi-tenant
+
+`SurfaceAdapter` separates observation, action execution and checkpoint verification from the capability contract. This implementation is a Playwright adapter; operator screenshots and page control remain web-specific. A legacy adapter could add frame scopes and table/header anchors; inaccessible DOM could use screenshot/OCR targets plus visual confidence checks. A desktop adapter would map semantic actions to OS accessibility or screen coordinates and supply its own session/evidence implementation. Coordinate replay would require window/viewport anchors and uncertainty checks, not unconditional reuse of browser selectors.
+
+Cross-tenant identity should be **VendorApp / Capability / Version**, with an immutable base artifact and narrow tenant/version overrides for origin, labels, frame/window scopes and secret-provider binding. The effective policy must intersect deployment limits with artifact limits. Input/output semantics and success conditions remain shared. Product/version metadata plus locator/checkpoint signatures can detect drift; failed fingerprints require review and versioned rediscovery. The current artifact records application version and checks behavior at runtime; a deployed version fingerprint and override registry are design proposals, not implemented features.
+
+# 5. Escalation & handoff
+
+A blocked run creates an InterventionRequest containing run/goal/step, reason and persistent page/context IDs, with sanitized diagnostic files. Ownership changes automation → paused → human → automation. The server retains the same browser, context and page while awaiting the operator; the human acts on the existing authenticated session. The console streams ephemeral screenshots and forwards permitted dialog clicks. A headed browser optionally allows broader manual work. Native clicks/input events are recorded with values omitted; trusted DOM events are evidence of browser input, not cryptographic proof of a person's identity.
+
+Resume verifies that the session/route remain valid and the blocking dialog is gone, then rechecks the pending action. A 15-minute deadline bounds handoff. Process restart cannot restore the live session. The demonstration blocker is explicitly injected; the underlying login, control ownership, live page interaction and resume mechanism are real. Completed handoff tests used explicitly labeled automated operators. The requested manual demonstration timed out without a takeover event, so actual human participation remains unverified.
+
+# 6. Safety
+
+Policy restricts interaction to a configured local RFCU origin, allowed routes for the supplied member and approved action classes/controls. Secret references are bound to their corresponding login fields. Model-supplied risk labels are insufficient: the runtime also examines the actual clicked control. Sensitive/irreversible actions stop before execution; account opening and SSN reveal are denied. Navigation requests, popups and downloads are guarded; SPA routes are checked before/after actions. Subresources are limited to the target origin and its configured Supabase authentication/read-RPC endpoints; financial writes and SSN-reveal RPCs are denied. RFCU’s own backend traffic is necessary for the real app and is not a shortcut available to the model.
+
+`target-app/STAFF_CREDENTIALS.local.md` is local-only, ignored and untracked. Credentials are loaded in memory and excluded from model observations, artifacts, logs and API responses. Evidence uses symbolic inputs, minimal UI facts and masked screenshots; traces/HAR/full DOM/storage dumps are disabled because they can retain secrets and PII. A secret audit checks local staff passwords against source/artifacts/text evidence. Required synthetic balance outputs are intentionally retained. Screenshot masking and the observation filter are application-specific and need review after UI changes.
+
+The loopback operator server enforces Host/Origin and custom-header checks but does not implement production operator authentication. It is a trusted local development tool, not a security boundary against a malicious local user or compromised target application. An exposed deployment would need operator authentication, authorization, hardened isolation, retention controls and stronger egress enforcement.
+
+# 7. Cuts
+
+One deeply verified savings workflow; no account-opening implementation, real institution, desktop adapter, distributed execution, cross-tenant learning, automatic artifact repair or automatic reauthentication. The console is intentionally small. No raw trace collection. Live OpenAI-provider execution remains unverified without a developer key; the Codex discovery is genuine. The transient fault and handoff blocker are labeled simulations, not claimed target outages.
+
+Next: independently review/sign immutable capability versions; add tenant overrides and deployed-version fingerprints; test session timeout/revocation through RFCU's admin UI; broaden egress isolation and privacy profiles; add authenticated operator access and retention; then implement one account-opening review workflow with an explicit stop before commitment. Preserve the small execution contract instead of adding infrastructure ahead of need.

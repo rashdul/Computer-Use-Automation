@@ -1,0 +1,130 @@
+{
+  "observation": {
+    "path": "/members?q={{member_id}}",
+    "session": "authenticated",
+    "controls": [
+      {
+        "name": "Search",
+        "target": {
+          "description": "Search",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "searchbox",
+              "name": "Search",
+              "exact": true
+            },
+            {
+              "kind": "label",
+              "label": "Search"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Status",
+        "target": {
+          "description": "Status",
+          "locators": [
+            {
+              "kind": "label",
+              "label": "Status"
+            },
+            {
+              "kind": "role",
+              "role": "combobox",
+              "name": "Status",
+              "exact": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "Branch",
+        "target": {
+          "description": "Branch",
+          "locators": [
+            {
+              "kind": "label",
+              "label": "Branch"
+            },
+            {
+              "kind": "role",
+              "role": "combobox",
+              "name": "Branch",
+              "exact": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "Sort by",
+        "target": {
+          "description": "Sort by",
+          "locators": [
+            {
+              "kind": "label",
+              "label": "Sort by"
+            },
+            {
+              "kind": "role",
+              "role": "combobox",
+              "name": "Sort by",
+              "exact": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "Search",
+        "target": {
+          "description": "Search",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "button",
+              "name": "Search",
+              "exact": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "Clear search",
+        "target": {
+          "description": "Clear search",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "button",
+              "name": "Clear search",
+              "exact": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "Clear search",
+        "target": {
+          "description": "Clear search",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "button",
+              "name": "Clear search",
+              "exact": true
+            }
+          ]
+        }
+      }
+    ],
+    "signals": [
+      "No members match"
+    ]
+  },
+  "currentStep": "submit-member-search",
+  "session": "authenticated",
+  "owner": "automation",
+  "contextId": "ad27b6ee-5116-43b8-83cc-79ea621af668",
+  "pageId": "0123dbca-a516-474c-ab21-80620fe5e0e7"
+}

@@ -1,0 +1,415 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Automation operations · RFCU</title>
+    <link rel="stylesheet" href="/tokens.css" />
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--page);
+        color: var(--text);
+        font:
+          14px "Segoe UI",
+          sans-serif;
+      }
+      header {
+        background: var(--ink-950);
+        color: white;
+        padding: 20px 28px;
+        border-bottom: 3px solid var(--brass-500);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      header strong {
+        font:
+          23px Georgia,
+          serif;
+      }
+      header span {
+        color: var(--ink-200);
+      }
+      main {
+        max-width: 1500px;
+        margin: auto;
+        padding: 24px;
+        display: grid;
+        grid-template-columns: 340px 1fr;
+        gap: 20px;
+      }
+      section {
+        background: white;
+        border: 1px solid var(--line);
+        border-radius: 5px;
+        padding: 20px;
+        margin-bottom: 16px;
+      }
+      h1 {
+        font:
+          24px Georgia,
+          serif;
+        margin: 0 0 10px;
+      }
+      h2 {
+        font-size: 16px;
+        margin: 0 0 16px;
+      }
+      label {
+        display: block;
+        font-weight: 600;
+        margin: 14px 0 5px;
+      }
+      input,
+      textarea,
+      select,
+      button {
+        font: inherit;
+      }
+      input,
+      textarea,
+      select {
+        width: 100%;
+        border: 1px solid var(--gray-300);
+        border-radius: 3px;
+        padding: 9px;
+        background: white;
+      }
+      textarea {
+        min-height: 105px;
+        resize: vertical;
+      }
+      button {
+        padding: 10px 15px;
+        background: var(--ink-800);
+        color: white;
+        border: 1px solid var(--ink-800);
+        border-radius: 3px;
+        cursor: pointer;
+        margin: 10px 6px 0 0;
+      }
+      button.secondary {
+        background: white;
+        color: var(--ink-800);
+      }
+      button:disabled {
+        opacity: 0.4;
+        cursor: default;
+      }
+      :focus-visible {
+        outline: 3px solid var(--ink-300);
+        outline-offset: 2px;
+      }
+      .muted {
+        color: var(--text-2);
+        line-height: 1.5;
+      }
+      .status {
+        background: var(--ink-50);
+        padding: 12px;
+        border-left: 3px solid var(--ink-600);
+        white-space: pre-wrap;
+      }
+      .notice {
+        background: var(--warn-100);
+        padding: 15px;
+        border: 1px solid var(--warn-200);
+      }
+      pre {
+        font:
+          12px/1.6 Consolas,
+          monospace;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+        max-height: 420px;
+        overflow: auto;
+        background: var(--gray-25);
+        padding: 12px;
+      }
+      .frame {
+        width: 100%;
+        display: block;
+        border: 1px solid var(--line);
+        cursor: default;
+      }
+      .frame.human {
+        cursor: crosshair;
+        border: 3px solid var(--warn-700);
+      }
+      .check {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+      .check input {
+        width: auto;
+      }
+      .error {
+        color: var(--bad-700);
+      }
+      details summary {
+        cursor: pointer;
+        font-weight: 600;
+      }
+      #intervention[hidden] {
+        display: none;
+      }
+      @media (max-width: 900px) {
+        main {
+          grid-template-columns: 1fr;
+        }
+        header span {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <strong>RFCU <span> / </span> Member Services</strong
+      ><span>Automation operations · Local UAT</span>
+    </header>
+    <main>
+      <aside>
+        <section>
+          <h1>Run a capability</h1>
+          <p class="muted">
+            Discover a workflow through the application, then replay it with a
+            different member.
+          </p>
+          <form id="start">
+            <label for="mode">Execution mode</label
+            ><select id="mode">
+              <option value="discovery">Discover with configured model</option>
+              <option value="replay">Deterministic replay</option></select
+            ><label for="goal">Goal</label
+            ><textarea id="goal">
+Log in to RFCU, look up member {{member_id}}, and return their current savings balance.</textarea
+            ><label for="member">Member number</label
+            ><input
+              id="member"
+              value="1030966"
+              pattern="[0-9]{7}"
+              required
+            /><label for="capability">Capability</label
+            ><input
+              id="capability"
+              value="get-member-savings-balance"
+              required
+            /><label class="check"
+              ><input id="handoff" type="checkbox" />Simulate operator
+              interruption</label
+            ><label class="check"
+              ><input id="headed" type="checkbox" />Show native browser
+              window</label
+            ><button id="run">Start run</button>
+          </form>
+          <p id="config" class="muted"></p>
+          <p id="error" role="alert" class="error"></p>
+        </section>
+        <section>
+          <h2>Saved capabilities</h2>
+          <select id="catalog" aria-label="Saved capabilities"></select>
+          <details>
+            <summary>Inspect artifact</summary>
+            <pre id="artifact">No capability selected.</pre>
+          </details>
+        </section>
+      </aside>
+      <div>
+        <section>
+          <h2>Live execution</h2>
+          <div id="status" class="status" role="status">
+            Ready. Each run starts at the RFCU login page in a clean browser
+            context.
+          </div>
+          <div id="intervention" class="notice" hidden>
+            <h2>Operator intervention</h2>
+            <p id="reason"></p>
+            <p class="muted">
+              Take control, then click a permitted dialog button in the live
+              view below or operate the open native browser. Resume returns this
+              same page to automation.
+            </p>
+            <button id="takeover">Take control</button
+            ><button id="resume" class="secondary">Resume automation</button>
+          </div>
+          <p class="muted">
+            Login fields are masked in this view. Live member data stays in
+            memory; recorded diagnostics use redaction.
+          </p>
+          <img id="frame" class="frame" alt="Live RFCU application" hidden />
+        </section>
+        <section>
+          <h2>Structured result</h2>
+          <pre id="result">Awaiting a run.</pre>
+        </section>
+        <section>
+          <h2>Run events</h2>
+          <pre id="events">No events yet.</pre>
+        </section>
+      </div>
+    </main>
+    <script>
+      const el = (id) => document.getElementById(id);
+      let current,
+        artifacts = [],
+        polling = false;
+      async function api(url, body) {
+        const r = await fetch(
+          url,
+          body === undefined
+            ? {}
+            : {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  "X-RFCU-Client": "operator",
+                },
+                body: JSON.stringify(body),
+              },
+        );
+        const data = await r.json();
+        if (!r.ok) throw Error(data.message || data.error);
+        return data;
+      }
+      function fail(e) {
+        el("error").textContent = e.message;
+      }
+      async function catalog() {
+        artifacts = await api("/api/capabilities");
+        el("catalog").replaceChildren(
+          ...artifacts.map((a) => {
+            const o = document.createElement("option");
+            o.value = a.capabilityId;
+            o.textContent = a.name + " · v" + a.metadata.artifactVersion;
+            return o;
+          }),
+        );
+        showArtifact();
+      }
+      function showArtifact() {
+        const a = artifacts.find((a) => a.capabilityId === el("catalog").value);
+        el("artifact").textContent = a
+          ? JSON.stringify(a, null, 2)
+          : "No saved artifact yet.";
+      }
+      el("catalog").onchange = showArtifact;
+      el("start").onsubmit = async (e) => {
+        e.preventDefault();
+        el("error").textContent = "";
+        try {
+          const mode = el("mode").value;
+          const r = await api("/api/runs", {
+            mode,
+            goal: el("goal").value,
+            inputs: { member_id: el("member").value },
+            capabilityId: el("capability").value,
+            headed: el("headed").checked,
+            handoffDemo: el("handoff").checked,
+            evidenceGroup: el("handoff").checked
+              ? "handoff"
+              : mode === "discovery"
+                ? "discovery"
+                : "replay-success",
+          });
+          current = r.runId;
+          await poll();
+        } catch (e) {
+          fail(e);
+        }
+      };
+      el("takeover").onclick = async () => {
+        try {
+          await api("/api/runs/" + current + "/takeover", {});
+          await poll();
+        } catch (e) {
+          fail(e);
+        }
+      };
+      el("resume").onclick = async () => {
+        try {
+          await api("/api/runs/" + current + "/resume", {});
+          await poll();
+        } catch (e) {
+          fail(e);
+        }
+      };
+      el("frame").onclick = async (e) => {
+        if (!el("frame").classList.contains("human")) return;
+        const b = e.target.getBoundingClientRect();
+        try {
+          await api("/api/runs/" + current + "/human-click", {
+            x: ((e.clientX - b.left) * 1440) / b.width,
+            y: ((e.clientY - b.top) * 900) / b.height,
+          });
+          await poll();
+        } catch (e) {
+          fail(e);
+        }
+      };
+      async function poll() {
+        if (polling) return;
+        polling = true;
+        try {
+          if (!current) {
+            const all = await api("/api/runs");
+            current = all.at(-1)?.runId;
+          }
+          if (!current) return;
+          const r = await api("/api/runs/" + current);
+          el("run").disabled = !r.result;
+          el("status").textContent =
+            "Run " +
+            r.runId +
+            "\n" +
+            r.currentStep +
+            " · " +
+            r.owner +
+            " control · " +
+            (r.session || "starting") +
+            "\nModel decisions: " +
+            r.modelCalls;
+          el("intervention").hidden =
+            !r.intervention || r.intervention.status === "resolved";
+          el("reason").textContent = r.intervention?.reason || "";
+          el("takeover").disabled = r.owner !== "paused";
+          el("resume").disabled = r.owner !== "human";
+          el("frame").classList.toggle("human", r.owner === "human");
+          el("events").textContent = r.events
+            .map((e) => JSON.stringify(e))
+            .join("\n");
+          el("result").textContent = r.result
+            ? JSON.stringify(r.result, null, 2)
+            : "Running…";
+          if (!r.result && r.session) {
+            el("frame").hidden = false;
+            el("frame").src = "/api/runs/" + current + "/frame?t=" + Date.now();
+          }
+          if (r.result) await catalog();
+        } catch (e) {
+          fail(e);
+        } finally {
+          polling = false;
+        }
+      }
+      api("/api/config")
+        .then(
+          (c) =>
+            (el("config").textContent =
+              "Starts at " +
+              c.origin +
+              "/login · Discovery provider: " +
+              c.provider),
+        )
+        .catch(fail);
+      catalog().catch(fail);
+      setInterval(poll, 1500);
+      poll();
+    </script>
+  </body>
+</html>

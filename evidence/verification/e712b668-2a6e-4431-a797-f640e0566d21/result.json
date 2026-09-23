@@ -1,0 +1,6 @@
+{
+  "status": "business_outcome",
+  "code": "MEMBER_NOT_FOUND",
+  "message": "No member matches the requested ID",
+  "runId": "e712b668-2a6e-4431-a797-f640e0566d21"
+}

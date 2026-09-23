@@ -1,0 +1,7 @@
+{
+  "status": "failure",
+  "errorType": "HANDOFF_TIMEOUT",
+  "stepId": "fill-member-search",
+  "message": "Operator did not resume within 15 minutes",
+  "runId": "f57b14fc-4666-4de0-81f7-2398f422a72a"
+}

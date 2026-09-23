@@ -1,0 +1,34 @@
+{
+  "name": "rfcu-computer-use",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20.19"
+  },
+  "scripts": {
+    "dev": "tsx automation/dev.ts",
+    "operator": "tsx automation/server.ts",
+    "discovery": "tsx automation/cli.ts discovery",
+    "replay": "tsx automation/cli.ts replay",
+    "test": "tsx --test automation/tests/core.test.ts",
+    "typecheck": "tsc --noEmit",
+    "build": "npm run typecheck && npm --prefix target-app run build",
+    "audit:secrets": "tsx automation/audit-secrets.ts",
+    "test:integration": "tsx automation/tests/integration.ts",
+    "test:operator": "tsx automation/tests/operator-ui.ts"
+  },
+  "dependencies": {
+    "dotenv": "16.6.1",
+    "express": "5.1.0",
+    "playwright": "1.55.1",
+    "zod": "3.25.76"
+  },
+  "devDependencies": {
+    "@types/express": "5.0.3",
+    "@types/node": "22.18.6",
+    "prettier": "3.6.2",
+    "tsx": "4.20.5",
+    "typescript": "5.9.3"
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "observation": {
+    "path": "/members",
+    "session": "authenticated",
+    "controls": [
+      {
+        "name": "Resolve demonstration block",
+        "target": {
+          "description": "Resolve demonstration block",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "button",
+              "name": "Resolve demonstration block",
+              "exact": true
+            }
+          ]
+        }
+      }
+    ],
+    "signals": [
+      "MODAL_PRESENT"
+    ]
+  },
+  "currentStep": "fill-member-search",
+  "session": "authenticated",
+  "owner": "paused",
+  "contextId": "c6bf9b67-7396-400e-8e95-dfbf5c2fab17",
+  "pageId": "47cd335b-f958-4005-9abe-7ecebacdef6c"
+}
