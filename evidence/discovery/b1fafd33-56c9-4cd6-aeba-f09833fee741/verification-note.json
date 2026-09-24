@@ -1,0 +1,4 @@
+{
+  "operator": "automated-test",
+  "approval": "Only the previously authorized Sign in action was approved. No member-data or financial write was approved. Subsequent runs exempt normal login from data-change approval."
+}

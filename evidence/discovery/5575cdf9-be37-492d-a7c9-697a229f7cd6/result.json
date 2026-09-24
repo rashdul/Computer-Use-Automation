@@ -1,0 +1,6 @@
+{
+  "status": "business_outcome",
+  "code": "MEMBER_AMBIGUOUS",
+  "message": "Multiple members match this name. Use a more specific name or restart with a member number.",
+  "runId": "5575cdf9-be37-492d-a7c9-697a229f7cd6"
+}

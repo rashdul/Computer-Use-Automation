@@ -1,3 +1,4 @@
+import { readFile } from "node:fs/promises";
 import { parseArgs } from "node:util";
 import { settings } from "./config.js";
 const mode = process.argv[2];
@@ -5,6 +6,9 @@ const { values } = parseArgs({
   args: process.argv.slice(3),
   options: {
     goal: { type: "string" },
+    "inputs-file": { type: "string" },
+    input: { type: "string", multiple: true },
+    profile: { type: "string" },
     "member-id": { type: "string" },
     "member-name": { type: "string" },
     capability: { type: "string" },
@@ -19,13 +23,23 @@ const member_name = values["member-name"];
 const member_id =
   values["member-id"] ??
   (!member_name ? values.goal?.match(/\b\d{7}\b/)?.[0] : undefined);
-if (!["discovery", "replay"].includes(mode) || (!member_id && !member_name)) {
+if (!["discovery", "replay"].includes(mode)) {
   console.error(
     'Usage: npm run discovery -- --goal "Return savings balance" --member-id 1030966 (or --member-name "Full Name") | npm run replay -- --capability CAPABILITY_ID --member-id 1000021 (or --member-name "Full Name")',
   );
   process.exit(2);
 }
 try {
+  const inputs: Record<string, string> = values["inputs-file"]
+    ? JSON.parse(await readFile(values["inputs-file"], "utf8"))
+    : {};
+  for (const item of values.input ?? []) {
+    const i = item.indexOf("=");
+    if (i < 1) throw Error("Invalid input");
+    inputs[item.slice(0, i)] = item.slice(i + 1);
+  }
+  if (member_id) inputs.member_id = member_id;
+  if (member_name) inputs.member_name = member_name;
   const base = `http://127.0.0.1:${settings.port}`;
   const response = await fetch(base + "/api/runs", {
     method: "POST",
@@ -36,7 +50,8 @@ try {
     body: JSON.stringify({
       mode,
       goal: values.goal,
-      inputs: { member_id, member_name },
+      inputs,
+      profile: values.profile,
       capabilityId: values.capability,
       startUrl: values["start-url"],
       headed: values.headed,

@@ -45,6 +45,30 @@ Audited against implemented code, actual run evidence and tests on September 23,
 
 ## Validation and deliberate limits
 
-The 19 unit/DOM/provider-contract tests, eight browser integration cases, console takeover test, typecheck and target build pass. A clean source copy installed both dependency trees, built and passed tests under Node 22, then replayed successfully and returned the expected not-found outcome without model credentials. It reused the existing configured synthetic Supabase backend; provisioning a new database from scratch was not independently repeated.
+The 28 unit/DOM/provider-contract tests, eight browser integration cases, console takeover test, typecheck and target build pass. A clean source copy installed both dependency trees, built and passed tests under Node 22, then replayed successfully and returned the expected not-found outcome without model credentials. It reused the existing configured synthetic Supabase backend; provisioning a new database from scratch was not independently repeated.
 
-OpenAI API support is implemented and transport/schema/error handling are contract-tested, but live API discovery is unverified without a developer-provided key. Real admin-driven idle expiry/revocation was not exercised; UI session loss and state classification were. Desktop/native adapters, tenant overrides, account opening, production operator authentication and distributed execution are intentionally omitted. See [REPORT.md](../REPORT.md) and the [evidence index](../evidence/README.md).
+OpenAI API support is implemented and transport/schema/error handling are contract-tested, but live API discovery is unverified without a developer-provided key. Real admin-driven idle expiry/revocation was not exercised; UI session loss and state classification were. General form controls cover account-opening/admin routes, but live approved financial/admin writes and an exhaustive workflow matrix remain unverified. Desktop/native adapters, tenant overrides, production operator authentication and distributed execution are intentionally omitted. See [REPORT.md](../REPORT.md) and the [evidence index](../evidence/README.md).
+
+## General RFCU extension
+
+- [x] General discovery goals with developer choice of Codex or OpenAI
+- [x] Named input parameters, selects/checks, typed table/text/number/boolean/money outputs
+- [x] Schema 2.0 with existing 1.0/1.1 replay compatibility
+- [x] Approval manager and console controls; model risk labels cannot bypass approval
+- [x] Approval invalidation after form changes; approval is never replayed as permission
+- [x] Page-scoped network permit for one approved mutation; no automatic mutation retry
+- [x] Product-rate discovery and deterministic replay against the real RFCU UI
+- [x] Account-table discovery and zero-model replay for another member
+- [x] Genuine unsaved note-preparation discovery and replay with different runtime inputs
+- [x] Real Save note denial without a write; automated operator provenance
+- [x] General console memberless replay and capability input fields
+- [ ] Exhaustive role-specific account-opening/admin mutation verification
+
+Successful approval execution is tested on an isolated DOM fixture only. Real submission tests deny the change. This distinction is intentional: automated tests do not stand in for the user's approval of banking changes.
+
+The general console replay test passed. An additional test-server launch for repeating the older console handoff test was blocked by automatic tool approval review (reason: "blocked by policy"); the live same-session handoff integration test did pass during this update.
+
+Earlier account-opening attempts stopped safely; later run `331f46f1-dfed-48f9-8dbc-f1ba6954a3d6` succeeded through the real UI and saved the review-only opening capability. The approval-console button tests use a labeled API fixture, not human authorization.
+
+- [x] Scripted real-UI account-opening review and final-action denial, with no disclosures/signature selected or mutation attempted.
+- [x] Successful LLM account-opening discovery and saved review-only capability: later run `331f46f1` completed with 16 model decisions.

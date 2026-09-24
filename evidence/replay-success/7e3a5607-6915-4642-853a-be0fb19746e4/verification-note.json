@@ -1,0 +1,4 @@
+{
+  "status": "aborted-test",
+  "reason": "Ambiguous unscoped Notes link caused a safe intervention pause. Test process stopped; this was not a successful replay. New discovery scopes targets to the named navigation region."
+}

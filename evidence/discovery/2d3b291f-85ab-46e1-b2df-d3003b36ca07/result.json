@@ -1,0 +1,22 @@
+{
+  "status": "failure",
+  "errorType": "AMBIGUOUS_TARGET",
+  "stepId": "open-member-accounts",
+  "expected": {
+    "description": "/members/{{member_id}}/accounts",
+    "locators": [
+      {
+        "kind": "attribute",
+        "attribute": "href",
+        "value": "/members/{{member_id}}/accounts",
+        "tag": "a"
+      }
+    ]
+  },
+  "observed": {
+    "strategy": "attribute",
+    "count": 2
+  },
+  "message": "Locator matched multiple elements; refusing arbitrary first match",
+  "runId": "2d3b291f-85ab-46e1-b2df-d3003b36ca07"
+}

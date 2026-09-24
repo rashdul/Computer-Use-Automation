@@ -1,0 +1,7 @@
+{
+  "status": "failure",
+  "errorType": "INTERNAL_ERROR",
+  "stepId": "open-supplied-member",
+  "message": "Runtime failed; see the sanitized run events",
+  "runId": "f384cd33-4829-43bc-8f57-01e09fa88252"
+}

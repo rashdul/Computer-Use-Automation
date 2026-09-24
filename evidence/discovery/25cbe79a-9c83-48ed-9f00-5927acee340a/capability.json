@@ -1,0 +1,278 @@
+{
+  "schemaVersion": "2.0",
+  "capabilityId": "read-product-rates",
+  "name": "get_product_rates",
+  "description": "Sign in to RFCU, open Product rates, and extract all visible product codes, rates, and minimum opening deposits.",
+  "target": {
+    "application": "RFCU Member Services",
+    "vendor": "RFCU",
+    "applicationVersion": "4.12.2",
+    "startUrl": "https://rashed-federal-credit-union.netlify.app/login",
+    "surface": "web"
+  },
+  "inputs": [],
+  "outputs": [
+    {
+      "key": "product_rates",
+      "type": "table",
+      "description": "All visible rate sheet rows with Code, Rate, and Minimum to open columns."
+    }
+  ],
+  "steps": [
+    {
+      "id": "fill-staff-username",
+      "description": "Fill Username with the staff credential.",
+      "action": "fill",
+      "target": {
+        "description": "Username",
+        "locators": [
+          {
+            "kind": "role",
+            "role": "textbox",
+            "name": "Username",
+            "exact": true
+          },
+          {
+            "kind": "label",
+            "label": "Username"
+          }
+        ]
+      },
+      "value": {
+        "source": "secret",
+        "key": "RFCU_STAFF_USERNAME"
+      },
+      "risk": "reversible",
+      "expectedState": {
+        "kind": "visible",
+        "target": {
+          "description": "Username",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "textbox",
+              "name": "Username",
+              "exact": true
+            },
+            {
+              "kind": "label",
+              "label": "Username"
+            }
+          ]
+        }
+      },
+      "retry": {
+        "maxAttempts": 2,
+        "safeToRepeat": true
+      }
+    },
+    {
+      "id": "fill-staff-password",
+      "description": "Fill Password with the staff credential.",
+      "action": "fill",
+      "target": {
+        "description": "Password",
+        "locators": [
+          {
+            "kind": "role",
+            "role": "textbox",
+            "name": "Password",
+            "exact": true
+          },
+          {
+            "kind": "label",
+            "label": "Password"
+          }
+        ]
+      },
+      "value": {
+        "source": "secret",
+        "key": "RFCU_STAFF_PASSWORD"
+      },
+      "risk": "reversible",
+      "expectedState": {
+        "kind": "visible",
+        "target": {
+          "description": "Password",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "textbox",
+              "name": "Password",
+              "exact": true
+            },
+            {
+              "kind": "label",
+              "label": "Password"
+            }
+          ]
+        }
+      },
+      "retry": {
+        "maxAttempts": 2,
+        "safeToRepeat": true
+      }
+    },
+    {
+      "id": "sign-in-staff",
+      "description": "Click Sign in to authenticate.",
+      "action": "click",
+      "target": {
+        "description": "Sign in",
+        "locators": [
+          {
+            "kind": "role",
+            "role": "button",
+            "name": "Sign in",
+            "exact": true
+          }
+        ]
+      },
+      "risk": "reversible",
+      "expectedState": {
+        "kind": "authenticated"
+      },
+      "retry": {
+        "maxAttempts": 1,
+        "safeToRepeat": false
+      }
+    },
+    {
+      "id": "open-product-rates",
+      "description": "Open Product rates.",
+      "action": "click",
+      "target": {
+        "description": "Product rates",
+        "locators": [
+          {
+            "kind": "attribute",
+            "attribute": "href",
+            "value": "/products",
+            "tag": "a"
+          }
+        ]
+      },
+      "risk": "read_only",
+      "precondition": {
+        "kind": "authenticated"
+      },
+      "expectedState": {
+        "kind": "route",
+        "path": "/products"
+      },
+      "retry": {
+        "maxAttempts": 2,
+        "safeToRepeat": true
+      }
+    },
+    {
+      "id": "extract-product-rates",
+      "description": "Read all visible product codes, rates and minimum opening deposits.",
+      "action": "extract",
+      "target": {
+        "description": "Rate sheet",
+        "locators": [
+          {
+            "kind": "css",
+            "selector": "section.panel:has(h2:text-matches(\"^Rate sheet\")) table"
+          }
+        ]
+      },
+      "output": "product_rates",
+      "outputType": "table",
+      "columns": [
+        "Code",
+        "Rate",
+        "Minimum to open"
+      ],
+      "risk": "read_only",
+      "precondition": {
+        "kind": "route",
+        "path": "/products"
+      },
+      "expectedState": {
+        "kind": "output",
+        "key": "product_rates",
+        "type": "table"
+      },
+      "retry": {
+        "maxAttempts": 2,
+        "safeToRepeat": true
+      }
+    }
+  ],
+  "successCondition": [
+    {
+      "kind": "authenticated"
+    },
+    {
+      "kind": "route",
+      "path": "/products"
+    },
+    {
+      "kind": "visible",
+      "target": {
+        "description": "Product rates",
+        "locators": [
+          {
+            "kind": "role",
+            "role": "heading",
+            "name": "Product rates",
+            "exact": false
+          }
+        ]
+      }
+    },
+    {
+      "kind": "output",
+      "key": "product_rates",
+      "type": "table"
+    }
+  ],
+  "safety": {
+    "allowedOrigins": [
+      "https://rashed-federal-credit-union.netlify.app"
+    ],
+    "allowedRoutes": [
+      "/login",
+      "/session-expired",
+      "/members",
+      "/products",
+      "/activity",
+      "/open-account",
+      "/members/{{member_id}}",
+      "/members/{{member_id}}/accounts",
+      "/members/{{member_id}}/accounts/:account",
+      "/members/{{member_id}}/notes",
+      "/members/{{member_id}}/access-log",
+      "/members/{{member_id}}/accounts/new",
+      "/members/{{member_id}}/accounts/new/review",
+      "/members/{{member_id}}/accounts/new/confirmation/:receipt",
+      "/admin",
+      "/admin/environment",
+      "/admin/staff",
+      "/admin/permissions",
+      "/admin/products",
+      "/admin/audit",
+      "/admin/test-data"
+    ],
+    "allowedActions": [
+      "click",
+      "fill",
+      "select",
+      "navigate",
+      "wait",
+      "extract",
+      "check"
+    ],
+    "riskLevel": "safe"
+  },
+  "metadata": {
+    "createdAt": "2026-09-23T18:52:46.413Z",
+    "source": "llm-discovery",
+    "artifactVersion": 1,
+    "discoveryRunId": "25cbe79a-9c83-48ed-9f00-5927acee340a",
+    "modelProvider": "codex-cli",
+    "model": "codex-default"
+  }
+}

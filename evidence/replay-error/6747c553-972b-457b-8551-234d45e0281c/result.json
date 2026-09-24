@@ -1,0 +1,14 @@
+{
+  "status": "failure",
+  "errorType": "APPROVAL_DENIED",
+  "stepId": "test-deny-save",
+  "expected": {
+    "kind": "authenticated"
+  },
+  "observed": {
+    "session": "authenticated",
+    "path": "/members/{{member_id}}/notes?compose=1"
+  },
+  "message": "The action was not approved; no change was submitted",
+  "runId": "6747c553-972b-457b-8551-234d45e0281c"
+}

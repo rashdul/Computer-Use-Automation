@@ -1,0 +1,271 @@
+{
+  "observation": {
+    "readables": [
+      {
+        "name": "Product rates",
+        "target": {
+          "description": "Product rates",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "heading",
+              "name": "Product rates",
+              "exact": false
+            }
+          ]
+        },
+        "type": "text"
+      },
+      {
+        "name": "Rate sheet",
+        "target": {
+          "description": "Rate sheet",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "heading",
+              "name": "Rate sheet",
+              "exact": false
+            }
+          ]
+        },
+        "type": "text"
+      },
+      {
+        "name": "Rate sheet",
+        "target": {
+          "description": "Rate sheet",
+          "locators": [
+            {
+              "kind": "css",
+              "selector": "section.panel:has(h2:text-matches(\"^Rate sheet\")) table"
+            }
+          ]
+        },
+        "type": "table",
+        "columns": [
+          "Product",
+          "Code",
+          "Rate",
+          "Minimum to open",
+          "Minimum balance",
+          "Term",
+          "Monthly fee",
+          "Eligibility"
+        ]
+      }
+    ],
+    "alerts": [],
+    "path": "/products",
+    "session": "authenticated",
+    "controls": [
+      {
+        "name": "Rashed Federal Credit Union — Member search",
+        "target": {
+          "description": "Rashed Federal Credit Union — Member search",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "link",
+              "name": "Rashed Federal Credit Union — Member search",
+              "exact": true
+            },
+            {
+              "kind": "attribute",
+              "tag": "a",
+              "attribute": "href",
+              "value": "/members"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Member search",
+        "target": {
+          "description": "Member search",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "link",
+              "name": "Member search",
+              "exact": true
+            },
+            {
+              "kind": "attribute",
+              "tag": "a",
+              "attribute": "href",
+              "value": "/members"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Open sub-account",
+        "target": {
+          "description": "Open sub-account",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "link",
+              "name": "Open sub-account",
+              "exact": true
+            },
+            {
+              "kind": "attribute",
+              "tag": "a",
+              "attribute": "href",
+              "value": "/open-account"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Product rates",
+        "target": {
+          "description": "Product rates",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "link",
+              "name": "Product rates",
+              "exact": true
+            },
+            {
+              "kind": "attribute",
+              "tag": "a",
+              "attribute": "href",
+              "value": "/products"
+            }
+          ]
+        }
+      },
+      {
+        "name": "My activity",
+        "target": {
+          "description": "My activity",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "link",
+              "name": "My activity",
+              "exact": true
+            },
+            {
+              "kind": "attribute",
+              "tag": "a",
+              "attribute": "href",
+              "value": "/activity"
+            }
+          ]
+        }
+      }
+    ],
+    "signals": []
+  },
+  "contextId": "610be1de-5764-4316-8ac1-47fd07a7238d",
+  "pageId": "dee72c36-82f6-48e9-8964-8f2a772bda41",
+  "outputs": {
+    "product_rates": [
+      {
+        "Code": "SHR-MEM",
+        "Rate": "0.10% APY",
+        "Minimum to open": "$5.00"
+      },
+      {
+        "Code": "SHR-REG",
+        "Rate": "0.15% APY",
+        "Minimum to open": "$0.00"
+      },
+      {
+        "Code": "SHR-YTH",
+        "Rate": "1.50% APY",
+        "Minimum to open": "$0.00"
+      },
+      {
+        "Code": "DFT-BAS",
+        "Rate": "0.00% APY",
+        "Minimum to open": "$25.00"
+      },
+      {
+        "Code": "DFT-PRM",
+        "Rate": "0.25% APY",
+        "Minimum to open": "$100.00"
+      },
+      {
+        "Code": "MMA-PLT",
+        "Rate": "3.15% APY",
+        "Minimum to open": "$2,500.00"
+      },
+      {
+        "Code": "CLB-HOL",
+        "Rate": "0.50% APY",
+        "Minimum to open": "$0.00"
+      },
+      {
+        "Code": "CLB-VAC",
+        "Rate": "0.50% APY",
+        "Minimum to open": "$0.00"
+      },
+      {
+        "Code": "CD-06",
+        "Rate": "4.05% APY",
+        "Minimum to open": "$500.00"
+      },
+      {
+        "Code": "CD-12",
+        "Rate": "4.25% APY",
+        "Minimum to open": "$500.00"
+      },
+      {
+        "Code": "CD-24",
+        "Rate": "3.90% APY",
+        "Minimum to open": "$1,000.00"
+      },
+      {
+        "Code": "CD-36",
+        "Rate": "3.75% APY",
+        "Minimum to open": "$1,000.00"
+      },
+      {
+        "Code": "CD-60",
+        "Rate": "3.65% APY",
+        "Minimum to open": "$1,000.00"
+      },
+      {
+        "Code": "IRA-TRD",
+        "Rate": "2.75% APY",
+        "Minimum to open": "$25.00"
+      },
+      {
+        "Code": "IRA-ROTH",
+        "Rate": "2.75% APY",
+        "Minimum to open": "$25.00"
+      },
+      {
+        "Code": "LN-AUTO",
+        "Rate": "5.99% APR",
+        "Minimum to open": "—"
+      },
+      {
+        "Code": "LN-SIG",
+        "Rate": "10.49% APR",
+        "Minimum to open": "—"
+      },
+      {
+        "Code": "LN-VISA",
+        "Rate": "15.90% APR",
+        "Minimum to open": "—"
+      },
+      {
+        "Code": "LN-HELOC",
+        "Rate": "7.25% APR",
+        "Minimum to open": "—"
+      },
+      {
+        "Code": "LN-MORT",
+        "Rate": "6.38% APR",
+        "Minimum to open": "—"
+      }
+    ]
+  }
+}

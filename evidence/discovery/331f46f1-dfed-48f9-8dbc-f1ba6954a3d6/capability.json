@@ -1,0 +1,736 @@
+{
+  "schemaVersion": "2.0",
+  "capabilityId": "prepare-account-opening",
+  "name": "prepare_regular_share_savings_review",
+  "description": "Authenticate, find member {{member_id}}, and prepare Regular Share Savings with Individual ownership, No opening deposit, Paper statements and the supplied purpose, expected_deposits and source_of_funds. Stop at Review and open without acknowledging disclosures, signing or submitting.",
+  "target": {
+    "application": "RFCU Member Services",
+    "vendor": "RFCU",
+    "applicationVersion": "4.12.2",
+    "startUrl": "http://localhost:5173/login",
+    "surface": "web"
+  },
+  "inputs": [
+    {
+      "key": "checked",
+      "type": "string",
+      "required": true,
+      "description": "Runtime checked"
+    },
+    {
+      "key": "purpose",
+      "type": "string",
+      "required": true,
+      "description": "Runtime purpose"
+    },
+    {
+      "key": "expected_deposits",
+      "type": "string",
+      "required": true,
+      "description": "Runtime expected deposits"
+    },
+    {
+      "key": "source_of_funds",
+      "type": "string",
+      "required": true,
+      "description": "Runtime source of funds"
+    },
+    {
+      "key": "member_id",
+      "type": "string",
+      "required": true,
+      "description": "Runtime member id"
+    }
+  ],
+  "outputs": [],
+  "steps": [
+    {
+      "id": "fill-staff-username",
+      "description": "Fill Username with the staff credential.",
+      "action": "fill",
+      "target": {
+        "description": "Username",
+        "locators": [
+          {
+            "kind": "role",
+            "role": "textbox",
+            "name": "Username",
+            "exact": true
+          },
+          {
+            "kind": "label",
+            "label": "Username"
+          }
+        ]
+      },
+      "value": {
+        "source": "secret",
+        "key": "RFCU_STAFF_USERNAME"
+      },
+      "risk": "reversible",
+      "expectedState": {
+        "kind": "visible",
+        "target": {
+          "description": "Username",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "textbox",
+              "name": "Username",
+              "exact": true
+            },
+            {
+              "kind": "label",
+              "label": "Username"
+            }
+          ]
+        }
+      },
+      "retry": {
+        "maxAttempts": 2,
+        "safeToRepeat": true
+      }
+    },
+    {
+      "id": "fill-staff-password",
+      "description": "Fill Password with the staff credential.",
+      "action": "fill",
+      "target": {
+        "description": "Password",
+        "locators": [
+          {
+            "kind": "role",
+            "role": "textbox",
+            "name": "Password",
+            "exact": true
+          },
+          {
+            "kind": "label",
+            "label": "Password"
+          }
+        ]
+      },
+      "value": {
+        "source": "secret",
+        "key": "RFCU_STAFF_PASSWORD"
+      },
+      "risk": "reversible",
+      "expectedState": {
+        "kind": "visible",
+        "target": {
+          "description": "Password",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "textbox",
+              "name": "Password",
+              "exact": true
+            },
+            {
+              "kind": "label",
+              "label": "Password"
+            }
+          ]
+        }
+      },
+      "retry": {
+        "maxAttempts": 2,
+        "safeToRepeat": true
+      }
+    },
+    {
+      "id": "sign-in-staff",
+      "description": "Click Sign in to authenticate.",
+      "action": "click",
+      "target": {
+        "description": "Sign in",
+        "locators": [
+          {
+            "kind": "role",
+            "role": "button",
+            "name": "Sign in",
+            "exact": true
+          }
+        ]
+      },
+      "risk": "reversible",
+      "expectedState": {
+        "kind": "authenticated"
+      },
+      "retry": {
+        "maxAttempts": 1,
+        "safeToRepeat": false
+      }
+    },
+    {
+      "id": "fill-member-search",
+      "description": "Search for the authorized member by member ID.",
+      "action": "fill",
+      "target": {
+        "description": "Search",
+        "locators": [
+          {
+            "kind": "role",
+            "role": "searchbox",
+            "name": "Search",
+            "exact": true
+          },
+          {
+            "kind": "label",
+            "label": "Search"
+          }
+        ]
+      },
+      "value": {
+        "source": "input",
+        "key": "member_id"
+      },
+      "risk": "reversible",
+      "expectedState": {
+        "kind": "field_value",
+        "target": {
+          "description": "Search",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "searchbox",
+              "name": "Search",
+              "exact": true
+            },
+            {
+              "kind": "label",
+              "label": "Search"
+            }
+          ]
+        },
+        "value": {
+          "source": "input",
+          "key": "member_id"
+        }
+      },
+      "retry": {
+        "maxAttempts": 2,
+        "safeToRepeat": true
+      }
+    },
+    {
+      "id": "search-authorized-member",
+      "description": "Click Search to resolve the authorized member.",
+      "action": "click",
+      "target": {
+        "description": "Search",
+        "locators": [
+          {
+            "kind": "role",
+            "role": "button",
+            "name": "Search",
+            "exact": true
+          }
+        ]
+      },
+      "risk": "read_only",
+      "expectedState": {
+        "kind": "member_resolved"
+      },
+      "retry": {
+        "maxAttempts": 2,
+        "safeToRepeat": true
+      }
+    },
+    {
+      "id": "open-authorized-member",
+      "description": "Open the resolved member using the observed member link.",
+      "action": "click",
+      "target": {
+        "description": "/members/{{member_id}}",
+        "locators": [
+          {
+            "kind": "attribute",
+            "attribute": "href",
+            "value": "/members/{{member_id}}",
+            "tag": "a"
+          }
+        ]
+      },
+      "risk": "read_only",
+      "expectedState": {
+        "kind": "route",
+        "path": "/members/{{member_id}}"
+      },
+      "retry": {
+        "maxAttempts": 2,
+        "safeToRepeat": true
+      }
+    },
+    {
+      "id": "open-member-sub-account-form",
+      "description": "Click the member record’s Open sub-account button.",
+      "action": "click",
+      "target": {
+        "description": "Open sub-account",
+        "locators": [
+          {
+            "kind": "role",
+            "role": "button",
+            "name": "Open sub-account",
+            "exact": true
+          }
+        ]
+      },
+      "risk": "read_only",
+      "precondition": {
+        "kind": "route",
+        "path": "/members/{{member_id}}"
+      },
+      "expectedState": {
+        "kind": "authenticated"
+      },
+      "retry": {
+        "maxAttempts": 1,
+        "safeToRepeat": false
+      }
+    },
+    {
+      "id": "check-regular-share-savings",
+      "description": "Select Regular Share Savings using the supplied radio-check input.",
+      "action": "check",
+      "target": {
+        "description": "Regular Share Savings",
+        "locators": [
+          {
+            "kind": "role",
+            "role": "radio",
+            "name": "Regular Share Savings",
+            "exact": true
+          }
+        ]
+      },
+      "value": {
+        "source": "input",
+        "key": "checked"
+      },
+      "risk": "reversible",
+      "precondition": {
+        "kind": "route",
+        "path": "/members/{{member_id}}/accounts/new"
+      },
+      "expectedState": {
+        "kind": "field_value",
+        "target": {
+          "description": "Regular Share Savings",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "radio",
+              "name": "Regular Share Savings",
+              "exact": true
+            }
+          ]
+        },
+        "value": {
+          "source": "input",
+          "key": "checked"
+        }
+      },
+      "retry": {
+        "maxAttempts": 2,
+        "safeToRepeat": true
+      }
+    },
+    {
+      "id": "check-individual-ownership",
+      "description": "Select Individual ownership using the supplied radio-check input.",
+      "action": "check",
+      "target": {
+        "description": "Individual",
+        "locators": [
+          {
+            "kind": "role",
+            "role": "radio",
+            "name": "Individual",
+            "exact": true
+          },
+          {
+            "kind": "label",
+            "label": "Individual"
+          }
+        ]
+      },
+      "value": {
+        "source": "input",
+        "key": "checked"
+      },
+      "risk": "reversible",
+      "expectedState": {
+        "kind": "field_value",
+        "target": {
+          "description": "Individual",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "radio",
+              "name": "Individual",
+              "exact": true
+            },
+            {
+              "kind": "label",
+              "label": "Individual"
+            }
+          ]
+        },
+        "value": {
+          "source": "input",
+          "key": "checked"
+        }
+      },
+      "retry": {
+        "maxAttempts": 2,
+        "safeToRepeat": true
+      }
+    },
+    {
+      "id": "check-no-opening-deposit",
+      "description": "Select No opening deposit using the supplied radio-check input.",
+      "action": "check",
+      "target": {
+        "description": "No opening deposit",
+        "locators": [
+          {
+            "kind": "role",
+            "role": "radio",
+            "name": "No opening deposit",
+            "exact": true
+          },
+          {
+            "kind": "label",
+            "label": "No opening deposit"
+          }
+        ]
+      },
+      "value": {
+        "source": "input",
+        "key": "checked"
+      },
+      "risk": "reversible",
+      "expectedState": {
+        "kind": "field_value",
+        "target": {
+          "description": "No opening deposit",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "radio",
+              "name": "No opening deposit",
+              "exact": true
+            },
+            {
+              "kind": "label",
+              "label": "No opening deposit"
+            }
+          ]
+        },
+        "value": {
+          "source": "input",
+          "key": "checked"
+        }
+      },
+      "retry": {
+        "maxAttempts": 2,
+        "safeToRepeat": true
+      }
+    },
+    {
+      "id": "check-paper-statements",
+      "description": "Select Paper statements using the supplied radio-check input.",
+      "action": "check",
+      "target": {
+        "description": "Paper",
+        "locators": [
+          {
+            "kind": "role",
+            "role": "radio",
+            "name": "Paper",
+            "exact": false
+          }
+        ]
+      },
+      "value": {
+        "source": "input",
+        "key": "checked"
+      },
+      "risk": "reversible",
+      "expectedState": {
+        "kind": "field_value",
+        "target": {
+          "description": "Paper",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "radio",
+              "name": "Paper",
+              "exact": false
+            }
+          ]
+        },
+        "value": {
+          "source": "input",
+          "key": "checked"
+        }
+      },
+      "retry": {
+        "maxAttempts": 2,
+        "safeToRepeat": true
+      }
+    },
+    {
+      "id": "select-account-purpose",
+      "description": "Select the supplied purpose using its visible option label.",
+      "action": "select",
+      "target": {
+        "description": "Purpose of the account",
+        "locators": [
+          {
+            "kind": "role",
+            "role": "combobox",
+            "name": "Purpose of the account",
+            "exact": true
+          },
+          {
+            "kind": "label",
+            "label": "Purpose of the account"
+          }
+        ]
+      },
+      "value": {
+        "source": "input",
+        "key": "purpose"
+      },
+      "risk": "reversible",
+      "expectedState": {
+        "kind": "field_value",
+        "target": {
+          "description": "Purpose of the account",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "combobox",
+              "name": "Purpose of the account",
+              "exact": true
+            },
+            {
+              "kind": "label",
+              "label": "Purpose of the account"
+            }
+          ]
+        },
+        "value": {
+          "source": "input",
+          "key": "purpose"
+        }
+      },
+      "retry": {
+        "maxAttempts": 2,
+        "safeToRepeat": true
+      }
+    },
+    {
+      "id": "select-expected-monthly-deposits",
+      "description": "Select expected monthly deposits using the supplied visible option label.",
+      "action": "select",
+      "target": {
+        "description": "Expected monthly deposits",
+        "locators": [
+          {
+            "kind": "role",
+            "role": "combobox",
+            "name": "Expected monthly deposits",
+            "exact": true
+          },
+          {
+            "kind": "label",
+            "label": "Expected monthly deposits"
+          }
+        ]
+      },
+      "value": {
+        "source": "input",
+        "key": "expected_deposits"
+      },
+      "risk": "reversible",
+      "expectedState": {
+        "kind": "field_value",
+        "target": {
+          "description": "Expected monthly deposits",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "combobox",
+              "name": "Expected monthly deposits",
+              "exact": true
+            },
+            {
+              "kind": "label",
+              "label": "Expected monthly deposits"
+            }
+          ]
+        },
+        "value": {
+          "source": "input",
+          "key": "expected_deposits"
+        }
+      },
+      "retry": {
+        "maxAttempts": 2,
+        "safeToRepeat": true
+      }
+    },
+    {
+      "id": "select-source-of-funds",
+      "description": "Select source of funds using the supplied visible option label.",
+      "action": "select",
+      "target": {
+        "description": "Source of funds",
+        "locators": [
+          {
+            "kind": "role",
+            "role": "combobox",
+            "name": "Source of funds",
+            "exact": true
+          },
+          {
+            "kind": "label",
+            "label": "Source of funds"
+          }
+        ]
+      },
+      "value": {
+        "source": "input",
+        "key": "source_of_funds"
+      },
+      "risk": "reversible",
+      "expectedState": {
+        "kind": "field_value",
+        "target": {
+          "description": "Source of funds",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "combobox",
+              "name": "Source of funds",
+              "exact": true
+            },
+            {
+              "kind": "label",
+              "label": "Source of funds"
+            }
+          ]
+        },
+        "value": {
+          "source": "input",
+          "key": "source_of_funds"
+        }
+      },
+      "retry": {
+        "maxAttempts": 2,
+        "safeToRepeat": true
+      }
+    },
+    {
+      "id": "continue-to-account-review",
+      "description": "Open the review screen without acknowledging disclosures, signing or submitting.",
+      "action": "click",
+      "target": {
+        "description": "Continue to review",
+        "locators": [
+          {
+            "kind": "role",
+            "role": "button",
+            "name": "Continue to review",
+            "exact": true
+          }
+        ]
+      },
+      "risk": "reversible",
+      "precondition": {
+        "kind": "route",
+        "path": "/members/{{member_id}}/accounts/new"
+      },
+      "expectedState": {
+        "kind": "authenticated"
+      },
+      "retry": {
+        "maxAttempts": 1,
+        "safeToRepeat": false
+      }
+    }
+  ],
+  "successCondition": [
+    {
+      "kind": "authenticated"
+    },
+    {
+      "kind": "route",
+      "path": "/members/{{member_id}}/accounts/new/review"
+    },
+    {
+      "kind": "visible",
+      "target": {
+        "description": "Review and open",
+        "locators": [
+          {
+            "kind": "role",
+            "role": "heading",
+            "name": "Review and open",
+            "exact": false
+          }
+        ]
+      }
+    }
+  ],
+  "safety": {
+    "allowedOrigins": [
+      "http://localhost:5173"
+    ],
+    "allowedRoutes": [
+      "/login",
+      "/session-expired",
+      "/members",
+      "/products",
+      "/activity",
+      "/open-account",
+      "/members/{{member_id}}",
+      "/members/{{member_id}}/accounts",
+      "/members/{{member_id}}/accounts/:account",
+      "/members/{{member_id}}/notes",
+      "/members/{{member_id}}/access-log",
+      "/members/{{member_id}}/accounts/new",
+      "/members/{{member_id}}/accounts/new/review",
+      "/members/{{member_id}}/accounts/new/confirmation/:receipt",
+      "/admin",
+      "/admin/environment",
+      "/admin/staff",
+      "/admin/permissions",
+      "/admin/products",
+      "/admin/audit",
+      "/admin/test-data"
+    ],
+    "allowedActions": [
+      "click",
+      "fill",
+      "select",
+      "navigate",
+      "wait",
+      "extract",
+      "check"
+    ],
+    "riskLevel": "safe"
+  },
+  "metadata": {
+    "createdAt": "2026-09-24T18:03:08.618Z",
+    "source": "llm-discovery",
+    "artifactVersion": 1,
+    "discoveryRunId": "331f46f1-dfed-48f9-8dbc-f1ba6954a3d6",
+    "modelProvider": "codex-cli",
+    "model": "codex-default"
+  }
+}

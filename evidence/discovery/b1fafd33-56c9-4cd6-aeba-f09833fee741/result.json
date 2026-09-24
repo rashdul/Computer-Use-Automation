@@ -1,0 +1,333 @@
+{
+  "status": "failure",
+  "errorType": "CHECKPOINT_FAILED",
+  "stepId": "fill-note-body",
+  "expected": {
+    "kind": "route",
+    "path": "/members/{{member_id}}/notes?compose=1"
+  },
+  "observed": {
+    "readables": [
+      {
+        "name": "Notes",
+        "target": {
+          "description": "Notes",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "heading",
+              "name": "Notes",
+              "exact": false
+            }
+          ]
+        },
+        "type": "text"
+      },
+      {
+        "name": "Add note",
+        "target": {
+          "description": "Add note",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "heading",
+              "name": "Add note",
+              "exact": false
+            }
+          ]
+        },
+        "type": "text"
+      }
+    ],
+    "alerts": [],
+    "path": "/members/{{member_id}}/notes?compose=1",
+    "session": "authenticated",
+    "controls": [
+      {
+        "name": "Rashed Federal Credit Union — Member search",
+        "target": {
+          "description": "Rashed Federal Credit Union — Member search",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "link",
+              "name": "Rashed Federal Credit Union — Member search",
+              "exact": true
+            },
+            {
+              "kind": "attribute",
+              "tag": "a",
+              "attribute": "href",
+              "value": "/members"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Member search",
+        "target": {
+          "description": "Member search",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "link",
+              "name": "Member search",
+              "exact": true
+            },
+            {
+              "kind": "attribute",
+              "tag": "a",
+              "attribute": "href",
+              "value": "/members"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Open sub-account",
+        "target": {
+          "description": "Open sub-account",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "link",
+              "name": "Open sub-account",
+              "exact": true
+            },
+            {
+              "kind": "attribute",
+              "tag": "a",
+              "attribute": "href",
+              "value": "/open-account"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Product rates",
+        "target": {
+          "description": "Product rates",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "link",
+              "name": "Product rates",
+              "exact": true
+            },
+            {
+              "kind": "attribute",
+              "tag": "a",
+              "attribute": "href",
+              "value": "/products"
+            }
+          ]
+        }
+      },
+      {
+        "name": "My activity",
+        "target": {
+          "description": "My activity",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "link",
+              "name": "My activity",
+              "exact": true
+            },
+            {
+              "kind": "attribute",
+              "tag": "a",
+              "attribute": "href",
+              "value": "/activity"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Copy member number",
+        "target": {
+          "description": "Copy member number",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "button",
+              "name": "Copy member number",
+              "exact": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "Open sub-account",
+        "target": {
+          "description": "Open sub-account",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "button",
+              "name": "Open sub-account",
+              "exact": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "/members/{{member_id}}",
+        "target": {
+          "description": "/members/{{member_id}}",
+          "locators": [
+            {
+              "kind": "attribute",
+              "tag": "a",
+              "attribute": "href",
+              "value": "/members/{{member_id}}"
+            }
+          ]
+        }
+      },
+      {
+        "name": "/members/{{member_id}}/accounts",
+        "target": {
+          "description": "/members/{{member_id}}/accounts",
+          "locators": [
+            {
+              "kind": "attribute",
+              "tag": "a",
+              "attribute": "href",
+              "value": "/members/{{member_id}}/accounts"
+            }
+          ]
+        }
+      },
+      {
+        "name": "/members/{{member_id}}/notes",
+        "target": {
+          "description": "/members/{{member_id}}/notes",
+          "locators": [
+            {
+              "kind": "attribute",
+              "tag": "a",
+              "attribute": "href",
+              "value": "/members/{{member_id}}/notes"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Category",
+        "target": {
+          "description": "Category",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "combobox",
+              "name": "Category",
+              "exact": true
+            },
+            {
+              "kind": "label",
+              "label": "Category"
+            }
+          ]
+        },
+        "options": [
+          {
+            "label": "Choose…",
+            "value": ""
+          },
+          {
+            "label": "{{category}}",
+            "value": "{{category}}"
+          },
+          {
+            "label": "Account maintenance",
+            "value": "Account maintenance"
+          },
+          {
+            "label": "Fraud",
+            "value": "Fraud"
+          },
+          {
+            "label": "Collections",
+            "value": "Collections"
+          },
+          {
+            "label": "Complaint",
+            "value": "Complaint"
+          },
+          {
+            "label": "Compliance",
+            "value": "Compliance"
+          }
+        ]
+      },
+      {
+        "name": "Note",
+        "target": {
+          "description": "Note",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "textbox",
+              "name": "Note",
+              "exact": true
+            },
+            {
+              "kind": "label",
+              "label": "Note"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Pin to the top of this member's notes",
+        "target": {
+          "description": "Pin to the top of this member's notes",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "checkbox",
+              "name": "Pin to the top of this member's notes",
+              "exact": true
+            },
+            {
+              "kind": "label",
+              "label": "Pin to the top of this member's notes"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Cancel",
+        "target": {
+          "description": "Cancel",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "button",
+              "name": "Cancel",
+              "exact": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "Save note",
+        "target": {
+          "description": "Save note",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "button",
+              "name": "Save note",
+              "exact": true
+            }
+          ]
+        }
+      }
+    ],
+    "signals": []
+  },
+  "message": "Expected state did not become true",
+  "runId": "b1fafd33-56c9-4cd6-aeba-f09833fee741"
+}

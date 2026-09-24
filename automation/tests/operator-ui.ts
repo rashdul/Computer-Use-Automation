@@ -15,6 +15,7 @@ page.on("pageerror", (e) => errors.push(e.name));
 try {
   await page.goto(`http://localhost:${settings.port}`);
   await page.getByLabel("Execution mode").selectOption("replay");
+  await page.getByLabel("Capability ID", { exact: true }).fill("get-member-savings-balance");
   await page.getByLabel("Member number", { exact: true }).fill("1000021");
   await page.getByLabel("Simulate operator interruption").check();
   await page.getByRole("button", { name: "Start run", exact: true }).click();

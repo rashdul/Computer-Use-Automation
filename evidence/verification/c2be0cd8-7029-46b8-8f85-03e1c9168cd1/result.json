@@ -1,0 +1,15 @@
+{
+  "status": "failure",
+  "errorType": "PERMISSION_DENIED",
+  "stepId": "open-matching-member",
+  "expected": {
+    "kind": "route",
+    "path": "/members/{{member_id}}"
+  },
+  "observed": {
+    "session": "authenticated",
+    "path": "/members/{{member_id}}"
+  },
+  "message": "The staff session cannot access this record",
+  "runId": "c2be0cd8-7029-46b8-8f85-03e1c9168cd1"
+}

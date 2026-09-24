@@ -1,0 +1,583 @@
+{
+  "observation": {
+    "readables": [
+      {
+        "name": "Identity",
+        "target": {
+          "description": "Identity",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "heading",
+              "name": "Identity",
+              "exact": false
+            }
+          ]
+        },
+        "type": "text"
+      },
+      {
+        "name": "Contact",
+        "target": {
+          "description": "Contact",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "heading",
+              "name": "Contact",
+              "exact": false
+            }
+          ]
+        },
+        "type": "text"
+      },
+      {
+        "name": "Relationship",
+        "target": {
+          "description": "Relationship",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "heading",
+              "name": "Relationship",
+              "exact": false
+            }
+          ]
+        },
+        "type": "text"
+      },
+      {
+        "name": "Recent notes",
+        "target": {
+          "description": "Recent notes",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "heading",
+              "name": "Recent notes",
+              "exact": false
+            }
+          ]
+        },
+        "type": "text"
+      },
+      {
+        "name": "Related members",
+        "target": {
+          "description": "Related members",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "heading",
+              "name": "Related members",
+              "exact": false
+            }
+          ]
+        },
+        "type": "text"
+      },
+      {
+        "name": "ID on file",
+        "target": {
+          "description": "ID on file",
+          "locators": [
+            {
+              "kind": "css",
+              "selector": "dt:text-is(\"ID on file\") + dd"
+            }
+          ]
+        },
+        "type": "text"
+      },
+      {
+        "name": "CIP status",
+        "target": {
+          "description": "CIP status",
+          "locators": [
+            {
+              "kind": "css",
+              "selector": "dt:text-is(\"CIP status\") + dd"
+            }
+          ]
+        },
+        "type": "text"
+      },
+      {
+        "name": "Risk rating",
+        "target": {
+          "description": "Risk rating",
+          "locators": [
+            {
+              "kind": "css",
+              "selector": "dt:text-is(\"Risk rating\") + dd"
+            }
+          ]
+        },
+        "type": "text"
+      },
+      {
+        "name": "Home",
+        "target": {
+          "description": "Home",
+          "locators": [
+            {
+              "kind": "css",
+              "selector": "dt:text-is(\"Home\") + dd"
+            }
+          ]
+        },
+        "type": "text"
+      },
+      {
+        "name": "Preferred contact",
+        "target": {
+          "description": "Preferred contact",
+          "locators": [
+            {
+              "kind": "css",
+              "selector": "dt:text-is(\"Preferred contact\") + dd"
+            }
+          ]
+        },
+        "type": "text"
+      },
+      {
+        "name": "Statements",
+        "target": {
+          "description": "Statements",
+          "locators": [
+            {
+              "kind": "css",
+              "selector": "dt:text-is(\"Statements\") + dd"
+            }
+          ]
+        },
+        "type": "text"
+      },
+      {
+        "name": "Employer",
+        "target": {
+          "description": "Employer",
+          "locators": [
+            {
+              "kind": "css",
+              "selector": "dt:text-is(\"Employer\") + dd"
+            }
+          ]
+        },
+        "type": "text"
+      },
+      {
+        "name": "Occupation",
+        "target": {
+          "description": "Occupation",
+          "locators": [
+            {
+              "kind": "css",
+              "selector": "dt:text-is(\"Occupation\") + dd"
+            }
+          ]
+        },
+        "type": "text"
+      },
+      {
+        "name": "Deposits",
+        "target": {
+          "description": "Deposits",
+          "locators": [
+            {
+              "kind": "css",
+              "selector": "dt:text-is(\"Deposits\") + dd"
+            }
+          ]
+        },
+        "type": "text"
+      },
+      {
+        "name": "Available",
+        "target": {
+          "description": "Available",
+          "locators": [
+            {
+              "kind": "css",
+              "selector": "dt:text-is(\"Available\") + dd"
+            }
+          ]
+        },
+        "type": "text"
+      },
+      {
+        "name": "Loans & lines",
+        "target": {
+          "description": "Loans & lines",
+          "locators": [
+            {
+              "kind": "css",
+              "selector": "dt:text-is(\"Loans & lines\") + dd"
+            }
+          ]
+        },
+        "type": "text"
+      },
+      {
+        "name": "Sub-accounts",
+        "target": {
+          "description": "Sub-accounts",
+          "locators": [
+            {
+              "kind": "css",
+              "selector": "dt:text-is(\"Sub-accounts\") + dd"
+            }
+          ]
+        },
+        "type": "text"
+      },
+      {
+        "name": "Last activity",
+        "target": {
+          "description": "Last activity",
+          "locators": [
+            {
+              "kind": "css",
+              "selector": "dt:text-is(\"Last activity\") + dd"
+            }
+          ]
+        },
+        "type": "text"
+      }
+    ],
+    "alerts": [],
+    "path": "/members/{{member_id}}",
+    "session": "authenticated",
+    "controls": [
+      {
+        "name": "Rashed Federal Credit Union — Member search",
+        "target": {
+          "description": "Rashed Federal Credit Union — Member search",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "link",
+              "name": "Rashed Federal Credit Union — Member search",
+              "exact": true
+            },
+            {
+              "kind": "attribute",
+              "tag": "a",
+              "attribute": "href",
+              "value": "/members"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Member search",
+        "target": {
+          "description": "Member search",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "link",
+              "name": "Member search",
+              "exact": true
+            },
+            {
+              "kind": "attribute",
+              "tag": "a",
+              "attribute": "href",
+              "value": "/members"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Open sub-account",
+        "target": {
+          "description": "Open sub-account",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "link",
+              "name": "Open sub-account",
+              "exact": true
+            },
+            {
+              "kind": "attribute",
+              "tag": "a",
+              "attribute": "href",
+              "value": "/open-account"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Product rates",
+        "target": {
+          "description": "Product rates",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "link",
+              "name": "Product rates",
+              "exact": true
+            },
+            {
+              "kind": "attribute",
+              "tag": "a",
+              "attribute": "href",
+              "value": "/products"
+            }
+          ]
+        }
+      },
+      {
+        "name": "My activity",
+        "target": {
+          "description": "My activity",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "link",
+              "name": "My activity",
+              "exact": true
+            },
+            {
+              "kind": "attribute",
+              "tag": "a",
+              "attribute": "href",
+              "value": "/activity"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Copy member number",
+        "target": {
+          "description": "Copy member number",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "button",
+              "name": "Copy member number",
+              "exact": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "Add note",
+        "target": {
+          "description": "Add note",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "button",
+              "name": "Add note",
+              "exact": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "Open sub-account",
+        "target": {
+          "description": "Open sub-account",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "button",
+              "name": "Open sub-account",
+              "exact": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "/members/{{member_id}}",
+        "target": {
+          "description": "/members/{{member_id}}",
+          "locators": [
+            {
+              "kind": "attribute",
+              "tag": "a",
+              "attribute": "href",
+              "value": "/members/{{member_id}}"
+            }
+          ],
+          "within": {
+            "role": "navigation",
+            "name": "Member record"
+          }
+        }
+      },
+      {
+        "name": "/members/{{member_id}}/accounts",
+        "target": {
+          "description": "/members/{{member_id}}/accounts",
+          "locators": [
+            {
+              "kind": "attribute",
+              "tag": "a",
+              "attribute": "href",
+              "value": "/members/{{member_id}}/accounts"
+            }
+          ],
+          "within": {
+            "role": "navigation",
+            "name": "Member record"
+          }
+        }
+      },
+      {
+        "name": "/members/{{member_id}}/notes",
+        "target": {
+          "description": "/members/{{member_id}}/notes",
+          "locators": [
+            {
+              "kind": "attribute",
+              "tag": "a",
+              "attribute": "href",
+              "value": "/members/{{member_id}}/notes"
+            }
+          ],
+          "within": {
+            "role": "navigation",
+            "name": "Member record"
+          }
+        }
+      },
+      {
+        "name": "Reveal",
+        "target": {
+          "description": "Reveal",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "button",
+              "name": "Reveal",
+              "exact": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "/members/{{member_id}}/accounts/{{member_id}}-S00",
+        "target": {
+          "description": "/members/{{member_id}}/accounts/{{member_id}}-S00",
+          "locators": [
+            {
+              "kind": "attribute",
+              "tag": "a",
+              "attribute": "href",
+              "value": "/members/{{member_id}}/accounts/{{member_id}}-S00"
+            }
+          ]
+        }
+      },
+      {
+        "name": "/members/{{member_id}}/accounts/{{member_id}}-S01",
+        "target": {
+          "description": "/members/{{member_id}}/accounts/{{member_id}}-S01",
+          "locators": [
+            {
+              "kind": "attribute",
+              "tag": "a",
+              "attribute": "href",
+              "value": "/members/{{member_id}}/accounts/{{member_id}}-S01"
+            }
+          ]
+        }
+      },
+      {
+        "name": "/members/{{member_id}}/accounts/{{member_id}}-D01",
+        "target": {
+          "description": "/members/{{member_id}}/accounts/{{member_id}}-D01",
+          "locators": [
+            {
+              "kind": "attribute",
+              "tag": "a",
+              "attribute": "href",
+              "value": "/members/{{member_id}}/accounts/{{member_id}}-D01"
+            }
+          ]
+        }
+      },
+      {
+        "name": "/members/{{member_id}}/accounts/{{member_id}}-D02",
+        "target": {
+          "description": "/members/{{member_id}}/accounts/{{member_id}}-D02",
+          "locators": [
+            {
+              "kind": "attribute",
+              "tag": "a",
+              "attribute": "href",
+              "value": "/members/{{member_id}}/accounts/{{member_id}}-D02"
+            }
+          ]
+        }
+      },
+      {
+        "name": "/members/{{member_id}}/accounts/{{member_id}}-L01",
+        "target": {
+          "description": "/members/{{member_id}}/accounts/{{member_id}}-L01",
+          "locators": [
+            {
+              "kind": "attribute",
+              "tag": "a",
+              "attribute": "href",
+              "value": "/members/{{member_id}}/accounts/{{member_id}}-L01"
+            }
+          ]
+        }
+      },
+      {
+        "name": "/members/{{member_id}}/accounts",
+        "target": {
+          "description": "/members/{{member_id}}/accounts",
+          "locators": [
+            {
+              "kind": "attribute",
+              "tag": "a",
+              "attribute": "href",
+              "value": "/members/{{member_id}}/accounts"
+            }
+          ]
+        }
+      },
+      {
+        "name": "/members/{{member_id}}/notes?compose=1",
+        "target": {
+          "description": "/members/{{member_id}}/notes?compose=1",
+          "locators": [
+            {
+              "kind": "attribute",
+              "tag": "a",
+              "attribute": "href",
+              "value": "/members/{{member_id}}/notes?compose=1"
+            }
+          ]
+        }
+      },
+      {
+        "name": "/members/{{member_id}}/notes",
+        "target": {
+          "description": "/members/{{member_id}}/notes",
+          "locators": [
+            {
+              "kind": "attribute",
+              "tag": "a",
+              "attribute": "href",
+              "value": "/members/{{member_id}}/notes"
+            }
+          ]
+        }
+      }
+    ],
+    "signals": []
+  },
+  "currentStep": "open-supplied-member",
+  "session": "authenticated",
+  "owner": "automation",
+  "contextId": "b92c2511-fbb4-4c13-ad6c-5dcdd86ba249",
+  "pageId": "74bb9ff0-fac8-40dc-80b6-86774c12c8eb"
+}

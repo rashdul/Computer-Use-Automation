@@ -1,0 +1,21 @@
+{
+  "operator": "automated-test",
+  "liveWritesApproved": false,
+  "results": [
+    {
+      "test": "Typed product table replay without LLM",
+      "runId": "64ccb549-6880-413a-8c0e-cad00833687a",
+      "passed": true
+    },
+    {
+      "test": "Prepared note replay with different member and note, no save",
+      "runId": "db0d781f-0cbd-44a7-a1c2-c33009dcd549",
+      "passed": true
+    },
+    {
+      "test": "Real Save note denied without mutation; automated operator",
+      "runId": "6747c553-972b-457b-8551-234d45e0281c",
+      "passed": true
+    }
+  ]
+}

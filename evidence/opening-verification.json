@@ -1,0 +1,16 @@
+{
+  "status": "passed",
+  "operator": "automated-test",
+  "liveWritesApproved": false,
+  "scriptedFixture": true,
+  "genuineOpeningDiscovery": false,
+  "replayRunId": "c18eedb4-62f8-4a0d-af79-4c25303b83b9",
+  "denialRunId": "ba9b9eaf-d563-4520-83ad-8956462cd581",
+  "modelCalls": 0,
+  "checks": [
+    "different member and compliance values",
+    "final review route and heading",
+    "disclosures and signature remain unselected",
+    "Open account denial prevents mutation"
+  ]
+}

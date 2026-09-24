@@ -179,9 +179,20 @@
           <h1>Run a capability</h1>
           <p class="muted">
             Discover a workflow through the application, then replay it with a
-            different member.
+            different inputs. Data changes require your approval.
           </p>
           <form id="start">
+            <label for="example">Goal examples</label
+            ><select id="example">
+              <option value="custom">Custom RFCU workflow</option>
+              <option value="products">Read product rates</option>
+              <option value="accounts">List member accounts</option>
+              <option value="note">Prepare a member note</option>
+              <option value="opening">
+                Prepare account opening for review
+              </option>
+              <option value="admin">Inspect administration</option>
+            </select>
             <label for="mode">Execution mode</label
             ><select id="mode">
               <option value="discovery">Discover with configured model</option>
@@ -192,19 +203,23 @@ Log in to RFCU, look up member {{member_id}}, and return their current savings b
             ><label for="lookup">Search by</label
             ><select id="lookup">
               <option value="member_id">Member number</option>
-              <option value="member_name">Name</option></select
+              <option value="member_name">Name</option>
+              <option value="none">No member needed</option></select
             ><label id="member-label" for="member">Member number</label
             ><input
               id="member"
               value="1030966"
               pattern="[0-9]{7}"
               required
-            /><label for="capability">Capability</label
-            ><input
-              id="capability"
-              value="get-member-savings-balance"
-              required
-            /><label class="check"
+            /><label for="parameters">Additional inputs (JSON)</label
+            ><textarea id="parameters" rows="4">{}</textarea>
+            <p class="muted">
+              Named string values, such as account_suffix, category or
+              note_body. Keep passwords in the local credential file.
+            </p>
+            <label for="capability">Capability ID</label
+            ><input id="capability" value="rfcu-workflow" required /><label
+              class="check"
               ><input id="handoff" type="checkbox" />Simulate operator
               interruption</label
             ><label class="check"
@@ -218,6 +233,9 @@ Log in to RFCU, look up member {{member_id}}, and return their current savings b
         <section>
           <h2>Saved capabilities</h2>
           <select id="catalog" aria-label="Saved capabilities"></select>
+          <button type="button" id="use-capability" class="secondary">
+            Use selected capability
+          </button>
           <details>
             <summary>Inspect artifact</summary>
             <pre id="artifact">No capability selected.</pre>
@@ -230,6 +248,17 @@ Log in to RFCU, look up member {{member_id}}, and return their current savings b
           <div id="status" class="status" role="status">
             Ready. Each run starts at the RFCU login page in a clean browser
             context.
+          </div>
+          <div id="approval" class="notice" hidden>
+            <h2>Approve this change</h2>
+            <p id="approval-description"></p>
+            <p>
+              Review the live RFCU page and form values. Approval applies once
+              to this action and page state. Denying stops the run without
+              submitting this change.
+            </p>
+            <button id="approve-action">Approve once</button
+            ><button id="deny-action" class="secondary">Deny and stop</button>
           </div>
           <div id="intervention" class="notice" hidden>
             <h2>Operator intervention</h2>
@@ -260,6 +289,7 @@ Log in to RFCU, look up member {{member_id}}, and return their current savings b
     </main>
     <script>
       const el = (id) => document.getElementById(id);
+      let approvalId;
       let current,
         artifacts = [],
         polling = false;
@@ -304,21 +334,103 @@ Log in to RFCU, look up member {{member_id}}, and return their current savings b
       }
       el("catalog").onchange = showArtifact;
       el("lookup").onchange = () => {
-        const byName = el("lookup").value === "member_name";
+        const byName = el("lookup").value === "member_name",
+          none = el("lookup").value === "none";
         el("member-label").textContent = byName
           ? "Member name"
           : "Member number";
-        el("member").value = "";
-        if (byName) el("member").removeAttribute("pattern");
+        el("member").required = !none;
+        el("member").disabled = none;
+        if (byName || none) el("member").removeAttribute("pattern");
         else el("member").pattern = "[0-9]{7}";
-        el("capability").value = byName
-          ? "get-member-savings-balance-by-name"
-          : "get-member-savings-balance";
-        el("goal").value =
-          "Log in to RFCU, look up member {{" +
-          el("lookup").value +
-          "}}, and return their current savings balance.";
+        el("member").value = "";
       };
+      const examples = {
+        products: {
+          goal: "Log in to RFCU, open Product rates, and return the visible product codes, rates and minimum opening deposits as a table.",
+          id: "read-product-rates",
+          member: false,
+          inputs: {},
+        },
+        accounts: {
+          goal: "Log in to RFCU, search for member {{member_id}}, open Accounts, and return the visible account types and current balances as a table.",
+          id: "list-member-accounts",
+          member: true,
+          inputs: {},
+        },
+        note: {
+          goal: "Log in to RFCU, find member {{member_id}}, open Notes, choose Add note, select {{category}} and fill {{note_body}}. Stop with the completed form ready for review. Do not save.",
+          id: "prepare-member-note",
+          member: true,
+          inputs: {
+            category: "Service",
+            note_body: "Enter the note you want to prepare",
+          },
+        },
+        opening: {
+          goal: "Log in to RFCU and find member {{member_id}}. Prepare Regular Share Savings with Individual ownership, No opening deposit and Paper statements. Use {{checked}} for radio checks and the supplied purpose, expected_deposits and source_of_funds. Stop at Review and open; verify the heading and route. Do not acknowledge disclosures, sign or submit.",
+          id: "prepare-account-opening",
+          member: true,
+          inputs: {
+            checked: "true",
+            purpose: "Emergency savings",
+            expected_deposits: "Under $1,000",
+            source_of_funds: "Existing savings",
+          },
+        },
+        admin: {
+          goal: "Log in to RFCU, open Administration and inspect the overview. Return its page heading. Do not change settings. Report blocked if the staff role lacks access.",
+          id: "inspect-administration",
+          member: false,
+          inputs: {},
+        },
+      };
+      el("example").onchange = () => {
+        const x = examples[el("example").value];
+        if (!x) return;
+        el("goal").value = x.goal;
+        el("capability").value = x.id;
+        el("parameters").value = JSON.stringify(x.inputs, null, 2);
+        el("lookup").value = x.member ? "member_id" : "none";
+        el("lookup").onchange();
+      };
+      el("use-capability").onclick = () => {
+        const a = artifacts.find((a) => a.capabilityId === el("catalog").value);
+        if (!a) return;
+        el("mode").value = "replay";
+        el("capability").value = a.capabilityId;
+        el("goal").value = a.description;
+        el("lookup").value = a.inputs.some((i) => i.key === "member_name")
+          ? "member_name"
+          : a.inputs.some((i) => i.key === "member_id")
+            ? "member_id"
+            : "none";
+        el("lookup").onchange();
+        el("parameters").value = JSON.stringify(
+          Object.fromEntries(
+            a.inputs
+              .filter((i) => !["member_id", "member_name"].includes(i.key))
+              .map((i) => [i.key, ""]),
+          ),
+          null,
+          2,
+        );
+      };
+      for (const [id, approved] of [
+        ["approve-action", true],
+        ["deny-action", false],
+      ])
+        el(id).onclick = async () => {
+          try {
+            await api("/api/runs/" + current + "/approval", {
+              id: approvalId,
+              approved,
+            });
+            await poll();
+          } catch (e) {
+            fail(e);
+          }
+        };
       el("start").onsubmit = async (e) => {
         e.preventDefault();
         el("error").textContent = "";
@@ -327,7 +439,12 @@ Log in to RFCU, look up member {{member_id}}, and return their current savings b
           const r = await api("/api/runs", {
             mode,
             goal: el("goal").value,
-            inputs: { [el("lookup").value]: el("member").value },
+            inputs: {
+              ...JSON.parse(el("parameters").value || "{}"),
+              ...(el("lookup").value !== "none"
+                ? { [el("lookup").value]: el("member").value }
+                : {}),
+            },
             capabilityId: el("capability").value,
             headed: el("headed").checked,
             handoffDemo: el("handoff").checked,
@@ -394,6 +511,15 @@ Log in to RFCU, look up member {{member_id}}, and return their current savings b
             (r.session || "starting") +
             "\nModel decisions: " +
             r.modelCalls;
+          approvalId = r.approval?.id;
+          el("approval").hidden = r.approval?.status !== "waiting";
+          el("approval-description").textContent = r.approval
+            ? r.approval.description +
+              " | " +
+              r.approval.action +
+              " | " +
+              r.approval.target
+            : "";
           el("intervention").hidden =
             !r.intervention || r.intervention.status === "resolved";
           el("reason").textContent = r.intervention?.reason || "";

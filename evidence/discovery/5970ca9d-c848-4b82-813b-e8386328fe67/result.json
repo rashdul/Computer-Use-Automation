@@ -1,0 +1,14 @@
+{
+  "status": "failure",
+  "errorType": "INVALID_PARAMETER",
+  "stepId": "search-authorized-member",
+  "expected": {
+    "kind": "member_resolved"
+  },
+  "observed": {
+    "session": "authenticated",
+    "path": "/members?q={{member_id}}"
+  },
+  "message": "Name resolution requires member_name",
+  "runId": "5970ca9d-c848-4b82-813b-e8386328fe67"
+}

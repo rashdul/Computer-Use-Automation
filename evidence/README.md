@@ -1,5 +1,23 @@
 # Evidence index
 
+## Account-opening extension
+
+[Attempt 0f6a3eb2](discovery/0f6a3eb2-d08c-4c0f-be9f-0c1d0bddb5ad/result.json) opened the real form but failed a model-predicted route checkpoint. Discovery guidance was corrected to inspect unknown button destinations before asserting a route. [Attempt 2ff9646e](discovery/2ff9646e-1612-4043-b9e7-5f65380ad859/result.json) selected Regular Share Savings through the UI, then stopped with a Codex provider usage/rate limit. Neither attempt produced a capability. A later [genuine discovery](discovery/331f46f1-dfed-48f9-8dbc-f1ba6954a3d6/manifest.json) succeeded with 16 Codex decisions and saved the [review-only capability](../artifacts/prepare-account-opening.json). Its final checkpoints verify authentication, the review route and Review and open heading; it contains no account-creation step.
+
+The separate `test:opening -- --fixture` path passed: [verification summary](opening-verification.json), [review result](verification/c18eedb4-62f8-4a0d-af79-4c25303b83b9/result.json), and [Open account denial](replay-error/ba9b9eaf-d563-4520-83ad-8956462cd581/result.json). It is a scripted real-browser test, explicitly labeled in its evidence. It is not a substitute for genuine discovery. Radio observations exclude address hints and joint-owner names; approval button behavior also has a labeled API-fixture test.
+
+## General workflows and data-change approval
+
+The schema 2.0 extension is exercised against the deployed synthetic RFCU target:
+
+- [Product discovery](discovery/25cbe79a-9c83-48ed-9f00-5927acee340a/events.jsonl): genuine Codex observation/action loop, real login and typed product-rate table. Its privacy note records post-run redaction of a staff display name; credentials were never logged.
+- [Note-preparation discovery](discovery/ee52007f-afd3-488e-9a1b-31dc15232e93/events.jsonl): genuine Codex run, login, member search, scoped Member record navigation, category selection, note entry and final field-value checks. No save. [Artifact](../artifacts/prepare-member-note.json).
+- [Account-list discovery](discovery/64bd9756-2b23-4eb4-8ec4-137f0d464d39/events.jsonl) and [different-member replay](replay-success/4aa7c306-8121-470d-91c2-096842f8e030/manifest.json): genuine Codex discovery, typed deposit-account table, then zero-model replay for another member.
+- [General verification](general-verification.json): product-table replay and note preparation for a different member and different note text, both with zero model decisions. A separate real-UI Save note attempt was denied by an explicitly automated operator; it returned `APPROVAL_DENIED` with no mutation attempted. Successful approval execution is tested only in an isolated DOM fixture.
+- [General console](general-console-verification.json): actual console memberless product replay, zero model calls, catalog selection and generated parameter fields.
+
+Failures are retained: `5970ca9d` exposed an ID-resolution checkpoint limitation; `b1fafd33` exposed query-string route matching; `2d3b291f` exposed duplicate unscoped Accounts links. The interrupted test `7e3a5607` was paused on duplicate Notes links and explicitly marked aborted, not successful. A later discovery `b54aec33` prepared the form but its final Codex call failed; no artifact was published. These led to ID/query checkpoint fixes and navigation-region scopes. The successful note artifact comes from a fresh genuine discovery after those fixes, not hand-edited clicks.
+
 ## Name lookup and deployed origin update
 
 The new [name verification](name-lookup-verification.json) exercised the actual HTTPS Netlify RFCU deployment. [Discovery 6e6a10ee](discovery/6e6a10ee-c183-4412-94f6-73f1e4e753ca/events.jsonl) contains nine genuine Codex decisions, real UI login, name search, unique-result resolution, member navigation and savings extraction. Its [schema 1.1 capability](../artifacts/get-member-savings-balance-by-name.json) contains symbolic name/ID references. [Replay 251c21ec](verification/251c21ec-602d-4dd7-9d47-4e787800258b/result.json) used a different member name with zero model calls. Additional runs returned [MEMBER_AMBIGUOUS](verification/36fba3ba-1052-4753-9c25-a68ea818e838/result.json) and [MEMBER_NOT_FOUND](verification/4bcef9a5-4b10-4b1a-b223-4f43f1ad6e0e/result.json). Names were obtained from the live UI and retained only in memory by the test runner.

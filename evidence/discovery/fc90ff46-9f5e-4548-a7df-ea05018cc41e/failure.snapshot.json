@@ -1,0 +1,82 @@
+{
+  "observation": {
+    "readables": [
+      {
+        "name": "Sign in",
+        "target": {
+          "description": "Sign in",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "heading",
+              "name": "Sign in",
+              "exact": false
+            }
+          ]
+        },
+        "type": "text"
+      }
+    ],
+    "alerts": [],
+    "path": "/login",
+    "session": "unauthenticated",
+    "controls": [
+      {
+        "name": "Username",
+        "target": {
+          "description": "Username",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "textbox",
+              "name": "Username",
+              "exact": true
+            },
+            {
+              "kind": "label",
+              "label": "Username"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Password",
+        "target": {
+          "description": "Password",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "textbox",
+              "name": "Password",
+              "exact": true
+            },
+            {
+              "kind": "label",
+              "label": "Password"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Sign in",
+        "target": {
+          "description": "Sign in",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "button",
+              "name": "Sign in",
+              "exact": true
+            }
+          ]
+        }
+      }
+    ],
+    "signals": []
+  },
+  "currentStep": "start",
+  "session": "unauthenticated",
+  "owner": "automation",
+  "contextId": "55c4f17c-67cd-4edc-9c1c-f3ac26bdd8ba",
+  "pageId": "6fd40363-7d04-431b-9fb6-138180ad860a"
+}

@@ -1,0 +1,407 @@
+{
+  "schemaVersion": "2.0",
+  "capabilityId": "rfcu-workflow",
+  "name": "get-current-savings-balance",
+  "description": "Sign in to RFCU, find the authorized member, and retrieve their current savings balance.",
+  "target": {
+    "application": "RFCU Member Services",
+    "vendor": "RFCU",
+    "applicationVersion": "4.12.2",
+    "startUrl": "http://localhost:5173/login",
+    "surface": "web"
+  },
+  "inputs": [
+    {
+      "key": "member_id",
+      "type": "string",
+      "required": true,
+      "description": "Runtime member id"
+    }
+  ],
+  "outputs": [
+    {
+      "key": "current_savings_balance",
+      "type": "money",
+      "currency": "USD",
+      "description": "The member’s current savings balance"
+    }
+  ],
+  "steps": [
+    {
+      "id": "fill-staff-username",
+      "description": "Enter the staff username",
+      "action": "fill",
+      "target": {
+        "description": "Username",
+        "locators": [
+          {
+            "kind": "role",
+            "role": "textbox",
+            "name": "Username",
+            "exact": true
+          },
+          {
+            "kind": "label",
+            "label": "Username"
+          }
+        ]
+      },
+      "value": {
+        "source": "secret",
+        "key": "RFCU_STAFF_USERNAME"
+      },
+      "risk": "reversible",
+      "expectedState": {
+        "kind": "visible",
+        "target": {
+          "description": "Username",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "textbox",
+              "name": "Username",
+              "exact": true
+            },
+            {
+              "kind": "label",
+              "label": "Username"
+            }
+          ]
+        }
+      },
+      "retry": {
+        "maxAttempts": 2,
+        "safeToRepeat": true
+      }
+    },
+    {
+      "id": "fill-staff-password",
+      "description": "Enter the staff password",
+      "action": "fill",
+      "target": {
+        "description": "Password",
+        "locators": [
+          {
+            "kind": "role",
+            "role": "textbox",
+            "name": "Password",
+            "exact": true
+          },
+          {
+            "kind": "label",
+            "label": "Password"
+          }
+        ]
+      },
+      "value": {
+        "source": "secret",
+        "key": "RFCU_STAFF_PASSWORD"
+      },
+      "risk": "reversible",
+      "expectedState": {
+        "kind": "visible",
+        "target": {
+          "description": "Password",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "textbox",
+              "name": "Password",
+              "exact": true
+            },
+            {
+              "kind": "label",
+              "label": "Password"
+            }
+          ]
+        }
+      },
+      "retry": {
+        "maxAttempts": 2,
+        "safeToRepeat": true
+      }
+    },
+    {
+      "id": "sign-in-staff",
+      "description": "Sign in to RFCU",
+      "action": "click",
+      "target": {
+        "description": "Sign in",
+        "locators": [
+          {
+            "kind": "role",
+            "role": "button",
+            "name": "Sign in",
+            "exact": true
+          }
+        ]
+      },
+      "risk": "reversible",
+      "expectedState": {
+        "kind": "authenticated"
+      },
+      "retry": {
+        "maxAttempts": 1,
+        "safeToRepeat": false
+      }
+    },
+    {
+      "id": "fill-member-search",
+      "description": "Enter the authorized member ID",
+      "action": "fill",
+      "target": {
+        "description": "Search",
+        "locators": [
+          {
+            "kind": "role",
+            "role": "searchbox",
+            "name": "Search",
+            "exact": true
+          },
+          {
+            "kind": "label",
+            "label": "Search"
+          }
+        ]
+      },
+      "value": {
+        "source": "input",
+        "key": "member_id"
+      },
+      "risk": "reversible",
+      "expectedState": {
+        "kind": "field_value",
+        "target": {
+          "description": "Search",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "searchbox",
+              "name": "Search",
+              "exact": true
+            },
+            {
+              "kind": "label",
+              "label": "Search"
+            }
+          ]
+        },
+        "value": {
+          "source": "input",
+          "key": "member_id"
+        }
+      },
+      "retry": {
+        "maxAttempts": 2,
+        "safeToRepeat": true
+      }
+    },
+    {
+      "id": "search-authorized-member",
+      "description": "Search using the supplied member ID",
+      "action": "click",
+      "target": {
+        "description": "Search",
+        "locators": [
+          {
+            "kind": "role",
+            "role": "button",
+            "name": "Search",
+            "exact": true
+          }
+        ]
+      },
+      "risk": "read_only",
+      "expectedState": {
+        "kind": "member_resolved"
+      },
+      "retry": {
+        "maxAttempts": 2,
+        "safeToRepeat": true
+      }
+    },
+    {
+      "id": "open-authorized-member",
+      "description": "Open the authorized member overview",
+      "action": "click",
+      "target": {
+        "description": "/members/{{member_id}}",
+        "locators": [
+          {
+            "kind": "attribute",
+            "attribute": "href",
+            "value": "/members/{{member_id}}",
+            "tag": "a"
+          }
+        ]
+      },
+      "risk": "read_only",
+      "expectedState": {
+        "kind": "route",
+        "path": "/members/{{member_id}}"
+      },
+      "retry": {
+        "maxAttempts": 2,
+        "safeToRepeat": true
+      }
+    },
+    {
+      "id": "open-member-accounts",
+      "description": "Open the authorized member’s accounts",
+      "action": "click",
+      "target": {
+        "description": "/members/{{member_id}}/accounts",
+        "locators": [
+          {
+            "kind": "attribute",
+            "attribute": "href",
+            "value": "/members/{{member_id}}/accounts",
+            "tag": "a"
+          }
+        ],
+        "within": {
+          "role": "navigation",
+          "name": "Member record"
+        }
+      },
+      "risk": "read_only",
+      "expectedState": {
+        "kind": "route",
+        "path": "/members/{{member_id}}/accounts"
+      },
+      "retry": {
+        "maxAttempts": 2,
+        "safeToRepeat": true
+      }
+    },
+    {
+      "id": "open-s00-account",
+      "description": "Open the member’s S00 account details",
+      "action": "click",
+      "target": {
+        "description": "/members/{{member_id}}/accounts/{{member_id}}-S00",
+        "locators": [
+          {
+            "kind": "attribute",
+            "attribute": "href",
+            "value": "/members/{{member_id}}/accounts/{{member_id}}-S00",
+            "tag": "a"
+          }
+        ]
+      },
+      "risk": "read_only",
+      "expectedState": {
+        "kind": "route",
+        "path": "/members/{{member_id}}/accounts/{{member_id}}-S00"
+      },
+      "retry": {
+        "maxAttempts": 2,
+        "safeToRepeat": true
+      }
+    },
+    {
+      "id": "extract-current-savings-balance",
+      "description": "Read the member’s current savings balance",
+      "action": "extract",
+      "target": {
+        "description": "Current balance in Account summary",
+        "locators": [
+          {
+            "kind": "css",
+            "selector": "section[aria-label=\"Account summary\"] .account-balances > div:has(.account-balances__label:text-is(\"Current balance\")) .account-balances__value"
+          }
+        ]
+      },
+      "output": "current_savings_balance",
+      "outputType": "money",
+      "risk": "read_only",
+      "precondition": {
+        "kind": "route",
+        "path": "/members/{{member_id}}/accounts/{{member_id}}-S00"
+      },
+      "expectedState": {
+        "kind": "output",
+        "key": "current_savings_balance",
+        "type": "money"
+      },
+      "retry": {
+        "maxAttempts": 2,
+        "safeToRepeat": true
+      }
+    }
+  ],
+  "successCondition": [
+    {
+      "kind": "authenticated"
+    },
+    {
+      "kind": "route",
+      "path": "/members/{{member_id}}/accounts/{{member_id}}-S00"
+    },
+    {
+      "kind": "visible",
+      "target": {
+        "description": "Membership Share",
+        "locators": [
+          {
+            "kind": "role",
+            "role": "heading",
+            "name": "Membership Share",
+            "exact": false
+          }
+        ]
+      }
+    },
+    {
+      "kind": "output",
+      "key": "current_savings_balance",
+      "type": "money"
+    }
+  ],
+  "safety": {
+    "allowedOrigins": [
+      "http://localhost:5173"
+    ],
+    "allowedRoutes": [
+      "/login",
+      "/session-expired",
+      "/members",
+      "/products",
+      "/activity",
+      "/open-account",
+      "/members/{{member_id}}",
+      "/members/{{member_id}}/accounts",
+      "/members/{{member_id}}/accounts/:account",
+      "/members/{{member_id}}/notes",
+      "/members/{{member_id}}/access-log",
+      "/members/{{member_id}}/accounts/new",
+      "/members/{{member_id}}/accounts/new/review",
+      "/members/{{member_id}}/accounts/new/confirmation/:receipt",
+      "/admin",
+      "/admin/environment",
+      "/admin/staff",
+      "/admin/permissions",
+      "/admin/products",
+      "/admin/audit",
+      "/admin/test-data"
+    ],
+    "allowedActions": [
+      "click",
+      "fill",
+      "select",
+      "navigate",
+      "wait",
+      "extract",
+      "check"
+    ],
+    "riskLevel": "safe"
+  },
+  "metadata": {
+    "createdAt": "2026-09-23T23:43:47.741Z",
+    "source": "llm-discovery",
+    "artifactVersion": 1,
+    "discoveryRunId": "2bef5a98-0205-47ee-91af-7b5164b17d93",
+    "modelProvider": "codex-cli",
+    "model": "codex-default"
+  }
+}

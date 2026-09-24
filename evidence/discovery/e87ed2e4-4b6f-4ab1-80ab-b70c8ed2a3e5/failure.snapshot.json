@@ -1,0 +1,7 @@
+{
+  "observation": {
+    "condition": "OBSERVATION_UNAVAILABLE"
+  },
+  "currentStep": "start",
+  "owner": "automation"
+}

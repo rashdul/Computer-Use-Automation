@@ -13,28 +13,34 @@ export async function resolveTarget(
   const candidates = [...target.locators].sort(
     (a, b) => order[a.kind] - order[b.kind],
   );
+  const root = target.within
+    ? page.getByRole(target.within.role, {
+        name: interpolate(target.within.name, inputs),
+        exact: true,
+      })
+    : page;
   const deadline = Date.now() + timeout;
   do {
     for (const spec of candidates) {
       let locator: Locator;
       if (spec.kind === "role")
-        locator = page.getByRole(spec.role, {
+        locator = root.getByRole(spec.role, {
           name: interpolate(spec.name, inputs),
           exact: spec.exact,
         });
       else if (spec.kind === "label")
-        locator = page.getByLabel(interpolate(spec.label, inputs), {
+        locator = root.getByLabel(interpolate(spec.label, inputs), {
           exact: true,
         });
       else if (spec.kind === "text")
-        locator = page.getByText(interpolate(spec.text, inputs), {
+        locator = root.getByText(interpolate(spec.text, inputs), {
           exact: true,
         });
       else if (spec.kind === "attribute")
-        locator = page.locator(
+        locator = root.locator(
           `${spec.tag}[${spec.attribute}=${JSON.stringify(interpolate(spec.value, inputs))}]`,
         );
-      else locator = page.locator(interpolate(spec.selector, inputs));
+      else locator = root.locator(interpolate(spec.selector, inputs));
       const count = await locator.count();
       if (count > 1)
         throw new RuntimeCondition(

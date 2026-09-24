@@ -1,0 +1,7 @@
+{
+  "status": "failure",
+  "errorType": "MODEL_BLOCKED",
+  "stepId": "sign-in-staff",
+  "message": "Discovery reported that the requested goal is blocked",
+  "runId": "6a76411b-e625-488a-9826-a323f4fe8f91"
+}

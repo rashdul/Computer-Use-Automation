@@ -3,7 +3,7 @@ import path from "node:path";
 import type {
   CapabilityStep,
   InputValues,
-  Money,
+  OutputValue,
   RunResult,
 } from "./schema.js";
 import { Secrets } from "./secrets.js";
@@ -11,12 +11,14 @@ import { Evidence } from "./evidence.js";
 import { Policy } from "./policy.js";
 import { PlaywrightSurface } from "./surface.js";
 import { RuntimeCondition } from "./errors.js";
+import { ApprovalManager } from "./approval.js";
 import { ControlManager } from "./control.js";
 
 export class Run {
   readonly runId = randomUUID();
-  readonly outputs: Record<string, Money> = {};
+  readonly outputs: Record<string, OutputValue> = {};
   readonly control: ControlManager;
+  readonly approvals: ApprovalManager;
   readonly evidence: Evidence;
   surface!: PlaywrightSurface;
   currentStep = "start";
@@ -34,6 +36,7 @@ export class Run {
       headed?: boolean;
       handoffDemo?: boolean;
       evidenceGroup?: string;
+      interventionEnabled?: boolean;
     } = {},
   ) {
     policy.inputs = inputs; // Share the UI-resolved member binding across policy, surface and redaction.
@@ -43,7 +46,26 @@ export class Run {
       secrets,
       inputs,
     );
+    this.approvals = new ApprovalManager((t, d) => this.evidence.event(t, d));
     this.control = new ControlManager((t, d) => this.evidence.event(t, d));
+  }
+  async approveAction(step: CapabilityStep) {
+    const details = await this.surface.approvalDetails(step);
+    if (!details) return;
+    await this.diagnostic("approval");
+    this.control.owner = "paused";
+    try {
+      await this.approvals.wait({
+        stepId: step.id,
+        description: step.description,
+        action: step.action,
+        target: details.target,
+      });
+      await this.surface.condition();
+      await this.surface.approve(step, details.fingerprint);
+    } finally {
+      this.control.owner = "automation";
+    }
   }
   async start() {
     await this.evidence.init();
@@ -178,8 +200,11 @@ export class Run {
         .screenshot({
           path: path.join(this.evidence.directory, `${label}.png`),
           mask: [
+            ...(this.policy.profile === "general"
+              ? [this.surface.page.locator("main,.page,[role=dialog]")]
+              : []),
             this.surface.page.locator(
-              "input,.topbar,.sidebar__foot,.member-band,.crumbs,.recent-list,.tips,.grid-12,tbody,.account-head__number,.account-head__title .muted,.alert-strip,.user-menu,.stats,.empty-state,.empty,.empty__title",
+              "input,textarea,.note__body,.note__author,.topbar,.sidebar__foot,.member-band,.crumbs,.recent-list,.tips,.grid-12,tbody,.account-head__number,.account-head__title .muted,.alert-strip,.user-menu,.stats,.empty-state,.empty,.empty__title",
             ),
           ],
           maskColor: "#c9d6e6",
@@ -274,8 +299,9 @@ export class Run {
           value: step.value?.source === "secret" ? "[REDACTED]" : step.value,
           attempt,
         });
+        await this.approveAction(step);
         const result = await this.surface.execute(step);
-        if (result.output && step.output)
+        if (result.output !== undefined && step.output)
           this.outputs[step.output] = result.output;
         await this.surface.checkpoint(step.expectedState, this.outputs);
         await this.evidence.event("action_completed", {
@@ -287,9 +313,11 @@ export class Run {
           durationMs: Date.now() - started,
           session: this.surface.session.state,
         });
+        this.surface.endAction();
         this.busy = false;
         return;
       } catch (error) {
+        this.surface.endAction();
         this.busy = false;
         let e =
           error instanceof RuntimeCondition
@@ -327,6 +355,7 @@ export class Run {
           durationMs: Date.now() - started,
         });
         if (
+          !this.surface.mutationAttempted &&
           e.category === "recoverable" &&
           step.retry.safeToRepeat &&
           attempt < step.retry.maxAttempts
@@ -345,7 +374,9 @@ export class Run {
           continue;
         }
         if (
+          !this.surface.mutationAttempted &&
           allowHandoff &&
+          this.options.interventionEnabled !== false &&
           [
             "CONTROL_NOT_FOUND",
             "INTERSTITIAL_BLOCKED",

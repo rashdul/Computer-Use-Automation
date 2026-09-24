@@ -1,0 +1,568 @@
+{
+  "observation": {
+    "readables": [
+      {
+        "name": "Review and open",
+        "target": {
+          "description": "Review and open",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "heading",
+              "name": "Review and open",
+              "exact": false
+            }
+          ]
+        },
+        "type": "text"
+      },
+      {
+        "name": "Application",
+        "target": {
+          "description": "Application",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "heading",
+              "name": "Application",
+              "exact": false
+            }
+          ]
+        },
+        "type": "text"
+      },
+      {
+        "name": "Disclosures & signature",
+        "target": {
+          "description": "Disclosures & signature",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "heading",
+              "name": "Disclosures & signature",
+              "exact": false
+            }
+          ]
+        },
+        "type": "text"
+      },
+      {
+        "name": "You're opening",
+        "target": {
+          "description": "You're opening",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "heading",
+              "name": "You're opening",
+              "exact": false
+            }
+          ]
+        },
+        "type": "text"
+      },
+      {
+        "name": "Screening",
+        "target": {
+          "description": "Screening",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "heading",
+              "name": "Screening",
+              "exact": false
+            }
+          ]
+        },
+        "type": "text"
+      },
+      {
+        "name": "Product",
+        "target": {
+          "description": "Product",
+          "locators": [
+            {
+              "kind": "css",
+              "selector": "dt:text-is(\"Product\") + dd"
+            }
+          ]
+        },
+        "type": "text"
+      },
+      {
+        "name": "New account number",
+        "target": {
+          "description": "New account number",
+          "locators": [
+            {
+              "kind": "css",
+              "selector": "dt:text-is(\"New account number\") + dd"
+            }
+          ]
+        },
+        "type": "text"
+      },
+      {
+        "name": "Rate",
+        "target": {
+          "description": "Rate",
+          "locators": [
+            {
+              "kind": "css",
+              "selector": "dt:text-is(\"Rate\") + dd"
+            }
+          ]
+        },
+        "type": "text"
+      },
+      {
+        "name": "Joint owners",
+        "target": {
+          "description": "Joint owners",
+          "locators": [
+            {
+              "kind": "css",
+              "selector": "dt:text-is(\"Joint owners\") + dd"
+            }
+          ]
+        },
+        "type": "text"
+      },
+      {
+        "name": "Beneficiaries (POD)",
+        "target": {
+          "description": "Beneficiaries (POD)",
+          "locators": [
+            {
+              "kind": "css",
+              "selector": "dt:text-is(\"Beneficiaries (POD)\") + dd"
+            }
+          ]
+        },
+        "type": "text"
+      },
+      {
+        "name": "Amount",
+        "target": {
+          "description": "Amount",
+          "locators": [
+            {
+              "kind": "css",
+              "selector": "dt:text-is(\"Amount\") + dd"
+            }
+          ]
+        },
+        "type": "text"
+      },
+      {
+        "name": "Method",
+        "target": {
+          "description": "Method",
+          "locators": [
+            {
+              "kind": "css",
+              "selector": "dt:text-is(\"Method\") + dd"
+            }
+          ]
+        },
+        "type": "text"
+      },
+      {
+        "name": "Statements",
+        "target": {
+          "description": "Statements",
+          "locators": [
+            {
+              "kind": "css",
+              "selector": "dt:text-is(\"Statements\") + dd"
+            }
+          ]
+        },
+        "type": "text"
+      },
+      {
+        "name": "Purpose",
+        "target": {
+          "description": "Purpose",
+          "locators": [
+            {
+              "kind": "css",
+              "selector": "dt:text-is(\"Purpose\") + dd"
+            }
+          ]
+        },
+        "type": "text"
+      },
+      {
+        "name": "Expected deposits",
+        "target": {
+          "description": "Expected deposits",
+          "locators": [
+            {
+              "kind": "css",
+              "selector": "dt:text-is(\"Expected deposits\") + dd"
+            }
+          ]
+        },
+        "type": "text"
+      },
+      {
+        "name": "Source of funds",
+        "target": {
+          "description": "Source of funds",
+          "locators": [
+            {
+              "kind": "css",
+              "selector": "dt:text-is(\"Source of funds\") + dd"
+            }
+          ]
+        },
+        "type": "text"
+      },
+      {
+        "name": "Account",
+        "target": {
+          "description": "Account",
+          "locators": [
+            {
+              "kind": "css",
+              "selector": "dt:text-is(\"Account\") + dd"
+            }
+          ]
+        },
+        "type": "text"
+      },
+      {
+        "name": "Product",
+        "target": {
+          "description": "Product",
+          "locators": [
+            {
+              "kind": "css",
+              "selector": "dt:text-is(\"Product\") + dd"
+            }
+          ]
+        },
+        "type": "text"
+      },
+      {
+        "name": "Opening deposit",
+        "target": {
+          "description": "Opening deposit",
+          "locators": [
+            {
+              "kind": "css",
+              "selector": "dt:text-is(\"Opening deposit\") + dd"
+            }
+          ]
+        },
+        "type": "text"
+      }
+    ],
+    "alerts": [],
+    "path": "/members/{{member_id}}/accounts/new/review",
+    "session": "authenticated",
+    "controls": [
+      {
+        "name": "Rashed Federal Credit Union — Member search",
+        "target": {
+          "description": "Rashed Federal Credit Union — Member search",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "link",
+              "name": "Rashed Federal Credit Union — Member search",
+              "exact": true
+            },
+            {
+              "kind": "attribute",
+              "tag": "a",
+              "attribute": "href",
+              "value": "/members"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Member search",
+        "target": {
+          "description": "Member search",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "link",
+              "name": "Member search",
+              "exact": true
+            },
+            {
+              "kind": "attribute",
+              "tag": "a",
+              "attribute": "href",
+              "value": "/members"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Open sub-account",
+        "target": {
+          "description": "Open sub-account",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "link",
+              "name": "Open sub-account",
+              "exact": true
+            },
+            {
+              "kind": "attribute",
+              "tag": "a",
+              "attribute": "href",
+              "value": "/open-account"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Product rates",
+        "target": {
+          "description": "Product rates",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "link",
+              "name": "Product rates",
+              "exact": true
+            },
+            {
+              "kind": "attribute",
+              "tag": "a",
+              "attribute": "href",
+              "value": "/products"
+            }
+          ]
+        }
+      },
+      {
+        "name": "My activity",
+        "target": {
+          "description": "My activity",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "link",
+              "name": "My activity",
+              "exact": true
+            },
+            {
+              "kind": "attribute",
+              "tag": "a",
+              "attribute": "href",
+              "value": "/activity"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Copy member number",
+        "target": {
+          "description": "Copy member number",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "button",
+              "name": "Copy member number",
+              "exact": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "/members/{{member_id}}/accounts/new#section-product",
+        "target": {
+          "description": "/members/{{member_id}}/accounts/new#section-product",
+          "locators": [
+            {
+              "kind": "attribute",
+              "tag": "a",
+              "attribute": "href",
+              "value": "/members/{{member_id}}/accounts/new#section-product"
+            }
+          ]
+        }
+      },
+      {
+        "name": "/members/{{member_id}}/accounts/new#section-ownership",
+        "target": {
+          "description": "/members/{{member_id}}/accounts/new#section-ownership",
+          "locators": [
+            {
+              "kind": "attribute",
+              "tag": "a",
+              "attribute": "href",
+              "value": "/members/{{member_id}}/accounts/new#section-ownership"
+            }
+          ]
+        }
+      },
+      {
+        "name": "/members/{{member_id}}/accounts/new#section-funding",
+        "target": {
+          "description": "/members/{{member_id}}/accounts/new#section-funding",
+          "locators": [
+            {
+              "kind": "attribute",
+              "tag": "a",
+              "attribute": "href",
+              "value": "/members/{{member_id}}/accounts/new#section-funding"
+            }
+          ]
+        }
+      },
+      {
+        "name": "/members/{{member_id}}/accounts/new#section-compliance",
+        "target": {
+          "description": "/members/{{member_id}}/accounts/new#section-compliance",
+          "locators": [
+            {
+              "kind": "attribute",
+              "tag": "a",
+              "attribute": "href",
+              "value": "/members/{{member_id}}/accounts/new#section-compliance"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Truth in Savings disclosure",
+        "target": {
+          "description": "Truth in Savings disclosure",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "checkbox",
+              "name": "Truth in Savings disclosure",
+              "exact": false
+            }
+          ]
+        }
+      },
+      {
+        "name": "Schedule of fees and charges",
+        "target": {
+          "description": "Schedule of fees and charges",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "checkbox",
+              "name": "Schedule of fees and charges",
+              "exact": false
+            }
+          ]
+        }
+      },
+      {
+        "name": "Privacy notice",
+        "target": {
+          "description": "Privacy notice",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "checkbox",
+              "name": "Privacy notice",
+              "exact": false
+            }
+          ]
+        }
+      },
+      {
+        "name": "Signed on the signature pad",
+        "target": {
+          "description": "Signed on the signature pad",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "radio",
+              "name": "Signed on the signature pad",
+              "exact": true
+            },
+            {
+              "kind": "label",
+              "label": "Signed on the signature pad"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Wet signature card on file",
+        "target": {
+          "description": "Wet signature card on file",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "radio",
+              "name": "Wet signature card on file",
+              "exact": true
+            },
+            {
+              "kind": "label",
+              "label": "Wet signature card on file"
+            }
+          ]
+        }
+      },
+      {
+        "name": "E-signed (DocuSign)",
+        "target": {
+          "description": "E-signed (DocuSign)",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "radio",
+              "name": "E-signed (DocuSign)",
+              "exact": true
+            },
+            {
+              "kind": "label",
+              "label": "E-signed (DocuSign)"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Back to edit",
+        "target": {
+          "description": "Back to edit",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "button",
+              "name": "Back to edit",
+              "exact": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "Open account",
+        "target": {
+          "description": "Open account",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "button",
+              "name": "Open account",
+              "exact": true
+            }
+          ]
+        }
+      }
+    ],
+    "signals": []
+  },
+  "currentStep": "test-deny-open-account",
+  "session": "authenticated",
+  "owner": "automation",
+  "contextId": "7f1fbbf9-1095-48c3-8687-cec9cab53377",
+  "pageId": "ee94d435-9866-4c6e-9e4b-4d0542d7194e"
+}

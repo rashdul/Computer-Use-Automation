@@ -1,0 +1,19 @@
+{
+  "status": "success",
+  "outputs": {
+    "deposit_accounts": [
+      {
+        "Account": "S00 {{member_id}}-S00",
+        "Product": "Membership Share",
+        "Current balance": "$1,663.00"
+      },
+      {
+        "Account": "D01 [MEMBER]-D01",
+        "Product": "Premier Checking",
+        "Current balance": "$6,704.40"
+      }
+    ]
+  },
+  "runId": "64bd9756-2b23-4eb4-8ec4-137f0d464d39",
+  "humanInterventions": 0
+}

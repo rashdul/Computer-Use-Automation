@@ -4,6 +4,7 @@ import {
   Capability,
   NAME_PATTERN,
   Step,
+  GeneralCompletion,
   type CapabilityArtifact,
   type CapabilityStep,
 } from "./schema.js";
@@ -18,6 +19,10 @@ export async function discover(
   capabilityId = "get-member-savings-balance",
 ) {
   const steps: CapabilityStep[] = [];
+  const general = run.policy.profile === "general";
+  const declaredInputs = Object.keys(run.inputs).filter(
+    (k) => run.inputs[k] !== undefined,
+  );
   const inputKey = run.inputs.member_name ? "member_name" : "member_id";
   try {
     await run.start();
@@ -27,13 +32,16 @@ export async function discover(
     });
     let repetitions = 0,
       last = "";
-    for (let index = 0; index < 30; index++) {
+    for (let index = 0; index < (general ? 60 : 30); index++) {
       const observation = await run.surface.condition();
       await run.evidence.event("observe", { observation, index });
       const prompt = JSON.stringify(
         run.evidence.clean({
+          profile: general ? "general" : "savings",
           goal: run.goal,
-          inputs: { [inputKey]: "{{" + inputKey + "}}" },
+          inputs: Object.fromEntries(
+            declaredInputs.map((key) => [key, "{{" + key + "}}"]),
+          ),
           observation,
           completedSteps: steps,
           outputs: run.outputs,
@@ -61,14 +69,18 @@ export async function discover(
         continue;
       }
       if (decision.kind === "finish") {
-        const successCondition: CapabilityArtifact["successCondition"] = [
-          { kind: "authenticated" },
-          {
-            kind: "route",
-            path: "/members/{{member_id}}/accounts/{{member_id}}-S00",
-          },
-          { kind: "output", key: "savings_balance", type: "money" },
-        ];
+        const completion = general
+          ? GeneralCompletion.parse(decision.completion)
+          : undefined;
+        const successCondition: CapabilityArtifact["successCondition"] =
+          completion?.successCondition ?? [
+            { kind: "authenticated" },
+            {
+              kind: "route",
+              path: "/members/{{member_id}}/accounts/{{member_id}}-S00",
+            },
+            { kind: "output", key: "savings_balance", type: "money" },
+          ];
         for (const cp of successCondition)
           await run.surface.checkpoint(cp, run.outputs);
         let version = 1;
@@ -84,10 +96,15 @@ export async function discover(
             ).metadata.artifactVersion + 1;
         } catch {}
         const artifact = Capability.parse({
-          schemaVersion: inputKey === "member_name" ? "1.1" : "1.0",
+          schemaVersion: general
+            ? "2.0"
+            : inputKey === "member_name"
+              ? "1.1"
+              : "1.0",
           capabilityId,
-          name: "Get member savings balance",
+          name: completion?.name ?? "Get member savings balance",
           description:
+            completion?.description ??
             "Authenticate through RFCU and return the requested member’s primary savings share (S00) current balance.",
           target: {
             application: "RFCU Member Services",
@@ -96,19 +113,26 @@ export async function discover(
             startUrl: run.policy.origin + "/login",
             surface: "web",
           },
-          inputs: [
-            {
-              key: inputKey,
-              type: "string",
-              pattern: inputKey === "member_id" ? "^\\d{7}$" : NAME_PATTERN,
-              required: true,
-              description:
-                inputKey === "member_id"
-                  ? "Seven-digit RFCU member number"
-                  : "Member name (2-100 characters); must resolve to exactly one search result",
-            },
-          ],
-          outputs: [
+          inputs: general
+            ? declaredInputs.map((key) => ({
+                key,
+                type: "string",
+                required: true,
+                description: "Runtime " + key.replaceAll("_", " "),
+              }))
+            : [
+                {
+                  key: inputKey,
+                  type: "string",
+                  pattern: inputKey === "member_id" ? "^\\d{7}$" : NAME_PATTERN,
+                  required: true,
+                  description:
+                    inputKey === "member_id"
+                      ? "Seven-digit RFCU member number"
+                      : "Member name (2-100 characters); must resolve to exactly one search result",
+                },
+              ],
+          outputs: completion?.outputs ?? [
             {
               key: "savings_balance",
               type: "money",
@@ -123,7 +147,7 @@ export async function discover(
             allowedOrigins: run.policy.origins,
             allowedRoutes: run.policy.routes,
             allowedActions: run.policy.actions,
-            riskLevel: "safe",
+            riskLevel: general && run.approvals.request ? "sensitive" : "safe",
           },
           metadata: {
             createdAt: new Date().toISOString(),
@@ -134,8 +158,14 @@ export async function discover(
             model: provider.model,
           },
         });
-        const serialized = JSON.stringify(artifact, null, 2) + "\n";
+        const serialized =
+          JSON.stringify(
+            JSON.parse(parameterize(JSON.stringify(artifact), run.inputs)),
+            null,
+            2,
+          ) + "\n";
         run.secrets.assertAbsent(serialized);
+        Capability.parse(JSON.parse(serialized));
         if (/\b\d{7}\b|\$\d/.test(serialized))
           throw new RuntimeCondition(
             "ARTIFACT_DATA_LEAK",
@@ -181,7 +211,7 @@ export async function discover(
     }
     throw new RuntimeCondition(
       "DISCOVERY_LIMIT",
-      "Discovery exceeded the 30-decision limit",
+      "Discovery exceeded its bounded decision limit",
     );
   } catch (error) {
     return run.finish(error);

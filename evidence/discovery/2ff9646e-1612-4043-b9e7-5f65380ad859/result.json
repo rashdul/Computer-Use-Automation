@@ -1,0 +1,7 @@
+{
+  "status": "failure",
+  "errorType": "MODEL_REQUEST_FAILED",
+  "stepId": "check-regular-share-savings",
+  "message": "Codex exited with code 1; provider usage/rate limit",
+  "runId": "2ff9646e-1612-4043-b9e7-5f65380ad859"
+}

@@ -1,0 +1,364 @@
+{
+  "observation": {
+    "readables": [
+      {
+        "name": "Member search",
+        "target": {
+          "description": "Member search",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "heading",
+              "name": "Member search",
+              "exact": false
+            }
+          ]
+        },
+        "type": "text"
+      },
+      {
+        "name": "Results",
+        "target": {
+          "description": "Results",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "heading",
+              "name": "Results",
+              "exact": false
+            }
+          ]
+        },
+        "type": "text"
+      },
+      {
+        "name": "Members matching the search",
+        "target": {
+          "description": "Members matching the search",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "table",
+              "name": "Members matching the search",
+              "exact": true
+            }
+          ]
+        },
+        "type": "table",
+        "columns": [
+          "City",
+          "Branch",
+          "Status",
+          "Member since"
+        ]
+      }
+    ],
+    "alerts": [],
+    "path": "/members?q={{member_name}}",
+    "session": "authenticated",
+    "controls": [
+      {
+        "name": "Rashed Federal Credit Union — Member search",
+        "target": {
+          "description": "Rashed Federal Credit Union — Member search",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "link",
+              "name": "Rashed Federal Credit Union — Member search",
+              "exact": true
+            },
+            {
+              "kind": "attribute",
+              "tag": "a",
+              "attribute": "href",
+              "value": "/members"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Member search",
+        "target": {
+          "description": "Member search",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "link",
+              "name": "Member search",
+              "exact": true
+            },
+            {
+              "kind": "attribute",
+              "tag": "a",
+              "attribute": "href",
+              "value": "/members"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Open sub-account",
+        "target": {
+          "description": "Open sub-account",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "link",
+              "name": "Open sub-account",
+              "exact": true
+            },
+            {
+              "kind": "attribute",
+              "tag": "a",
+              "attribute": "href",
+              "value": "/open-account"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Product rates",
+        "target": {
+          "description": "Product rates",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "link",
+              "name": "Product rates",
+              "exact": true
+            },
+            {
+              "kind": "attribute",
+              "tag": "a",
+              "attribute": "href",
+              "value": "/products"
+            }
+          ]
+        }
+      },
+      {
+        "name": "My activity",
+        "target": {
+          "description": "My activity",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "link",
+              "name": "My activity",
+              "exact": true
+            },
+            {
+              "kind": "attribute",
+              "tag": "a",
+              "attribute": "href",
+              "value": "/activity"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Search",
+        "target": {
+          "description": "Search",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "searchbox",
+              "name": "Search",
+              "exact": true
+            },
+            {
+              "kind": "label",
+              "label": "Search"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Status",
+        "target": {
+          "description": "Status",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "combobox",
+              "name": "Status",
+              "exact": true
+            },
+            {
+              "kind": "label",
+              "label": "Status"
+            }
+          ]
+        },
+        "options": [
+          {
+            "label": "Any status",
+            "value": ""
+          },
+          {
+            "label": "Active",
+            "value": "active"
+          },
+          {
+            "label": "Dormant",
+            "value": "dormant"
+          },
+          {
+            "label": "Closed",
+            "value": "closed"
+          },
+          {
+            "label": "Deceased",
+            "value": "deceased"
+          }
+        ]
+      },
+      {
+        "name": "Branch",
+        "target": {
+          "description": "Branch",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "combobox",
+              "name": "Branch",
+              "exact": true
+            },
+            {
+              "kind": "label",
+              "label": "Branch"
+            }
+          ]
+        },
+        "options": [
+          {
+            "label": "All branches",
+            "value": ""
+          },
+          {
+            "label": "BAL · Baltimore Main Office",
+            "value": "BAL"
+          },
+          {
+            "label": "TWS · Towson",
+            "value": "TWS"
+          },
+          {
+            "label": "COL · Columbia",
+            "value": "COL"
+          },
+          {
+            "label": "ANP · Annapolis",
+            "value": "ANP"
+          },
+          {
+            "label": "SSP · Silver Spring",
+            "value": "SSP"
+          },
+          {
+            "label": "DCK · Washington K Street",
+            "value": "DCK"
+          },
+          {
+            "label": "ARL · Arlington",
+            "value": "ARL"
+          },
+          {
+            "label": "GLB · Glen Burnie",
+            "value": "GLB"
+          }
+        ]
+      },
+      {
+        "name": "Sort by",
+        "target": {
+          "description": "Sort by",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "combobox",
+              "name": "Sort by",
+              "exact": true
+            },
+            {
+              "kind": "label",
+              "label": "Sort by"
+            }
+          ]
+        },
+        "options": [
+          {
+            "label": "Best match",
+            "value": "relevance"
+          },
+          {
+            "label": "Name (A–Z)",
+            "value": "name"
+          },
+          {
+            "label": "Member number",
+            "value": "member_number"
+          },
+          {
+            "label": "Newest members",
+            "value": "member_since"
+          }
+        ]
+      },
+      {
+        "name": "Search",
+        "target": {
+          "description": "Search",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "button",
+              "name": "Search",
+              "exact": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "Clear search",
+        "target": {
+          "description": "Clear search",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "button",
+              "name": "Clear search",
+              "exact": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "Next",
+        "target": {
+          "description": "Next",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "button",
+              "name": "Next",
+              "exact": true
+            }
+          ],
+          "within": {
+            "role": "navigation",
+            "name": "Pagination"
+          }
+        }
+      }
+    ],
+    "signals": []
+  },
+  "currentStep": "search-member-name",
+  "session": "authenticated",
+  "owner": "automation",
+  "contextId": "07952d3f-e854-43f4-917b-6f3dfc26ec01",
+  "pageId": "c16de0de-9026-407e-8564-784ebb798729"
+}

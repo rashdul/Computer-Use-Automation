@@ -1,0 +1,386 @@
+{
+  "schemaVersion": "2.0",
+  "capabilityId": "list-member-accounts",
+  "name": "view-member-deposit-accounts",
+  "description": "Sign in, search for the supplied member, open Accounts through Member record navigation, and extract visible deposit account suffixes, products and current balances.",
+  "target": {
+    "application": "RFCU Member Services",
+    "vendor": "RFCU",
+    "applicationVersion": "4.12.2",
+    "startUrl": "https://rashed-federal-credit-union.netlify.app/login",
+    "surface": "web"
+  },
+  "inputs": [
+    {
+      "key": "member_id",
+      "type": "string",
+      "required": true,
+      "description": "Runtime member id"
+    }
+  ],
+  "outputs": [
+    {
+      "key": "deposit_accounts",
+      "type": "table",
+      "description": "Visible deposit accounts with Account, Product and Current balance columns."
+    }
+  ],
+  "steps": [
+    {
+      "id": "fill-staff-username",
+      "description": "Fill Username with the staff credential.",
+      "action": "fill",
+      "target": {
+        "description": "Username",
+        "locators": [
+          {
+            "kind": "role",
+            "role": "textbox",
+            "name": "Username",
+            "exact": true
+          },
+          {
+            "kind": "label",
+            "label": "Username"
+          }
+        ]
+      },
+      "value": {
+        "source": "secret",
+        "key": "RFCU_STAFF_USERNAME"
+      },
+      "risk": "reversible",
+      "expectedState": {
+        "kind": "visible",
+        "target": {
+          "description": "Username",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "textbox",
+              "name": "Username",
+              "exact": true
+            },
+            {
+              "kind": "label",
+              "label": "Username"
+            }
+          ]
+        }
+      },
+      "retry": {
+        "maxAttempts": 2,
+        "safeToRepeat": true
+      }
+    },
+    {
+      "id": "fill-staff-password",
+      "description": "Fill Password with the staff credential.",
+      "action": "fill",
+      "target": {
+        "description": "Password",
+        "locators": [
+          {
+            "kind": "role",
+            "role": "textbox",
+            "name": "Password",
+            "exact": true
+          },
+          {
+            "kind": "label",
+            "label": "Password"
+          }
+        ]
+      },
+      "value": {
+        "source": "secret",
+        "key": "RFCU_STAFF_PASSWORD"
+      },
+      "risk": "reversible",
+      "expectedState": {
+        "kind": "visible",
+        "target": {
+          "description": "Password",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "textbox",
+              "name": "Password",
+              "exact": true
+            },
+            {
+              "kind": "label",
+              "label": "Password"
+            }
+          ]
+        }
+      },
+      "retry": {
+        "maxAttempts": 2,
+        "safeToRepeat": true
+      }
+    },
+    {
+      "id": "sign-in-staff",
+      "description": "Sign in to RFCU.",
+      "action": "click",
+      "target": {
+        "description": "Sign in",
+        "locators": [
+          {
+            "kind": "role",
+            "role": "button",
+            "name": "Sign in",
+            "exact": true
+          }
+        ]
+      },
+      "risk": "reversible",
+      "expectedState": {
+        "kind": "authenticated"
+      },
+      "retry": {
+        "maxAttempts": 1,
+        "safeToRepeat": false
+      }
+    },
+    {
+      "id": "fill-member-search",
+      "description": "Search for the authorized member by member ID.",
+      "action": "fill",
+      "target": {
+        "description": "Search",
+        "locators": [
+          {
+            "kind": "role",
+            "role": "searchbox",
+            "name": "Search",
+            "exact": true
+          },
+          {
+            "kind": "label",
+            "label": "Search"
+          }
+        ]
+      },
+      "value": {
+        "source": "input",
+        "key": "member_id"
+      },
+      "risk": "reversible",
+      "expectedState": {
+        "kind": "field_value",
+        "target": {
+          "description": "Search",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "searchbox",
+              "name": "Search",
+              "exact": true
+            },
+            {
+              "kind": "label",
+              "label": "Search"
+            }
+          ]
+        },
+        "value": {
+          "source": "input",
+          "key": "member_id"
+        }
+      },
+      "retry": {
+        "maxAttempts": 2,
+        "safeToRepeat": true
+      }
+    },
+    {
+      "id": "submit-member-search",
+      "description": "Search for the authorized member.",
+      "action": "click",
+      "target": {
+        "description": "Search",
+        "locators": [
+          {
+            "kind": "role",
+            "role": "button",
+            "name": "Search",
+            "exact": true
+          }
+        ]
+      },
+      "risk": "read_only",
+      "expectedState": {
+        "kind": "member_resolved"
+      },
+      "retry": {
+        "maxAttempts": 2,
+        "safeToRepeat": true
+      }
+    },
+    {
+      "id": "open-member-record",
+      "description": "Open the authorized member record.",
+      "action": "click",
+      "target": {
+        "description": "/members/{{member_id}}",
+        "locators": [
+          {
+            "kind": "attribute",
+            "attribute": "href",
+            "value": "/members/{{member_id}}",
+            "tag": "a"
+          }
+        ]
+      },
+      "risk": "read_only",
+      "expectedState": {
+        "kind": "route",
+        "path": "/members/{{member_id}}"
+      },
+      "retry": {
+        "maxAttempts": 2,
+        "safeToRepeat": true
+      }
+    },
+    {
+      "id": "open-member-accounts",
+      "description": "Open the authorized member’s Accounts page through Member record navigation.",
+      "action": "click",
+      "target": {
+        "description": "/members/{{member_id}}/accounts",
+        "locators": [
+          {
+            "kind": "attribute",
+            "attribute": "href",
+            "value": "/members/{{member_id}}/accounts",
+            "tag": "a"
+          }
+        ],
+        "within": {
+          "role": "navigation",
+          "name": "Member record"
+        }
+      },
+      "risk": "read_only",
+      "expectedState": {
+        "kind": "route",
+        "path": "/members/{{member_id}}/accounts"
+      },
+      "retry": {
+        "maxAttempts": 2,
+        "safeToRepeat": true
+      }
+    },
+    {
+      "id": "extract-deposit-accounts",
+      "description": "Return visible deposit account suffixes, products and current balances using observed column labels.",
+      "action": "extract",
+      "target": {
+        "description": "Deposit accounts",
+        "locators": [
+          {
+            "kind": "css",
+            "selector": "section.panel:has(h2:text-matches(\"^Deposit accounts\")) table"
+          }
+        ]
+      },
+      "output": "deposit_accounts",
+      "outputType": "table",
+      "columns": [
+        "Account",
+        "Product",
+        "Current balance"
+      ],
+      "risk": "read_only",
+      "precondition": {
+        "kind": "route",
+        "path": "/members/{{member_id}}/accounts"
+      },
+      "expectedState": {
+        "kind": "output",
+        "key": "deposit_accounts",
+        "type": "table"
+      },
+      "retry": {
+        "maxAttempts": 2,
+        "safeToRepeat": true
+      }
+    }
+  ],
+  "successCondition": [
+    {
+      "kind": "authenticated"
+    },
+    {
+      "kind": "route",
+      "path": "/members/{{member_id}}/accounts"
+    },
+    {
+      "kind": "visible",
+      "target": {
+        "description": "Deposit accounts",
+        "locators": [
+          {
+            "kind": "role",
+            "role": "heading",
+            "name": "Deposit accounts",
+            "exact": false
+          }
+        ]
+      }
+    },
+    {
+      "kind": "output",
+      "key": "deposit_accounts",
+      "type": "table"
+    }
+  ],
+  "safety": {
+    "allowedOrigins": [
+      "https://rashed-federal-credit-union.netlify.app"
+    ],
+    "allowedRoutes": [
+      "/login",
+      "/session-expired",
+      "/members",
+      "/products",
+      "/activity",
+      "/open-account",
+      "/members/{{member_id}}",
+      "/members/{{member_id}}/accounts",
+      "/members/{{member_id}}/accounts/:account",
+      "/members/{{member_id}}/notes",
+      "/members/{{member_id}}/access-log",
+      "/members/{{member_id}}/accounts/new",
+      "/members/{{member_id}}/accounts/new/review",
+      "/members/{{member_id}}/accounts/new/confirmation/:receipt",
+      "/admin",
+      "/admin/environment",
+      "/admin/staff",
+      "/admin/permissions",
+      "/admin/products",
+      "/admin/audit",
+      "/admin/test-data"
+    ],
+    "allowedActions": [
+      "click",
+      "fill",
+      "select",
+      "navigate",
+      "wait",
+      "extract",
+      "check"
+    ],
+    "riskLevel": "safe"
+  },
+  "metadata": {
+    "createdAt": "2026-09-23T19:27:33.513Z",
+    "source": "llm-discovery",
+    "artifactVersion": 1,
+    "discoveryRunId": "64bd9756-2b23-4eb4-8ec4-137f0d464d39",
+    "modelProvider": "codex-cli",
+    "model": "codex-default"
+  }
+}

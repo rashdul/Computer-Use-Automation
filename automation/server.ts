@@ -2,8 +2,9 @@ import express from "express";
 import { readdir, readFile } from "node:fs/promises";
 import { z } from "zod";
 import { settings } from "./config.js";
-import { Inputs } from "./schema.js";
+import { Inputs, GeneralInputs } from "./schema.js";
 import { Secrets } from "./secrets.js";
+import { GENERAL_ROUTES } from "./rfcu-profile.js";
 import { Policy, ROUTES } from "./policy.js";
 import { Run } from "./runtime.js";
 import { discover } from "./discovery.js";
@@ -64,7 +65,8 @@ const Request = z
     mode: z.enum(["discovery", "replay"]),
     goal: z.string().max(1500).optional(),
     startUrl: z.string().url().optional(),
-    inputs: Inputs,
+    inputs: GeneralInputs.default({}),
+    profile: z.enum(["general", "savings"]).default("general"),
     capabilityId: z
       .string()
       .regex(/^[a-z][a-z0-9-]{0,80}$/)
@@ -84,17 +86,16 @@ const Request = z
   .strict();
 app.post("/api/runs", async (req, res) => {
   const input = Request.parse(req.body);
-  input.capabilityId ??= input.inputs.member_name
-    ? "get-member-savings-balance-by-name"
-    : "get-member-savings-balance";
-  if (
-    input.mode === "discovery" &&
-    input.goal &&
-    !/savings[\s\S]*balance|balance[\s\S]*savings/i.test(input.goal)
-  )
+  input.capabilityId ??=
+    input.profile === "general"
+      ? "rfcu-workflow"
+      : input.inputs.member_name
+        ? "get-member-savings-balance-by-name"
+        : "get-member-savings-balance";
+  if (input.mode === "discovery" && !input.goal?.trim())
     throw new RuntimeCondition(
-      "UNSUPPORTED_GOAL",
-      "This implementation supports primary savings balance lookup. Supply a savings-balance goal.",
+      "GOAL_REQUIRED",
+      "Enter a natural-language goal",
     );
   if ([...runs.values()].some((r) => !r.result)) {
     res.status(409).json({
@@ -113,10 +114,22 @@ app.post("/api/runs", async (req, res) => {
     input.mode === "replay"
       ? await loadCapability(input.capabilityId)
       : undefined;
+  const general = artifact
+    ? artifact.schemaVersion === "2.0"
+    : input.profile === "general";
+  if (!general) Inputs.parse(input.inputs);
+  const allowed = general ? GENERAL_ROUTES : ROUTES;
   const routes = artifact
-    ? ROUTES.filter((r) => artifact.safety.allowedRoutes.includes(r))
-    : ROUTES;
-  const policy = new Policy(settings.origin, input.inputs, routes);
+    ? allowed.filter((r) => artifact.safety.allowedRoutes.includes(r))
+    : allowed;
+  const policy = new Policy(
+    settings.origin,
+    input.inputs,
+    routes,
+    undefined,
+    undefined,
+    general ? "general" : "savings",
+  );
   const provider = input.mode === "discovery" ? providerFromEnv() : undefined;
   // Setup above awaits local files; another request may have started meanwhile.
   // Recheck immediately before registration, with no intervening await.
@@ -133,7 +146,8 @@ app.post("/api/runs", async (req, res) => {
     secrets,
     policy,
     input.goal ??
-      `Log in to RFCU, look up member {{${input.inputs.member_name ? "member_name" : "member_id"}}}, and return their current savings balance.`,
+      artifact?.description ??
+      "Execute the selected RFCU capability",
     input,
   );
   runs.set(run.runId, run);
@@ -178,6 +192,7 @@ app.get("/api/runs/:id", async (req, res) => {
       owner: run.control.owner,
       session: run.surface?.session.state,
       intervention: run.control.intervention,
+      approval: run.approvals.request,
       result: run.result,
       modelCalls: run.modelCalls,
       events: run.evidence.events,
@@ -195,12 +210,29 @@ app.get("/api/runs/:id/frame", async (req, res) => {
     await run.surface.page.screenshot({
       mask: [
         run.surface.page.locator(
-          "input,.shell__topbar,.topbar,.sidebar__footer,.shell__user,.sidebar-user",
+          run.policy.profile === "general"
+            ? 'input[type="password"],input[name="username"],.topbar,.sidebar__foot'
+            : "input,textarea,.shell__topbar,.topbar,.sidebar__footer,.shell__user,.sidebar-user",
         ),
       ],
       maskColor: "#c9d6e6",
     }),
   );
+});
+app.post("/api/runs/:id/approval", async (req, res) => {
+  const run = getRun(req.params.id);
+  const input = z
+    .object({ id: z.string().uuid(), approved: z.boolean() })
+    .strict()
+    .parse(req.body);
+  if (req.headers["x-rfcu-operator"] === "automated-test")
+    await run.evidence.event("operator_test_provenance", {
+      operator: "automated-test",
+      simulatedOperator: true,
+      decision: input.approved ? "approve" : "deny",
+    });
+  await run.approvals.decide(input.id, input.approved);
+  res.json({ status: run.approvals.request?.status });
 });
 app.post("/api/runs/:id/takeover", async (req, res) => {
   const run = getRun(req.params.id);

@@ -1,0 +1,7 @@
+{
+  "status": "failure",
+  "errorType": "START_FAILED",
+  "stepId": "start",
+  "message": "RFCU login page could not be opened",
+  "runId": "e87ed2e4-4b6f-4ab1-80ab-b70c8ed2a3e5"
+}

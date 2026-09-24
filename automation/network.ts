@@ -1,3 +1,4 @@
+import { GENERAL_READ_RPC } from "./rfcu-profile.js";
 import { readFile } from "node:fs/promises";
 import { parse } from "dotenv";
 
@@ -24,6 +25,7 @@ export function allowResource(
   url: string,
   appOrigin: string,
   backendOrigin?: string,
+  general = false,
 ) {
   const u = new URL(url);
   if (u.origin === appOrigin) return true;
@@ -33,5 +35,7 @@ export function allowResource(
   )
     return true;
   const rpc = u.pathname.match(/^\/rest\/v1\/rpc\/([a-z_]+)$/);
-  return !!rpc && SAFE_RPC.has(rpc[1]);
+  return (
+    !!rpc && (SAFE_RPC.has(rpc[1]) || (general && GENERAL_READ_RPC.has(rpc[1])))
+  );
 }

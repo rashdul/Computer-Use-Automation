@@ -53,15 +53,41 @@ export function parameterize(
   text: string,
   inputs: Record<string, string | undefined>,
 ) {
-  for (const [key, value] of Object.entries(inputs))
-    if (value) {
-      text = text.split(value).join("{{" + key + "}}");
-      text = text.split(encodeURIComponent(value)).join("{{" + key + "}}");
-      text = text
-        .split(new URLSearchParams({ q: value }).toString().slice(2))
-        .join("{{" + key + "}}");
+  const replace = (str: string) => {
+    for (const [key, value] of Object.entries(inputs).sort(
+      (a, b) => (b[1]?.length ?? 0) - (a[1]?.length ?? 0),
+    )) {
+      if (!value) continue;
+      const placeholder = "{{" + key + "}}";
+      if (str === value) {
+        str = placeholder;
+        continue;
+      }
+      if (value.length < 4) continue;
+      for(const variant of [value,encodeURIComponent(value),new URLSearchParams({q:value}).toString().slice(2)]) {
+        const escaped=variant.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
+        str=str.replace(new RegExp("(?<![\\p{L}\\p{N}_])"+escaped+"(?![\\p{L}\\p{N}_])","gu"),()=>placeholder);
+      }
     }
-  return text;
+    return str;
+  };
+  try {
+    const parsed = JSON.parse(text);
+    const structural=new Set(["action","kind","role","type","source","key","output","outputType","currency","risk","schemaVersion","surface","profile","application","vendor"]);
+    const walk = (v: any): any =>
+      typeof v === "string"
+        ? replace(v)
+        : Array.isArray(v)
+          ? v.map(walk)
+          : v && typeof v === "object"
+            ? Object.fromEntries(
+                Object.entries(v).map(([k, value]) => [k, structural.has(k)?value:walk(value)]),
+              )
+            : v;
+    return JSON.stringify(walk(parsed));
+  } catch {
+    return replace(text);
+  }
 }
 export function redactPII(text: string) {
   return text

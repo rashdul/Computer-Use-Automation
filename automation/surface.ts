@@ -4,12 +4,13 @@ import {
   type BrowserContext,
   type Page,
 } from "playwright";
-import { randomUUID } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import type {
   CapabilityStep,
   CheckpointSpec,
   InputValues,
   Money,
+  OutputValue,
   TargetSpec,
 } from "./schema.js";
 import { Policy, interpolate } from "./policy.js";
@@ -18,6 +19,12 @@ import { resolveTarget } from "./locators.js";
 import { SessionManager } from "./session.js";
 import { RuntimeCondition, classifyText } from "./errors.js";
 import { allowResource, targetBackendOrigin } from "./network.js";
+import {
+  observeGeneral,
+  extractGeneral,
+  outputMatches,
+} from "./general-surface.js";
+import { SAFE_BUTTON, mutationRpcs } from "./rfcu-profile.js";
 import { resolveNameSearch } from "./member-search.js";
 
 export interface Observation {
@@ -30,10 +37,12 @@ export interface Observation {
 export interface SurfaceAdapter {
   readonly session: SessionManager;
   observe(): Promise<Observation>;
-  execute(step: CapabilityStep): Promise<{ strategy?: string; output?: Money }>;
+  execute(
+    step: CapabilityStep,
+  ): Promise<{ strategy?: string; output?: OutputValue }>;
   checkpoint(
     checkpoint: CheckpointSpec,
-    outputs: Record<string, Money>,
+    outputs: Record<string, OutputValue>,
   ): Promise<void>;
   close(): Promise<void>;
 }
@@ -51,6 +60,81 @@ export class PlaywrightSurface implements SurfaceAdapter {
   readonly contextId = randomUUID();
   readonly pageId = randomUUID();
   private blockedNavigation = false;
+  private approvedFingerprint?: string;
+  private writePermit?: { rpcs: string[]; remaining: number };
+  mutationAttempted = false;
+  async approvalDetails(step: CapabilityStep) {
+    if (
+      this.policy.profile !== "general" ||
+      !["click", "fill", "select", "check"].includes(step.action)
+    )
+      return;
+    const { locator } = await resolveTarget(
+      this.page,
+      step.target!,
+      this.inputs,
+    );
+    const c = await locator.evaluate((e) => ({
+      tag: e.tagName.toLowerCase(),
+      href: e.getAttribute("href"),
+      type: e.getAttribute("type"),
+      name: (e.getAttribute("aria-label") || e.textContent || "").trim(),
+    }));
+    if (c.tag === "a" && c.href) return;
+    const path = new URL(this.page.url()).pathname;
+    // UI authentication is explicitly authorized by starting a run. It does not
+    // authorize later member, financial or administration changes.
+    if (
+      path === "/login" &&
+      (step.value?.source === "secret" ||
+        (step.action === "click" && /^Sign in$/i.test(c.name)))
+    )
+      return;
+    const risk =
+      ["sensitive", "irreversible"].includes(step.risk) ||
+      (path.startsWith("/admin") &&
+        ["fill", "select", "check"].includes(step.action)) ||
+      (path.startsWith("/admin") &&
+        step.action === "click" &&
+        (c.type === "checkbox" || c.type === "radio")) ||
+      (step.action === "click" &&
+        c.type !== "checkbox" &&
+        c.type !== "radio" &&
+        !SAFE_BUTTON.test(c.name));
+    if (!risk) return;
+    const formState = await this.page
+      .locator("input,textarea,select")
+      .evaluateAll((es) =>
+        es.map((e) => ({
+          name: e.getAttribute("name"),
+          id: e.id,
+          value: (e as HTMLInputElement).value,
+          checked: (e as HTMLInputElement).checked,
+        })),
+      );
+    const fingerprint = createHash("sha256")
+      .update(JSON.stringify({ url: this.page.url(), step, c, formState }))
+      .digest("hex");
+    return {
+      fingerprint,
+      target: step.target!.description,
+      action: step.action,
+    };
+  }
+  async approve(step: CapabilityStep, fingerprint: string) {
+    const details = await this.approvalDetails(step);
+    if (!details || details.fingerprint !== fingerprint)
+      throw new RuntimeCondition(
+        "APPROVAL_STALE",
+        "Page or form changed while awaiting approval; restart approval",
+      );
+    this.approvedFingerprint = fingerprint;
+  }
+  endAction() {
+    this.writePermit = undefined;
+    this.approvedFingerprint = undefined;
+  }
+
   constructor(
     readonly browser: Browser,
     readonly context: BrowserContext,
@@ -104,7 +188,27 @@ export class PlaywrightSurface implements SurfaceAdapter {
           await route.abort();
           return;
         }
-      } else if (!allowResource(request.url(), policy.origin, backendOrigin)) {
+      } else if (
+        !allowResource(
+          request.url(),
+          policy.origin,
+          backendOrigin,
+          policy.profile === "general",
+        )
+      ) {
+        const url = new URL(request.url());
+        const rpc = url.pathname.match(/^\/rest\/v1\/rpc\/([a-z_]+)$/)?.[1];
+        if (
+          url.origin === backendOrigin &&
+          rpc &&
+          surface.writePermit?.rpcs.includes(rpc) &&
+          surface.writePermit.remaining > 0
+        ) {
+          surface.writePermit.remaining--;
+          surface.mutationAttempted = true;
+          await route.continue();
+          return;
+        }
         surface.blockedNavigation = true;
         await route.abort();
         return;
@@ -307,10 +411,27 @@ export class PlaywrightSurface implements SurfaceAdapter {
           ],
         },
       });
+    const general =
+      this.policy.profile === "general"
+        ? await observeGeneral(
+            this.page,
+            this.policy,
+            this.inputs,
+            this.secrets,
+          )
+        : undefined;
     return {
+      ...(general
+        ? { readables: general.readables, alerts: general.alerts }
+        : {}),
       path: parameterize(u.pathname + u.search, this.inputs),
       session,
-      controls,
+      controls: general
+        ? [
+            ...general.controls,
+            ...controls.filter((c) => c.name === "Current balance value"),
+          ]
+        : controls,
       signals,
       accountSummary,
     };
@@ -328,14 +449,33 @@ export class PlaywrightSurface implements SurfaceAdapter {
     }
     return o;
   }
-  async execute(step: CapabilityStep) {
+  async execute(
+    step: CapabilityStep,
+  ): Promise<{ strategy?: string; output?: OutputValue }> {
     const current = await this.condition();
     this.policy.step(step, new URL(this.page.url()).pathname);
-    if (current.signals.includes("MODAL_PRESENT"))
+    if (
+      this.policy.profile !== "general" &&
+      current.signals.includes("MODAL_PRESENT")
+    )
       throw new RuntimeCondition(
         "INTERSTITIAL_BLOCKED",
         "An unexpected dialog requires operator review",
       );
+    this.mutationAttempted = false;
+    const approval = await this.approvalDetails(step);
+    if (approval) {
+      if (this.approvedFingerprint !== approval.fingerprint)
+        throw new RuntimeCondition(
+          "HUMAN_APPROVAL_REQUIRED",
+          "This action needs fresh operator approval",
+        );
+      this.approvedFingerprint = undefined;
+      this.writePermit = {
+        rpcs: mutationRpcs(new URL(this.page.url()).pathname),
+        remaining: 1,
+      };
+    }
     if (step.action === "navigate") {
       if (
         this.session.state !== "authenticated" &&
@@ -361,6 +501,8 @@ export class PlaywrightSurface implements SurfaceAdapter {
       await this.page.waitForTimeout(300);
       return {};
     }
+    if (this.policy.profile === "general" && step.action === "extract")
+      return extractGeneral(this.page, step, this.inputs, this.secrets);
     const { locator, strategy } = await resolveTarget(
       this.page,
       step.target!,
@@ -388,6 +530,15 @@ export class PlaywrightSurface implements SurfaceAdapter {
       await locator.selectOption({
         label: value.source === "input" ? this.inputs[value.key] : value.value,
       });
+    } else if (step.action === "check") {
+      const ref = step.value!;
+      const value = ref.source === "input" ? this.inputs[ref.key] : undefined;
+      if (value !== "true" && value !== "false")
+        throw new RuntimeCondition(
+          "INVALID_PARAMETER",
+          "Checkbox input must be true or false",
+        );
+      await locator.setChecked(value === "true");
     } else if (step.action === "click") {
       // Risk is derived from the actual control as well as model-supplied intent.
       const tag = await locator.evaluate((e) => e.tagName.toLowerCase());
@@ -395,7 +546,10 @@ export class PlaywrightSurface implements SurfaceAdapter {
       if (tag === "a" && href) this.policy.url(href);
       else {
         const name = (await locator.innerText()).trim();
-        if (!["Sign in", "Search", "Try again"].includes(name))
+        if (
+          this.policy.profile !== "general" &&
+          !["Sign in", "Search", "Try again"].includes(name)
+        )
           throw new RuntimeCondition(
             "HUMAN_APPROVAL_REQUIRED",
             "This control is not on the read-only button allowlist",
@@ -440,38 +594,82 @@ export class PlaywrightSurface implements SurfaceAdapter {
     }
     return { strategy };
   }
-  async checkpoint(cp: CheckpointSpec, outputs: Record<string, Money>) {
+  async checkpoint(cp: CheckpointSpec, outputs: Record<string, OutputValue>) {
     const deadline = Date.now() + 12000;
     do {
       await this.condition();
+      if (cp.kind === "field_value") {
+        const { locator } = await resolveTarget(
+          this.page,
+          cp.target,
+          this.inputs,
+          250,
+        );
+        const input = this.inputs[cp.value.key];
+        const kind = await locator.getAttribute("type");
+        const actual =
+          kind === "checkbox" || kind === "radio"
+            ? String(await locator.isChecked())
+            : await locator.evaluate((e) =>
+                e.tagName === "SELECT"
+                  ? (e as HTMLSelectElement).selectedOptions[0]?.label
+                  : (e as HTMLInputElement).value,
+              );
+        if (input !== undefined && actual === input) return;
+      }
       if (cp.kind === "member_resolved") {
-        if (!this.inputs.member_name)
-          throw new RuntimeCondition(
-            "INVALID_PARAMETER",
-            "Name resolution requires member_name",
-          );
-        const id = await resolveNameSearch(this.page, this.inputs.member_name);
-        if (id) {
-          if (this.inputs.member_id && this.inputs.member_id !== id)
+        if (this.inputs.member_id && !this.inputs.member_name) {
+          const url = new URL(this.page.url());
+          if (
+            url.pathname === "/members" &&
+            url.searchParams.get("q") === this.inputs.member_id &&
+            (await this.page
+              .locator(`tr[data-href="/members/${this.inputs.member_id}"]`)
+              .count()) === 1
+          )
+            return;
+        } else {
+          if (!this.inputs.member_name)
             throw new RuntimeCondition(
-              "MEMBER_CHANGED",
-              "Resolved member changed during this run",
+              "INVALID_PARAMETER",
+              "Name resolution requires member_name",
             );
-          this.inputs.member_id = id;
-          return;
+          const id = await resolveNameSearch(
+            this.page,
+            this.inputs.member_name,
+          );
+          if (id) {
+            if (this.inputs.member_id && this.inputs.member_id !== id)
+              throw new RuntimeCondition(
+                "MEMBER_CHANGED",
+                "Resolved member changed during this run",
+              );
+            this.inputs.member_id = id;
+            return;
+          }
         }
       }
       if (cp.kind === "authenticated" && this.session.state === "authenticated")
         return;
       if (
         cp.kind === "route" &&
-        new URL(this.page.url()).pathname === interpolate(cp.path, this.inputs)
+        (() => {
+          const expected = new URL(
+            interpolate(cp.path, this.inputs),
+            this.policy.origin,
+          );
+          const actual = new URL(this.page.url());
+          return (
+            actual.pathname === expected.pathname &&
+            (!expected.search || actual.search === expected.search)
+          );
+        })()
       )
         return;
       if (
         cp.kind === "output" &&
-        outputs[cp.key] &&
-        /^-?\d+\.\d{2}$/.test(outputs[cp.key].amount)
+        outputs[cp.key] !== undefined &&
+        outputMatches(outputs[cp.key], cp.type)
       )
         return;
       if (cp.kind === "visible") {

@@ -1,0 +1,11 @@
+{
+  "status": "passed",
+  "operator": "automated-ui-test",
+  "runId": "6d06ebcf-f607-49ec-84f5-7ba99e208ceb",
+  "modelCalls": 0,
+  "checks": [
+    "memberless product replay",
+    "catalog parameter fields",
+    "no page errors"
+  ]
+}

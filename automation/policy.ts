@@ -1,4 +1,5 @@
 import type { CapabilityStep, InputValues } from "./schema.js";
+import { GENERAL_ROUTES, matchRoute, permittedQuery } from "./rfcu-profile.js";
 import { RuntimeCondition } from "./errors.js";
 
 export const ROUTES = [
@@ -12,7 +13,7 @@ export const ROUTES = [
 export function interpolate(text: string, inputs: InputValues) {
   return text.replace(/\{\{(\w+)\}\}/g, (_, key) => {
     if (
-      !["member_id", "member_name"].includes(key) ||
+      !Object.prototype.hasOwnProperty.call(inputs, key) ||
       !inputs[key as keyof InputValues]
     )
       throw new RuntimeCondition(
@@ -34,6 +35,7 @@ export class Policy {
     )
       .split(",")
       .map((s) => s.trim()),
+    public profile: "savings" | "general" = "savings",
   ) {
     const u = new URL(origin);
     const local = ["localhost", "127.0.0.1", "[::1]"].includes(u.hostname);
@@ -49,6 +51,10 @@ export class Policy {
         "POLICY_DENIED",
         "RFCU origin must be explicitly allowlisted; remote origins require HTTPS",
       );
+    if (profile === "general" && routes === ROUTES)
+      this.routes = GENERAL_ROUTES;
+    if (profile === "general" && !this.actions.includes("check"))
+      this.actions = [...this.actions, "check"];
     this.origin = u.origin;
     this.origins = [u.origin];
   }
@@ -61,7 +67,9 @@ export class Policy {
       u.password ||
       !this.routes.some((p) => {
         try {
-          return interpolate(p, this.inputs) === path;
+          return this.profile === "general"
+            ? GENERAL_ROUTES.includes(p) && matchRoute(p, path, this.inputs)
+            : interpolate(p, this.inputs) === path;
         } catch {
           return false;
         }
@@ -73,9 +81,11 @@ export class Policy {
       );
     for (const [key, val] of u.searchParams) {
       if (
-        key !== "q" ||
-        val !== (this.inputs.member_name ?? this.inputs.member_id) ||
-        path !== "/members"
+        this.profile === "general"
+          ? !permittedQuery(path, key, val, this.inputs)
+          : key !== "q" ||
+            val !== (this.inputs.member_name ?? this.inputs.member_id) ||
+            path !== "/members"
       )
         throw new RuntimeCondition(
           "POLICY_DENIED",
@@ -87,13 +97,17 @@ export class Policy {
   step(step: CapabilityStep, pathname: string) {
     if (!this.actions.includes(step.action))
       throw new RuntimeCondition("POLICY_DENIED", "Action class not allowed");
-    if (["sensitive", "irreversible"].includes(step.risk))
+    if (
+      this.profile !== "general" &&
+      ["sensitive", "irreversible"].includes(step.risk)
+    )
       throw new RuntimeCondition(
         "HUMAN_APPROVAL_REQUIRED",
         "Risky actions are stopped before execution",
       );
     const t = JSON.stringify(step.target ?? {});
     if (
+      this.profile !== "general" &&
       /Reveal|Show password|Open sub-account|Add note|Submit|Transfer|Delete|Attest|Sign out/i.test(
         t,
       )
@@ -126,6 +140,7 @@ export class Policy {
         );
     }
     if (
+      this.profile !== "general" &&
       step.action === "fill" &&
       step.value?.source !== "secret" &&
       !(
@@ -148,11 +163,36 @@ export class Policy {
         "POLICY_DENIED",
         "Only parameterized member search is writable",
       );
-    if (step.action === "select")
+    if (this.profile !== "general" && step.action === "select")
       throw new RuntimeCondition(
         "POLICY_DENIED",
         "No selection controls are needed by this capability",
       );
+    if (this.profile === "general") {
+      if (/Reveal|Show password|Social security/i.test(t))
+        throw new RuntimeCondition(
+          "POLICY_DENIED",
+          "Secret and full SSN display remain disabled",
+        );
+      if (
+        ["fill", "select", "check"].includes(step.action) &&
+        step.value?.source !== "secret" &&
+        step.value?.source !== "input"
+      )
+        throw new RuntimeCondition(
+          "POLICY_DENIED",
+          "Form values must use named runtime inputs",
+        );
+      if (
+        pathname === "/login" &&
+        ["fill", "select", "check"].includes(step.action) &&
+        step.value?.source !== "secret"
+      )
+        throw new RuntimeCondition(
+          "POLICY_DENIED",
+          "Login fields require symbolic credential references",
+        );
+    }
     if (step.action === "navigate")
       this.url(
         interpolate(

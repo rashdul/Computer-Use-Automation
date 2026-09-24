@@ -1,0 +1,881 @@
+{
+  "status": "failure",
+  "errorType": "CHECKPOINT_FAILED",
+  "stepId": "start-member-sub-account",
+  "expected": {
+    "kind": "route",
+    "path": "/open-account"
+  },
+  "observed": {
+    "readables": [
+      {
+        "name": "Open a sub-account",
+        "target": {
+          "description": "Open a sub-account",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "heading",
+              "name": "Open a sub-account",
+              "exact": false
+            }
+          ]
+        },
+        "type": "text"
+      },
+      {
+        "name": "Product",
+        "target": {
+          "description": "Product",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "heading",
+              "name": "Product",
+              "exact": false
+            }
+          ]
+        },
+        "type": "text"
+      },
+      {
+        "name": "Account details",
+        "target": {
+          "description": "Account details",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "heading",
+              "name": "Account details",
+              "exact": false
+            }
+          ]
+        },
+        "type": "text"
+      },
+      {
+        "name": "Ownership",
+        "target": {
+          "description": "Ownership",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "heading",
+              "name": "Ownership",
+              "exact": false
+            }
+          ]
+        },
+        "type": "text"
+      },
+      {
+        "name": "Beneficiaries",
+        "target": {
+          "description": "Beneficiaries",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "heading",
+              "name": "Beneficiaries",
+              "exact": false
+            }
+          ]
+        },
+        "type": "text"
+      },
+      {
+        "name": "Opening deposit",
+        "target": {
+          "description": "Opening deposit",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "heading",
+              "name": "Opening deposit",
+              "exact": false
+            }
+          ]
+        },
+        "type": "text"
+      },
+      {
+        "name": "Statements",
+        "target": {
+          "description": "Statements",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "heading",
+              "name": "Statements",
+              "exact": false
+            }
+          ]
+        },
+        "type": "text"
+      },
+      {
+        "name": "Account purpose",
+        "target": {
+          "description": "Account purpose",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "heading",
+              "name": "Account purpose",
+              "exact": false
+            }
+          ]
+        },
+        "type": "text"
+      },
+      {
+        "name": "Summary",
+        "target": {
+          "description": "Summary",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "heading",
+              "name": "Summary",
+              "exact": false
+            }
+          ]
+        },
+        "type": "text"
+      },
+      {
+        "name": "Screening",
+        "target": {
+          "description": "Screening",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "heading",
+              "name": "Screening",
+              "exact": false
+            }
+          ]
+        },
+        "type": "text"
+      },
+      {
+        "name": "Product",
+        "target": {
+          "description": "Product",
+          "locators": [
+            {
+              "kind": "css",
+              "selector": "dt:text-is(\"Product\") + dd"
+            }
+          ]
+        },
+        "type": "text"
+      },
+      {
+        "name": "Account number",
+        "target": {
+          "description": "Account number",
+          "locators": [
+            {
+              "kind": "css",
+              "selector": "dt:text-is(\"Account number\") + dd"
+            }
+          ]
+        },
+        "type": "text"
+      },
+      {
+        "name": "Rate",
+        "target": {
+          "description": "Rate",
+          "locators": [
+            {
+              "kind": "css",
+              "selector": "dt:text-is(\"Rate\") + dd"
+            }
+          ]
+        },
+        "type": "text"
+      },
+      {
+        "name": "Opening deposit",
+        "target": {
+          "description": "Opening deposit",
+          "locators": [
+            {
+              "kind": "css",
+              "selector": "dt:text-is(\"Opening deposit\") + dd"
+            }
+          ]
+        },
+        "type": "text"
+      },
+      {
+        "name": "Funding",
+        "target": {
+          "description": "Funding",
+          "locators": [
+            {
+              "kind": "css",
+              "selector": "dt:text-is(\"Funding\") + dd"
+            }
+          ]
+        },
+        "type": "text"
+      },
+      {
+        "name": "Ownership",
+        "target": {
+          "description": "Ownership",
+          "locators": [
+            {
+              "kind": "css",
+              "selector": "dt:text-is(\"Ownership\") + dd"
+            }
+          ]
+        },
+        "type": "text"
+      }
+    ],
+    "alerts": [],
+    "path": "/members/{{member_id}}/accounts/new",
+    "session": "authenticated",
+    "controls": [
+      {
+        "name": "Rashed Federal Credit Union — Member search",
+        "target": {
+          "description": "Rashed Federal Credit Union — Member search",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "link",
+              "name": "Rashed Federal Credit Union — Member search",
+              "exact": true
+            },
+            {
+              "kind": "attribute",
+              "tag": "a",
+              "attribute": "href",
+              "value": "/members"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Member search",
+        "target": {
+          "description": "Member search",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "link",
+              "name": "Member search",
+              "exact": true
+            },
+            {
+              "kind": "attribute",
+              "tag": "a",
+              "attribute": "href",
+              "value": "/members"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Open sub-account",
+        "target": {
+          "description": "Open sub-account",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "link",
+              "name": "Open sub-account",
+              "exact": true
+            },
+            {
+              "kind": "attribute",
+              "tag": "a",
+              "attribute": "href",
+              "value": "/open-account"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Product rates",
+        "target": {
+          "description": "Product rates",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "link",
+              "name": "Product rates",
+              "exact": true
+            },
+            {
+              "kind": "attribute",
+              "tag": "a",
+              "attribute": "href",
+              "value": "/products"
+            }
+          ]
+        }
+      },
+      {
+        "name": "My activity",
+        "target": {
+          "description": "My activity",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "link",
+              "name": "My activity",
+              "exact": true
+            },
+            {
+              "kind": "attribute",
+              "tag": "a",
+              "attribute": "href",
+              "value": "/activity"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Copy member number",
+        "target": {
+          "description": "Copy member number",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "button",
+              "name": "Copy member number",
+              "exact": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "Regular Share Savings",
+        "target": {
+          "description": "Regular Share Savings",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "radio",
+              "name": "Regular Share Savings",
+              "exact": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "Basic Checking",
+        "target": {
+          "description": "Basic Checking",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "radio",
+              "name": "Basic Checking",
+              "exact": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "Premier Checking",
+        "target": {
+          "description": "Premier Checking",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "radio",
+              "name": "Premier Checking",
+              "exact": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "Platinum Money Market",
+        "target": {
+          "description": "Platinum Money Market",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "radio",
+              "name": "Platinum Money Market",
+              "exact": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "Holiday Club",
+        "target": {
+          "description": "Holiday Club",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "radio",
+              "name": "Holiday Club",
+              "exact": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "Vacation Club",
+        "target": {
+          "description": "Vacation Club",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "radio",
+              "name": "Vacation Club",
+              "exact": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "6-Month Share Certificate",
+        "target": {
+          "description": "6-Month Share Certificate",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "radio",
+              "name": "6-Month Share Certificate",
+              "exact": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "12-Month Share Certificate",
+        "target": {
+          "description": "12-Month Share Certificate",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "radio",
+              "name": "12-Month Share Certificate",
+              "exact": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "24-Month Share Certificate",
+        "target": {
+          "description": "24-Month Share Certificate",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "radio",
+              "name": "24-Month Share Certificate",
+              "exact": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "36-Month Share Certificate",
+        "target": {
+          "description": "36-Month Share Certificate",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "radio",
+              "name": "36-Month Share Certificate",
+              "exact": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "60-Month Share Certificate",
+        "target": {
+          "description": "60-Month Share Certificate",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "radio",
+              "name": "60-Month Share Certificate",
+              "exact": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "Traditional IRA Share",
+        "target": {
+          "description": "Traditional IRA Share",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "radio",
+              "name": "Traditional IRA Share",
+              "exact": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "Roth IRA Share",
+        "target": {
+          "description": "Roth IRA Share",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "radio",
+              "name": "Roth IRA Share",
+              "exact": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "Nickname(optional)",
+        "target": {
+          "description": "Nickname(optional)",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "textbox",
+              "name": "Nickname(optional)",
+              "exact": true
+            },
+            {
+              "kind": "label",
+              "label": "Nickname(optional)"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Individual",
+        "target": {
+          "description": "Individual",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "radio",
+              "name": "Individual",
+              "exact": true
+            },
+            {
+              "kind": "label",
+              "label": "Individual"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Joint with another member",
+        "target": {
+          "description": "Joint with another member",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "radio",
+              "name": "Joint with another member",
+              "exact": true
+            },
+            {
+              "kind": "label",
+              "label": "Joint with another member"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Add beneficiary",
+        "target": {
+          "description": "Add beneficiary",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "button",
+              "name": "Add beneficiary",
+              "exact": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "Transfer from another sub-account",
+        "target": {
+          "description": "Transfer from another sub-account",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "radio",
+              "name": "Transfer from another sub-account",
+              "exact": true
+            },
+            {
+              "kind": "label",
+              "label": "Transfer from another sub-account"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Cash",
+        "target": {
+          "description": "Cash",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "radio",
+              "name": "Cash",
+              "exact": true
+            },
+            {
+              "kind": "label",
+              "label": "Cash"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Check",
+        "target": {
+          "description": "Check",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "radio",
+              "name": "Check",
+              "exact": true
+            },
+            {
+              "kind": "label",
+              "label": "Check"
+            }
+          ]
+        }
+      },
+      {
+        "name": "No opening deposit",
+        "target": {
+          "description": "No opening deposit",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "radio",
+              "name": "No opening deposit",
+              "exact": true
+            },
+            {
+              "kind": "label",
+              "label": "No opening deposit"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Electronic",
+        "target": {
+          "description": "Electronic",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "radio",
+              "name": "Electronic",
+              "exact": false
+            }
+          ]
+        }
+      },
+      {
+        "name": "Paper",
+        "target": {
+          "description": "Paper",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "radio",
+              "name": "Paper",
+              "exact": false
+            }
+          ]
+        }
+      },
+      {
+        "name": "Purpose of the account",
+        "target": {
+          "description": "Purpose of the account",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "combobox",
+              "name": "Purpose of the account",
+              "exact": true
+            },
+            {
+              "kind": "label",
+              "label": "Purpose of the account"
+            }
+          ]
+        },
+        "options": [
+          {
+            "label": "Choose…",
+            "value": ""
+          },
+          {
+            "label": "Everyday spending",
+            "value": "Everyday spending"
+          },
+          {
+            "label": "{{purpose}}",
+            "value": "{{purpose}}"
+          },
+          {
+            "label": "Long-term savings",
+            "value": "Long-term savings"
+          },
+          {
+            "label": "Retirement savings",
+            "value": "Retirement savings"
+          },
+          {
+            "label": "Education savings",
+            "value": "Education savings"
+          },
+          {
+            "label": "Saving for a purchase",
+            "value": "Saving for a purchase"
+          },
+          {
+            "label": "Holiday or vacation savings",
+            "value": "Holiday or vacation savings"
+          }
+        ]
+      },
+      {
+        "name": "Expected monthly deposits",
+        "target": {
+          "description": "Expected monthly deposits",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "combobox",
+              "name": "Expected monthly deposits",
+              "exact": true
+            },
+            {
+              "kind": "label",
+              "label": "Expected monthly deposits"
+            }
+          ]
+        },
+        "options": [
+          {
+            "label": "Choose…",
+            "value": ""
+          },
+          {
+            "label": "{{expected_deposits}}",
+            "value": "under_1000"
+          },
+          {
+            "label": "$1,000 – $5,000",
+            "value": "1000_5000"
+          },
+          {
+            "label": "$5,000 – $10,000",
+            "value": "5000_10000"
+          },
+          {
+            "label": "Over $10,000",
+            "value": "over_10000"
+          }
+        ]
+      },
+      {
+        "name": "Source of funds",
+        "target": {
+          "description": "Source of funds",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "combobox",
+              "name": "Source of funds",
+              "exact": true
+            },
+            {
+              "kind": "label",
+              "label": "Source of funds"
+            }
+          ]
+        },
+        "options": [
+          {
+            "label": "Choose…",
+            "value": ""
+          },
+          {
+            "label": "Employment income",
+            "value": "employment"
+          },
+          {
+            "label": "{{source_of_funds}}",
+            "value": "savings"
+          },
+          {
+            "label": "Retirement or pension",
+            "value": "retirement"
+          },
+          {
+            "label": "Gift or inheritance",
+            "value": "gift_inheritance"
+          },
+          {
+            "label": "Business income",
+            "value": "business"
+          },
+          {
+            "label": "Other",
+            "value": "other"
+          }
+        ]
+      },
+      {
+        "name": "Cancel",
+        "target": {
+          "description": "Cancel",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "button",
+              "name": "Cancel",
+              "exact": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "Continue to review",
+        "target": {
+          "description": "Continue to review",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "button",
+              "name": "Continue to review",
+              "exact": true
+            }
+          ]
+        }
+      }
+    ],
+    "signals": []
+  },
+  "message": "Expected state did not become {{checked}}",
+  "runId": "0f6a3eb2-d08c-4c0f-be9f-0c1d0bddb5ad"
+}

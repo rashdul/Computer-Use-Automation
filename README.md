@@ -101,16 +101,16 @@ Restart the operator after environment changes. Capabilities remain bound to the
 
 ### Search by member name
 
-In the console choose **Search by → Name**, enter the member's name, then choose discovery or replay. The default name capability is `get-member-savings-balance-by-name`; the existing `get-member-savings-balance` capability continues to use a seven-digit ID.
+In the console choose **Search by → Name**, enter the member's name, then choose discovery or replay. Select `get-member-savings-balance-by-name` from the catalog for its saved replay; the existing `get-member-savings-balance` capability continues to use a seven-digit ID.
 
 ```sh
-npm run discovery -- --goal "Log in to RFCU and return the current savings balance for the supplied member name" --member-name "FULL MEMBER NAME" --capability get-member-savings-balance-by-name
+npm run discovery -- --goal "Log in to RFCU and return the current savings balance for the supplied member name" --member-name "FULL MEMBER NAME" --profile savings --capability get-member-savings-balance-by-name
 npm run replay -- --capability get-member-savings-balance-by-name --member-name "ANOTHER MEMBER NAME"
 ```
 
 Use an actual name from your synthetic RFCU data. First name, last name or a fuller name can be searched, but execution proceeds only when the UI reports **exactly one match**. A partial name returning several members produces `MEMBER_AMBIGUOUS`; retry with a more specific name or use the member-number capability. No result produces `MEMBER_NOT_FOUND`. The adapter reads the member ID from that unique rendered result and then restricts all member/account routes to it. It does not choose the first result or query the database.
 
-Name capabilities use schema `1.1` and an explicit `member_resolved` checkpoint. The member name and resolved member number are parameterized in artifacts/logs; resolved names are not sent to the model. Schema `1.0` ID capabilities remain supported. Supply exactly one of `member_id` and `member_name` through the API; the CLI equivalent is `--member-id` or `--member-name`.
+The focused savings name capabilities use schema `1.1` and an explicit `member_resolved` checkpoint. The member name and resolved member number are parameterized in artifacts/logs; resolved names are not sent to the model. Schema `1.0` ID capabilities remain supported. Supply exactly one of `member_id` and `member_name` through the API; the CLI equivalent is `--member-id` or `--member-name`.
 
 ### Start and run the ID demonstration
 
@@ -125,7 +125,7 @@ This starts RFCU at **http://localhost:5173/login** and the operator console at 
 Terminal 2:
 
 ```sh
-npm run discovery -- --goal "Log in to RFCU, look up member 1030966, and return their current savings balance." --start-url http://localhost:5173/login --member-id 1030966 --evidence-group discovery
+npm run discovery -- --goal "Log in to RFCU, look up member 1030966, and return their current savings balance." --start-url http://localhost:5173/login --member-id 1030966 --profile savings --capability get-member-savings-balance --evidence-group discovery
 npm run replay -- --capability get-member-savings-balance --member-id 1000021 --evidence-group replay-success
 npm run replay -- --capability get-member-savings-balance --member-id 9999999 --evidence-group replay-error
 ```
@@ -151,6 +151,41 @@ npm run replay -- --capability get-member-savings-balance --member-id 1000672 --
 
 Six-digit IDs are rejected before launching a browser. CLI exit codes: success/business outcome `0`, runtime failure `1`, setup/request error `2`.
 
+### General RFCU workflows and approval
+
+The default discovery profile is **general**. In the console choose a goal example or write your own, give the capability a unique ID, and supply parameters under **Additional inputs (JSON)**. Choose **Search by ? No member** for product/reference or administration tasks. For replay, select a saved capability and click **Use selected capability**, then fill its declared parameters. A different goal requires discovery first; replay executes the selected artifact, not a newly typed goal.
+
+```sh
+npm run discovery -- --goal "Log in and return the product codes, rates and minimum opening deposits from Product rates" --capability read-product-rates
+npm run replay -- --capability read-product-rates --evidence-group replay-success
+npm run discovery -- --goal "Log in, find the supplied member, open Accounts through Member record navigation, and return the visible deposit accounts and current balances as a table" --member-id 1000021 --capability list-member-accounts
+npm run replay -- --capability list-member-accounts --member-id 1030966
+npm run discovery -- --goal "Log in, find the supplied member, prepare a new note using category and note_body, verify the fields and stop without saving" --member-id 1000021 --input category=Service --input "note_body=Demonstration note; do not save" --capability prepare-member-note
+npm run replay -- --capability prepare-member-note --member-id 1030966 --input category=Service --input "note_body=Different demonstration note; do not save"
+```
+
+For longer or private inputs, use `--inputs-file .runtime/inputs.json` instead of command-line values. This must be a JSON object of named strings, for example `{"member_id":"1000021","category":"Service","note_body":"Demonstration note"}`. Keep that file local and ignored. Supplied values become symbolic references in artifacts; unused or missing replay parameters are rejected. Input names use snake_case. Checkboxes take the strings `"true"` or `"false"`; selects take the visible option label.
+
+The general profile covers the existing RFCU member, account, note, product, activity, account-opening and administration routes. It supports click, fill, select, check, navigate, wait and extraction of text, money, numbers, booleans or explicit table columns. Staff permissions still apply. This is a general execution framework for RFCU, not a claim that every combination of form, role and business rule has been verified. SSN reveal and bulk private-record extraction remain excluded.
+
+**Changes require human approval.** If a goal requests saving a note, opening an account or changing administration settings, the console pauses at the action and displays **Approve once** / **Deny and stop** alongside the live page. Inspect the actual form before approving. Approval binds to that action, URL and current form values; editing the form invalidates it. It is never saved in a capability, so replay asks again. Administrative inputs that may autosave also require approval. The browser permits at most one page-scoped mutation RPC for the approved action. An attempted mutation is not automatically retried after a failure because its outcome may be uncertain.
+
+Starting a run authorizes its normal UI login; it does not authorize financial or member-data changes. Preparation-only goals finish before Save/Confirm and report success after checking the prepared fields. The browser closes when a run finishes, so use a goal requesting a save if you want to inspect the paused live form and approve it. Do not approve changes just to run the test suite: tests prepare forms and deny real submissions; successful approval is exercised against an isolated DOM fixture.
+
+Use `--profile savings` to rediscover the narrower, legacy S00 workflow. Saved schema `1.0`/`1.1` artifacts select this profile automatically during replay; new general capabilities use schema `2.0`. All artifacts are bound to their discovery origin, including the checked-in examples. Rediscover after switching between local and deployed RFCU.
+
+### Account-opening review verification
+
+The general runtime can prepare account-opening forms and stop before **Open account**. To exercise that boundary without a model or a data write:
+
+```sh
+npm run test:opening -- --fixture
+```
+
+This is explicitly a scripted test of the real RFCU UI, not LLM discovery evidence. It uses the existing note capability's UI login/member-search prefix, then selects Regular Share Savings, individual ownership, no opening deposit, paper statements and supplied compliance fields. It checks the final review screen and denies a separate attempted Open account action. It neither signs nor acknowledges disclosures. It requires the configured synthetic deployment and its saved note capability.
+
+Earlier account-opening attempts stopped on a route checkpoint and a provider usage/rate limit. A later genuine Codex run succeeded: `331f46f1-dfed-48f9-8dbc-f1ba6954a3d6` made 16 model decisions and saved `artifacts/prepare-account-opening.json`, stopping at Review and open. `npm run test:opening` without `--fixture` tests that discovered artifact; `--fixture` remains explicitly scripted verification. Neither path approves account creation.
+
 ### Authentication and session behavior
 
 Every run creates a clean browser context and opens `/login`. The model selects login targets in discovery; replay resolves the recorded targets. Only the browser adapter resolves `RFCU_STAFF_USERNAME` and `RFCU_STAFF_PASSWORD`, then fills the real fields and clicks Sign in. An authenticated-shell checkpoint must pass before member work. The same page/context continues throughout the run and any intervention.
@@ -172,7 +207,7 @@ No automation actions execute while the human owns the page. Operator clicks and
 
 ## Capability/API contract
 
-`GET /api/capabilities` exposes the typed catalog; `POST /api/runs` starts discovery or replay; `GET /api/runs/:id` returns sanitized events and the structured result. All write requests require `Content-Type: application/json` and `X-RFCU-Client: operator`; browser origins and Host are restricted to the loopback console.
+`GET /api/capabilities` exposes the typed catalog; `POST /api/runs` starts discovery or replay; `GET /api/runs/:id` returns sanitized events, pending approval and the structured result. `POST /api/runs/:id/approval` accepts `{ "id": "PENDING_APPROVAL_ID", "approved": true }` for the local human operator?s decision. General discovery accepts arbitrary named-string `inputs` and an optional `profile` (`general` by default). All write requests require `Content-Type: application/json` and `X-RFCU-Client: operator`; browser origins and Host are restricted to the loopback console.
 
 ```json
 {
@@ -194,10 +229,14 @@ npm run build
 npm run test:integration
 npm run test:operator
 npm run test:names
+npm run test:general
+npm run test:opening -- --fixture
 npm run audit:secrets
 ```
 
-`npm test` requires the installed browser but no RFCU backend or model. Integration tests require RFCU running, seeded scenarios and local staff credentials; they perform real UI login/replay and cover not-found, permission denial, empty/invalid login, session ending and a labeled transient UI fault with bounded recovery. They do not reset scenarios, open accounts, or change the database directly.
+`npm run test:general` replays the product-rate and prepared-note capabilities, then verifies that denying a real Save note action performs no mutation. It requires those general capabilities discovered on the configured origin and local staff credentials. Its operator decision is explicitly an automated denial, not human approval.
+
+`npm test` requires the installed browser but no RFCU backend or model. Integration tests require RFCU running, seeded scenarios, local staff credentials and `RFCU_ORIGIN` matching the tested artifact. The included focused ID artifact targets localhost; the included name/general artifacts target the deployed HTTPS RFCU. Rediscover for your own deployment before testing there. Integration tests they perform real UI login/replay and cover not-found, permission denial, empty/invalid login, session ending and a labeled transient UI fault with bounded recovery. They do not reset scenarios, open accounts, or change the database directly.
 
 `npm run test:names` verifies name replay, ambiguity and not-found against the configured RFCU deployment, using names read through the actual UI and kept only in memory. It requires a name capability discovered for that deployment. To generate it first using the configured model and then run these checks, use `npm run test:names -- --discover`; this performs genuine discovery and may incur model usage.
 
@@ -214,6 +253,6 @@ Raw Playwright traces/HAR, storage state and full DOM snapshots are deliberately
 
 ## Security and limits
 
-This is a local synthetic-UAT demonstration, not a production banking integration. The policy binds the run to one configured RFCU origin, the supplied or uniquely resolved member, read-only member routes, approved controls and symbolic credential targets. Risky actions stop before execution. Page content is untrusted, and model decisions are validated before execution. The operator server is loopback-only, without production operator authentication or distributed persistence. Do not expose it to a network. Live frames contain synthetic member information for the authorized local operator and are not saved. The focused observation/redaction profile is RFCU-specific; another application needs its own tested profile.
+This is a local synthetic-UAT demonstration, not a production banking integration. The policy binds the run to one configured RFCU origin, the supplied or uniquely resolved member, RFCU route allowlists, approved controls and symbolic credential targets. Data-changing controls pause for single-use human approval; network writes are denied without the corresponding runtime permit. Page content is untrusted, and model decisions are validated before execution. The operator server is loopback-only, without production operator authentication or distributed persistence. Do not expose it to a network. Live frames contain synthetic member information for the authorized local operator and are not saved. The focused observation/redaction profile is RFCU-specific; another application needs its own tested profile.
 
-Account opening, desktop adapters, automatic artifact repair, cross-tenant deployment, raw traces and automatic reauthentication are intentionally omitted. See the seven-section [REPORT.md](REPORT.md) for trade-offs and next steps.
+Desktop adapters, automatic artifact repair, cross-tenant deployment, raw traces and automatic reauthentication are intentionally omitted. General form execution and approval cover account-opening/admin surfaces, but live financial/admin writes and an exhaustive workflow matrix have not been verified. See the seven-section [REPORT.md](REPORT.md) for trade-offs and next steps.

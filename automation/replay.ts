@@ -1,6 +1,10 @@
 // Intentionally no provider/discovery imports. Replay has no model dependency.
 import { readFile } from "node:fs/promises";
-import { Capability, type CapabilityArtifact } from "./schema.js";
+import {
+  GeneralInputs,
+  Capability,
+  type CapabilityArtifact,
+} from "./schema.js";
 import { RuntimeCondition } from "./errors.js";
 import type { Run } from "./runtime.js";
 export async function loadCapability(id: string) {
@@ -20,8 +24,27 @@ export async function loadCapability(id: string) {
 export async function replay(run: Run, artifact: CapabilityArtifact) {
   try {
     Capability.parse(artifact);
+    const general = artifact.schemaVersion === "2.0";
+    if (general) {
+      GeneralInputs.parse(run.inputs);
+      if (
+        artifact.inputs.some((i) => i.required && !run.inputs[i.key]) ||
+        Object.keys(run.inputs).some(
+          (k) => !artifact.inputs.some((i) => i.key === k),
+        )
+      )
+        throw new RuntimeCondition(
+          "INVALID_PARAMETER",
+          "Runtime inputs do not match this capability",
+        );
+      if (run.policy.profile !== "general")
+        throw new RuntimeCondition(
+          "POLICY_DENIED",
+          "General capability requires the general RFCU policy",
+        );
+    }
     const inputKey = run.inputs.member_name ? "member_name" : "member_id";
-    if (artifact.inputs[0].key !== inputKey)
+    if (!general && artifact.inputs[0].key !== inputKey)
       throw new RuntimeCondition(
         "INPUT_CAPABILITY_MISMATCH",
         "Choose a capability discovered for this search type (member number or name)",

@@ -1,0 +1,556 @@
+{
+  "observation": {
+    "readables": [
+      {
+        "name": "Membership Share",
+        "target": {
+          "description": "Membership Share",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "heading",
+              "name": "Membership Share",
+              "exact": false
+            }
+          ]
+        },
+        "type": "text"
+      },
+      {
+        "name": "Account details",
+        "target": {
+          "description": "Account details",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "heading",
+              "name": "Account details",
+              "exact": false
+            }
+          ]
+        },
+        "type": "text"
+      },
+      {
+        "name": "Owners & beneficiaries",
+        "target": {
+          "description": "Owners & beneficiaries",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "heading",
+              "name": "Owners & beneficiaries",
+              "exact": false
+            }
+          ]
+        },
+        "type": "text"
+      },
+      {
+        "name": "Transactions",
+        "target": {
+          "description": "Transactions",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "heading",
+              "name": "Transactions",
+              "exact": false
+            }
+          ]
+        },
+        "type": "text"
+      },
+      {
+        "name": "Transactions",
+        "target": {
+          "description": "Transactions",
+          "locators": [
+            {
+              "kind": "css",
+              "selector": "section.panel:has(h2:text-matches(\"^Transactions\")) table"
+            }
+          ]
+        },
+        "type": "table",
+        "columns": [
+          "Posted (ET)",
+          "Type",
+          "Debits",
+          "Credits",
+          "Balance"
+        ]
+      },
+      {
+        "name": "Product",
+        "target": {
+          "description": "Product",
+          "locators": [
+            {
+              "kind": "css",
+              "selector": "dt:text-is(\"Product\") + dd"
+            }
+          ]
+        },
+        "type": "text"
+      },
+      {
+        "name": "Rate (APY)",
+        "target": {
+          "description": "Rate (APY)",
+          "locators": [
+            {
+              "kind": "css",
+              "selector": "dt:text-is(\"Rate (APY)\") + dd"
+            }
+          ]
+        },
+        "type": "text"
+      },
+      {
+        "name": "Opened",
+        "target": {
+          "description": "Opened",
+          "locators": [
+            {
+              "kind": "css",
+              "selector": "dt:text-is(\"Opened\") + dd"
+            }
+          ]
+        },
+        "type": "text"
+      },
+      {
+        "name": "Last activity",
+        "target": {
+          "description": "Last activity",
+          "locators": [
+            {
+              "kind": "css",
+              "selector": "dt:text-is(\"Last activity\") + dd"
+            }
+          ]
+        },
+        "type": "text"
+      },
+      {
+        "name": "Statements",
+        "target": {
+          "description": "Statements",
+          "locators": [
+            {
+              "kind": "css",
+              "selector": "dt:text-is(\"Statements\") + dd"
+            }
+          ]
+        },
+        "type": "text"
+      },
+      {
+        "name": "About this product",
+        "target": {
+          "description": "About this product",
+          "locators": [
+            {
+              "kind": "css",
+              "selector": "dt:text-is(\"About this product\") + dd"
+            }
+          ]
+        },
+        "type": "text"
+      },
+      {
+        "name": "Beneficiaries",
+        "target": {
+          "description": "Beneficiaries",
+          "locators": [
+            {
+              "kind": "css",
+              "selector": "dt:text-is(\"Beneficiaries\") + dd"
+            }
+          ]
+        },
+        "type": "text"
+      }
+    ],
+    "alerts": [],
+    "path": "/members/{{member_id}}/accounts/{{member_id}}-S00",
+    "session": "authenticated",
+    "controls": [
+      {
+        "name": "Rashed Federal Credit Union — Member search",
+        "target": {
+          "description": "Rashed Federal Credit Union — Member search",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "link",
+              "name": "Rashed Federal Credit Union — Member search",
+              "exact": true
+            },
+            {
+              "kind": "attribute",
+              "tag": "a",
+              "attribute": "href",
+              "value": "/members"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Member search",
+        "target": {
+          "description": "Member search",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "link",
+              "name": "Member search",
+              "exact": true
+            },
+            {
+              "kind": "attribute",
+              "tag": "a",
+              "attribute": "href",
+              "value": "/members"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Open sub-account",
+        "target": {
+          "description": "Open sub-account",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "link",
+              "name": "Open sub-account",
+              "exact": true
+            },
+            {
+              "kind": "attribute",
+              "tag": "a",
+              "attribute": "href",
+              "value": "/open-account"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Product rates",
+        "target": {
+          "description": "Product rates",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "link",
+              "name": "Product rates",
+              "exact": true
+            },
+            {
+              "kind": "attribute",
+              "tag": "a",
+              "attribute": "href",
+              "value": "/products"
+            }
+          ]
+        }
+      },
+      {
+        "name": "My activity",
+        "target": {
+          "description": "My activity",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "link",
+              "name": "My activity",
+              "exact": true
+            },
+            {
+              "kind": "attribute",
+              "tag": "a",
+              "attribute": "href",
+              "value": "/activity"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Copy member number",
+        "target": {
+          "description": "Copy member number",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "button",
+              "name": "Copy member number",
+              "exact": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "Add note",
+        "target": {
+          "description": "Add note",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "button",
+              "name": "Add note",
+              "exact": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "Open sub-account",
+        "target": {
+          "description": "Open sub-account",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "button",
+              "name": "Open sub-account",
+              "exact": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "/members/{{member_id}}",
+        "target": {
+          "description": "/members/{{member_id}}",
+          "locators": [
+            {
+              "kind": "attribute",
+              "tag": "a",
+              "attribute": "href",
+              "value": "/members/{{member_id}}"
+            }
+          ],
+          "within": {
+            "role": "navigation",
+            "name": "Member record"
+          }
+        }
+      },
+      {
+        "name": "/members/{{member_id}}/accounts",
+        "target": {
+          "description": "/members/{{member_id}}/accounts",
+          "locators": [
+            {
+              "kind": "attribute",
+              "tag": "a",
+              "attribute": "href",
+              "value": "/members/{{member_id}}/accounts"
+            }
+          ],
+          "within": {
+            "role": "navigation",
+            "name": "Member record"
+          }
+        }
+      },
+      {
+        "name": "/members/{{member_id}}/notes",
+        "target": {
+          "description": "/members/{{member_id}}/notes",
+          "locators": [
+            {
+              "kind": "attribute",
+              "tag": "a",
+              "attribute": "href",
+              "value": "/members/{{member_id}}/notes"
+            }
+          ],
+          "within": {
+            "role": "navigation",
+            "name": "Member record"
+          }
+        }
+      },
+      {
+        "name": "/members/{{member_id}}/accounts",
+        "target": {
+          "description": "/members/{{member_id}}/accounts",
+          "locators": [
+            {
+              "kind": "attribute",
+              "tag": "a",
+              "attribute": "href",
+              "value": "/members/{{member_id}}/accounts"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Copy account number",
+        "target": {
+          "description": "Copy account number",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "button",
+              "name": "Copy account number",
+              "exact": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "/members/{{member_id}}",
+        "target": {
+          "description": "/members/{{member_id}}",
+          "locators": [
+            {
+              "kind": "attribute",
+              "tag": "a",
+              "attribute": "href",
+              "value": "/members/{{member_id}}"
+            }
+          ]
+        }
+      },
+      {
+        "name": "From",
+        "target": {
+          "description": "From",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "textbox",
+              "name": "From",
+              "exact": true
+            },
+            {
+              "kind": "label",
+              "label": "From"
+            }
+          ]
+        }
+      },
+      {
+        "name": "To",
+        "target": {
+          "description": "To",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "textbox",
+              "name": "To",
+              "exact": true
+            },
+            {
+              "kind": "label",
+              "label": "To"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Show",
+        "target": {
+          "description": "Show",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "combobox",
+              "name": "Show",
+              "exact": true
+            },
+            {
+              "kind": "label",
+              "label": "Show"
+            }
+          ]
+        },
+        "options": [
+          {
+            "label": "All transactions",
+            "value": "all"
+          },
+          {
+            "label": "Credits only",
+            "value": "credit"
+          },
+          {
+            "label": "Debits only",
+            "value": "debit"
+          }
+        ]
+      },
+      {
+        "name": "Description or check #",
+        "target": {
+          "description": "Description or check #",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "textbox",
+              "name": "Description or check #",
+              "exact": true
+            },
+            {
+              "kind": "label",
+              "label": "Description or check #"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Apply",
+        "target": {
+          "description": "Apply",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "button",
+              "name": "Apply",
+              "exact": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "Reset",
+        "target": {
+          "description": "Reset",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "button",
+              "name": "Reset",
+              "exact": true
+            }
+          ]
+        }
+      },
+      {
+        "name": "Current balance value",
+        "target": {
+          "description": "Current balance in Account summary",
+          "locators": [
+            {
+              "kind": "css",
+              "selector": "section[aria-label=\"Account summary\"] .account-balances > div:has(.account-balances__label:text-is(\"Current balance\")) .account-balances__value"
+            }
+          ]
+        }
+      }
+    ],
+    "signals": [],
+    "accountSummary": "Account summary | S00"
+  },
+  "contextId": "8854226c-8aa7-42ff-a767-47006ee0a604",
+  "pageId": "ff62e585-ce8f-47de-9b98-ddf3da4621e7",
+  "outputs": {
+    "current_savings_balance": {
+      "amount": "6337.65",
+      "currency": "USD"
+    }
+  }
+}

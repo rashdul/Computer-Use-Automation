@@ -11,13 +11,15 @@
     "operator": "tsx automation/server.ts",
     "discovery": "tsx automation/cli.ts discovery",
     "replay": "tsx automation/cli.ts replay",
-    "test": "tsx --test automation/tests/core.test.ts",
+    "test": "tsx --test automation/tests/core.test.ts automation/tests/general.test.ts",
     "typecheck": "tsc --noEmit",
     "build": "npm run typecheck && npm --prefix target-app run build",
     "audit:secrets": "tsx automation/audit-secrets.ts",
     "test:integration": "tsx automation/tests/integration.ts",
     "test:operator": "tsx automation/tests/operator-ui.ts",
-    "test:names": "tsx automation/tests/name-integration.ts"
+    "test:names": "tsx automation/tests/name-integration.ts",
+    "test:general": "tsx automation/tests/general-integration.ts",
+    "test:opening": "tsx automation/tests/opening-integration.ts"
   },
   "dependencies": {
     "dotenv": "16.6.1",

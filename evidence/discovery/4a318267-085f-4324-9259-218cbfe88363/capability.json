@@ -1,0 +1,523 @@
+{
+  "schemaVersion": "2.0",
+  "capabilityId": "prepare-member-note",
+  "name": "prepare-member-note",
+  "description": "Authenticate, find the supplied member, open Notes, and prepare and verify a category and note body without saving.",
+  "target": {
+    "application": "RFCU Member Services",
+    "vendor": "RFCU",
+    "applicationVersion": "4.12.2",
+    "startUrl": "https://rashed-federal-credit-union.netlify.app/login",
+    "surface": "web"
+  },
+  "inputs": [
+    {
+      "key": "category",
+      "type": "string",
+      "required": true,
+      "description": "Runtime category"
+    },
+    {
+      "key": "note_body",
+      "type": "string",
+      "required": true,
+      "description": "Runtime note body"
+    },
+    {
+      "key": "member_id",
+      "type": "string",
+      "required": true,
+      "description": "Runtime member id"
+    }
+  ],
+  "outputs": [],
+  "steps": [
+    {
+      "id": "fill-staff-username",
+      "description": "Fill Username with the staff credential.",
+      "action": "fill",
+      "target": {
+        "description": "Username",
+        "locators": [
+          {
+            "kind": "role",
+            "role": "textbox",
+            "name": "Username",
+            "exact": true
+          },
+          {
+            "kind": "label",
+            "label": "Username"
+          }
+        ]
+      },
+      "value": {
+        "source": "secret",
+        "key": "RFCU_STAFF_USERNAME"
+      },
+      "risk": "reversible",
+      "expectedState": {
+        "kind": "visible",
+        "target": {
+          "description": "Username",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "textbox",
+              "name": "Username",
+              "exact": true
+            },
+            {
+              "kind": "label",
+              "label": "Username"
+            }
+          ]
+        }
+      },
+      "retry": {
+        "maxAttempts": 2,
+        "safeToRepeat": true
+      }
+    },
+    {
+      "id": "fill-staff-password",
+      "description": "Fill Password with the staff credential.",
+      "action": "fill",
+      "target": {
+        "description": "Password",
+        "locators": [
+          {
+            "kind": "role",
+            "role": "textbox",
+            "name": "Password",
+            "exact": true
+          },
+          {
+            "kind": "label",
+            "label": "Password"
+          }
+        ]
+      },
+      "value": {
+        "source": "secret",
+        "key": "RFCU_STAFF_PASSWORD"
+      },
+      "risk": "reversible",
+      "expectedState": {
+        "kind": "visible",
+        "target": {
+          "description": "Password",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "textbox",
+              "name": "Password",
+              "exact": true
+            },
+            {
+              "kind": "label",
+              "label": "Password"
+            }
+          ]
+        }
+      },
+      "retry": {
+        "maxAttempts": 2,
+        "safeToRepeat": true
+      }
+    },
+    {
+      "id": "sign-in-staff",
+      "description": "Click Sign in and verify authentication.",
+      "action": "click",
+      "target": {
+        "description": "Sign in",
+        "locators": [
+          {
+            "kind": "role",
+            "role": "button",
+            "name": "Sign in",
+            "exact": true
+          }
+        ]
+      },
+      "risk": "reversible",
+      "expectedState": {
+        "kind": "authenticated"
+      },
+      "retry": {
+        "maxAttempts": 1,
+        "safeToRepeat": false
+      }
+    },
+    {
+      "id": "fill-member-search",
+      "description": "Look up the authorized member using the supplied member ID.",
+      "action": "fill",
+      "target": {
+        "description": "Search",
+        "locators": [
+          {
+            "kind": "role",
+            "role": "searchbox",
+            "name": "Search",
+            "exact": true
+          },
+          {
+            "kind": "label",
+            "label": "Search"
+          }
+        ]
+      },
+      "value": {
+        "source": "input",
+        "key": "member_id"
+      },
+      "risk": "reversible",
+      "expectedState": {
+        "kind": "field_value",
+        "target": {
+          "description": "Search",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "searchbox",
+              "name": "Search",
+              "exact": true
+            },
+            {
+              "kind": "label",
+              "label": "Search"
+            }
+          ]
+        },
+        "value": {
+          "source": "input",
+          "key": "member_id"
+        }
+      },
+      "retry": {
+        "maxAttempts": 2,
+        "safeToRepeat": true
+      }
+    },
+    {
+      "id": "search-authorized-member",
+      "description": "Submit the member search and verify the member is resolved.",
+      "action": "click",
+      "target": {
+        "description": "Search",
+        "locators": [
+          {
+            "kind": "role",
+            "role": "button",
+            "name": "Search",
+            "exact": true
+          }
+        ]
+      },
+      "risk": "read_only",
+      "expectedState": {
+        "kind": "member_resolved"
+      },
+      "retry": {
+        "maxAttempts": 2,
+        "safeToRepeat": true
+      }
+    },
+    {
+      "id": "open-authorized-member",
+      "description": "Open the resolved member profile.",
+      "action": "click",
+      "target": {
+        "description": "/members/{{member_id}}",
+        "locators": [
+          {
+            "kind": "attribute",
+            "attribute": "href",
+            "value": "/members/{{member_id}}",
+            "tag": "a"
+          }
+        ]
+      },
+      "risk": "read_only",
+      "expectedState": {
+        "kind": "route",
+        "path": "/members/{{member_id}}"
+      },
+      "retry": {
+        "maxAttempts": 2,
+        "safeToRepeat": true
+      }
+    },
+    {
+      "id": "open-member-notes",
+      "description": "Open Notes for the authorized member.",
+      "action": "click",
+      "target": {
+        "description": "/members/{{member_id}}/notes",
+        "locators": [
+          {
+            "kind": "attribute",
+            "attribute": "href",
+            "value": "/members/{{member_id}}/notes",
+            "tag": "a"
+          }
+        ]
+      },
+      "risk": "read_only",
+      "expectedState": {
+        "kind": "route",
+        "path": "/members/{{member_id}}/notes"
+      },
+      "retry": {
+        "maxAttempts": 2,
+        "safeToRepeat": true
+      }
+    },
+    {
+      "id": "open-new-note-form",
+      "description": "Click Add note to begin preparing an unsaved note.",
+      "action": "click",
+      "target": {
+        "description": "Add note",
+        "locators": [
+          {
+            "kind": "role",
+            "role": "button",
+            "name": "Add note",
+            "exact": true
+          }
+        ]
+      },
+      "risk": "reversible",
+      "precondition": {
+        "kind": "route",
+        "path": "/members/{{member_id}}/notes"
+      },
+      "expectedState": {
+        "kind": "route",
+        "path": "/members/{{member_id}}/notes"
+      },
+      "retry": {
+        "maxAttempts": 1,
+        "safeToRepeat": false
+      }
+    },
+    {
+      "id": "select-note-category",
+      "description": "Select the supplied category for the unsaved note.",
+      "action": "select",
+      "target": {
+        "description": "Category",
+        "locators": [
+          {
+            "kind": "role",
+            "role": "combobox",
+            "name": "Category",
+            "exact": true
+          },
+          {
+            "kind": "label",
+            "label": "Category"
+          }
+        ]
+      },
+      "value": {
+        "source": "input",
+        "key": "category"
+      },
+      "risk": "reversible",
+      "expectedState": {
+        "kind": "field_value",
+        "target": {
+          "description": "Category",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "combobox",
+              "name": "Category",
+              "exact": true
+            },
+            {
+              "kind": "label",
+              "label": "Category"
+            }
+          ]
+        },
+        "value": {
+          "source": "input",
+          "key": "category"
+        }
+      },
+      "retry": {
+        "maxAttempts": 2,
+        "safeToRepeat": true
+      }
+    },
+    {
+      "id": "fill-note-body",
+      "description": "Fill the supplied note body and verify the unsaved field.",
+      "action": "fill",
+      "target": {
+        "description": "Note",
+        "locators": [
+          {
+            "kind": "role",
+            "role": "textbox",
+            "name": "Note",
+            "exact": true
+          },
+          {
+            "kind": "label",
+            "label": "Note"
+          }
+        ]
+      },
+      "value": {
+        "source": "input",
+        "key": "note_body"
+      },
+      "risk": "reversible",
+      "expectedState": {
+        "kind": "field_value",
+        "target": {
+          "description": "Note",
+          "locators": [
+            {
+              "kind": "role",
+              "role": "textbox",
+              "name": "Note",
+              "exact": true
+            },
+            {
+              "kind": "label",
+              "label": "Note"
+            }
+          ]
+        },
+        "value": {
+          "source": "input",
+          "key": "note_body"
+        }
+      },
+      "retry": {
+        "maxAttempts": 2,
+        "safeToRepeat": true
+      }
+    }
+  ],
+  "successCondition": [
+    {
+      "kind": "authenticated"
+    },
+    {
+      "kind": "route",
+      "path": "/members/{{member_id}}/notes?compose=1"
+    },
+    {
+      "kind": "visible",
+      "target": {
+        "description": "Add note",
+        "locators": [
+          {
+            "kind": "role",
+            "role": "heading",
+            "name": "Add note",
+            "exact": false
+          }
+        ]
+      }
+    },
+    {
+      "kind": "field_value",
+      "target": {
+        "description": "Category",
+        "locators": [
+          {
+            "kind": "role",
+            "role": "combobox",
+            "name": "Category",
+            "exact": true
+          },
+          {
+            "kind": "label",
+            "label": "Category"
+          }
+        ]
+      },
+      "value": {
+        "source": "input",
+        "key": "category"
+      }
+    },
+    {
+      "kind": "field_value",
+      "target": {
+        "description": "Note",
+        "locators": [
+          {
+            "kind": "role",
+            "role": "textbox",
+            "name": "Note",
+            "exact": true
+          },
+          {
+            "kind": "label",
+            "label": "Note"
+          }
+        ]
+      },
+      "value": {
+        "source": "input",
+        "key": "note_body"
+      }
+    }
+  ],
+  "safety": {
+    "allowedOrigins": [
+      "https://rashed-federal-credit-union.netlify.app"
+    ],
+    "allowedRoutes": [
+      "/login",
+      "/session-expired",
+      "/members",
+      "/products",
+      "/activity",
+      "/open-account",
+      "/members/{{member_id}}",
+      "/members/{{member_id}}/accounts",
+      "/members/{{member_id}}/accounts/:account",
+      "/members/{{member_id}}/notes",
+      "/members/{{member_id}}/access-log",
+      "/members/{{member_id}}/accounts/new",
+      "/members/{{member_id}}/accounts/new/review",
+      "/members/{{member_id}}/accounts/new/confirmation/:receipt",
+      "/admin",
+      "/admin/environment",
+      "/admin/staff",
+      "/admin/permissions",
+      "/admin/products",
+      "/admin/audit",
+      "/admin/test-data"
+    ],
+    "allowedActions": [
+      "click",
+      "fill",
+      "select",
+      "navigate",
+      "wait",
+      "extract",
+      "check"
+    ],
+    "riskLevel": "safe"
+  },
+  "metadata": {
+    "createdAt": "2026-09-23T19:09:04.133Z",
+    "source": "llm-discovery",
+    "artifactVersion": 1,
+    "discoveryRunId": "4a318267-085f-4324-9259-218cbfe88363",
+    "modelProvider": "codex-cli",
+    "model": "codex-default"
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "status": "success",
+  "outputs": {
+    "deposit_accounts": [
+      {
+        "Account": "S00 {{member_id}}-S00",
+        "Product": "Membership Share",
+        "Current balance": "$23,693.68"
+      },
+      {
+        "Account": "S01 {{member_id}}-S01",
+        "Product": "Regular Share Savings",
+        "Current balance": "$1,350.06"
+      },
+      {
+        "Account": "D01 {{member_id}}-D01",
+        "Product": "Basic Checking“Rainy day”",
+        "Current balance": "$4,708.41"
+      },
+      {
+        "Account": "D02 {{member_id}}-D02",
+        "Product": "Basic Checking",
+        "Current balance": "$17,965.99"
+      }
+    ]
+  },
+  "runId": "4aa7c306-8121-470d-91c2-096842f8e030",
+  "humanInterventions": 0
+}

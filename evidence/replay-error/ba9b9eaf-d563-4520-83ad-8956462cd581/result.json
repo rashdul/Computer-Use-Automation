@@ -1,0 +1,14 @@
+{
+  "status": "failure",
+  "errorType": "APPROVAL_DENIED",
+  "stepId": "test-deny-open-account",
+  "expected": {
+    "kind": "authenticated"
+  },
+  "observed": {
+    "session": "authenticated",
+    "path": "/members/{{member_id}}/accounts/new/review"
+  },
+  "message": "The action was not approved; no change was submitted",
+  "runId": "ba9b9eaf-d563-4520-83ad-8956462cd581"
+}
