@@ -1,0 +1,131 @@
+http://localhost:5173/members/1000021
+
+- link "Skip to main content":
+  - /url: "#main"
+- complementary "Primary":
+  - link "Rashed Federal Credit Union — Member search":
+    - /url: /members
+    - text: Rashed FEDERAL CREDIT UNION
+  - navigation:
+    - text: Members
+    - link "Member search":
+      - /url: /members
+    - link "Open sub-account":
+      - /url: /open-account
+    - text: Reference
+    - link "Product rates":
+      - /url: /products
+    - link "My activity":
+      - /url: /activity
+  - strong: BAL · Baltimore Main Office
+  - text: BAL-MSR-04
+  - button "Collapse navigation" [expanded]: Collapse
+- banner:
+  - navigation "Breadcrumb":
+    - link "Members":
+      - /url: /members
+    - text: Foster, Santiago
+  - search:
+    - text: Find a member
+    - textbox "Find a member"
+    - text: /
+  - text: UAT User acceptance testing · synthetic member data Thu, Sep 24 · 5:29 PM ET
+  - button "Adaeze Okafor Member Service Representative"
+- main:
+  - region "Member":
+    - heading "Santiago Foster" [level=1]
+    - text: Member number 1000021
+    - button "Copy member number"
+    - text: Active Joint Member since
+    - strong: Sep 6, 1963
+    - text: Branch
+    - strong: BAL
+    - text: · Baltimore Main Office CIP Verified
+    - button "Add note"
+    - button "Open sub-account"
+  - navigation "Member record":
+    - link "Overview":
+      - /url: /members/1000021
+    - link "Accounts 3":
+      - /url: /members/1000021/accounts
+    - link "Notes 3":
+      - /url: /members/1000021/notes
+  - heading "Identity" [level=2]
+  - term: Legal name
+  - definition: Santiago Foster
+  - term: Date of birth
+  - definition: [date] · age 89
+  - term: SSN
+  - definition:
+    - text: •••-••-3612
+    - button "Reveal"
+  - term: ID on file
+  - definition: Driver license · MD · ••••3196 Expires Nov 29, 2034
+  - term: CIP status
+  - definition: Verified · Dec 18, 2018
+  - term: Risk rating
+  - definition: Low
+  - heading "Contact" [level=2]
+  - term: Mailing address
+  - definition: 3791 Fairfax Dr Baltimore, MD 21231
+  - term: Mobile
+  - definition: [phone]
+  - term: Home
+  - definition: [phone]
+  - term: Email
+  - definition: [email]
+  - term: Preferred contact
+  - definition: Email
+  - term: Statements
+  - definition: Electronic
+  - term: Employer
+  - definition: Retired
+  - term: Occupation
+  - definition: Retired
+  - heading "Relationship" [level=2]
+  - term: Deposits
+  - definition: [money]
+  - term: Available
+  - definition: [money]
+  - term: Loans & lines
+  - definition: [money]
+  - term: Sub-accounts
+  - definition: 3 open · 1 joint
+  - term: Last activity
+  - definition: Sep 19, 2026
+  - list:
+    - listitem:
+      - text: S00
+      - link "Membership Share":
+        - /url: /members/1000021/accounts/1000021-S00
+      - text: [money]
+    - listitem:
+      - text: D01
+      - link "Premier Checking":
+        - /url: /members/1000021/accounts/1081148-D01
+      - text: [money]
+    - listitem:
+      - text: L01
+      - link "Signature Loan":
+        - /url: /members/1000021/accounts/1000021-L01
+      - text: [money]
+  - link "All accounts":
+    - /url: /members/1000021/accounts
+  - heading "Recent notes · 3" [level=2]
+  - link "Add note":
+    - /url: /members/1000021/notes?compose=1
+  - article:
+    - text: Collections Gabriela Santos · Aug 23, 2024, 7:59 AM
+    - paragraph: Discussed hardship options after member reported reduced hours. Sent skip-a-payment application.
+  - article:
+    - text: Fraud Tyrone Johnson · Mar 3, 2024, 2:22 AM
+    - paragraph: Deposited check returned as counterfeit. Member advised; hold placed per funds availability policy.
+  - article:
+    - text: Account maintenance Jamal Harris · Oct 16, 2023, 4:09 AM
+    - paragraph: Switched statements to electronic delivery at member's request.
+  - heading "Related members" [level=2]
+  - list:
+    - listitem:
+      - link "Fuller, Ronald J.":
+        - /url: /members/1081148
+      - text: Spouse · 1081148 Active

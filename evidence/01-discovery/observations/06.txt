@@ -1,0 +1,90 @@
+http://localhost:5173/members?q=1030966
+Member search · RFCU Member Services
+
+- link "Skip to main content":
+  - /url: "#main"
+- complementary "Primary":
+  - link "Rashed Federal Credit Union — Member search":
+    - /url: /members
+    - text: Rashed FEDERAL CREDIT UNION
+  - navigation:
+    - text: Members
+    - link "Member search":
+      - /url: /members
+    - link "Open sub-account":
+      - /url: /open-account
+    - text: Reference
+    - link "Product rates":
+      - /url: /products
+    - link "My activity":
+      - /url: /activity
+  - strong: BAL · Baltimore Main Office
+  - text: BAL-MSR-04
+  - button "Collapse navigation" [expanded]: Collapse
+- banner:
+  - navigation "Breadcrumb": Members
+  - search:
+    - text: Find a member
+    - textbox "Find a member"
+    - text: /
+  - text: UAT User acceptance testing · synthetic member data Thu, Sep 24 · 5:25 PM ET
+  - button "Adaeze Okafor Member Service Representative"
+- main:
+  - heading "Member search" [level=1]
+  - paragraph: Find a membership by name, member number, SSN, phone, or email.
+  - search:
+    - text: Search
+    - searchbox "Search": "1030966"
+    - text: Status
+    - combobox "Status":
+      - option "Any status" [selected]
+      - option "Active"
+      - option "Dormant"
+      - option "Closed"
+      - option "Deceased"
+    - text: Branch
+    - combobox "Branch":
+      - option "All branches" [selected]
+      - option "BAL · Baltimore Main Office"
+      - option "TWS · Towson"
+      - option "COL · Columbia"
+      - option "ANP · Annapolis"
+      - option "SSP · Silver Spring"
+      - option "DCK · Washington K Street"
+      - option "ARL · Arlington"
+      - option "GLB · Glen Burnie"
+    - text: Sort by
+    - combobox "Sort by":
+      - option "Best match" [selected]
+      - option "Name (A–Z)"
+      - option "Member number"
+      - option "Newest members"
+    - button "Search"
+  - heading "Results · 1" [level=2]
+  - button "Clear search"
+  - table "Members matching the search":
+    - caption: Members matching the search
+    - rowgroup:
+      - 'row "Member # Name Date of birth SSN Mobile City Branch Status Member since"':
+        - 'columnheader "Member #"'
+        - columnheader "Name"
+        - columnheader "Date of birth"
+        - columnheader "SSN"
+        - columnheader "Mobile"
+        - columnheader "City"
+        - columnheader "Branch"
+        - columnheader "Status"
+        - columnheader "Member since"
+    - rowgroup:
+      - row "Cunningham, Renee S., member 1030966":
+        - cell "1030966":
+          - link "1030966":
+            - /url: /members/1030966
+        - cell "Cunningham, Renee S."
+        - cell "[date]"
+        - cell "•••-••-4298"
+        - cell "[phone]"
+        - cell "Salisbury, MD"
+        - cell "ANP"
+        - cell "Active"
+        - cell "[date]"

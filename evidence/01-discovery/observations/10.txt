@@ -1,0 +1,150 @@
+http://localhost:5173/members/1030966/accounts/1030966-S01
+Account 1030966-S01 · RFCU Member Services
+
+- link "Skip to main content":
+  - /url: "#main"
+- complementary "Primary":
+  - link "Rashed Federal Credit Union — Member search":
+    - /url: /members
+    - text: Rashed FEDERAL CREDIT UNION
+  - navigation:
+    - text: Members
+    - link "Member search":
+      - /url: /members
+    - link "Open sub-account":
+      - /url: /open-account
+    - text: Reference
+    - link "Product rates":
+      - /url: /products
+    - link "My activity":
+      - /url: /activity
+  - strong: BAL · Baltimore Main Office
+  - text: BAL-MSR-04
+  - button "Collapse navigation" [expanded]: Collapse
+- banner:
+  - navigation "Breadcrumb":
+    - link "Members":
+      - /url: /members
+    - link "Cunningham, Renee S.":
+      - /url: /members/1030966
+    - link "Accounts":
+      - /url: /members/1030966/accounts
+    - text: 1030966-S01
+  - search:
+    - text: Find a member
+    - textbox "Find a member"
+    - text: /
+  - text: UAT User acceptance testing · synthetic member data Thu, Sep 24 · 5:25 PM ET
+  - button "Adaeze Okafor Member Service Representative"
+- main:
+  - region "Member":
+    - heading "Renee S. Cunningham" [level=1]
+    - text: Member number 1030966
+    - button "Copy member number"
+    - text: Active Individual Member since
+    - strong: Sep 14, 1998
+    - text: Branch
+    - strong: ANP
+    - text: · Annapolis CIP Verified
+    - button "Add note"
+    - button "Open sub-account"
+  - navigation "Member record":
+    - link "Overview":
+      - /url: /members/1030966
+    - link "Accounts 5":
+      - /url: /members/1030966/accounts
+    - link "Notes 4":
+      - /url: /members/1030966/notes
+  - link "All accounts":
+    - /url: /members/1030966/accounts
+  - region "Account summary":
+    - text: S01
+    - heading "Regular Share Savings" [level=2]
+    - text: Open Account 1030966-S01
+    - button "Copy account number"
+    - text: Current balance [money] Available [money]
+  - heading "Account details" [level=2]
+  - term: Product
+  - definition: Regular Share Savings SHR-REG
+  - term: Rate (APY)
+  - definition: 0.15% APY
+  - term: Opened
+  - definition: May 12, 2020 by Yvette Carrington
+  - term: Last activity
+  - definition: Sep 15, 2026
+  - term: Statements
+  - definition: Electronic
+  - term: About this product
+  - definition: Everyday savings with dividends paid monthly.
+  - heading "Owners & beneficiaries" [level=2]
+  - term: Primary owner
+  - definition:
+    - link "Cunningham, Renee S.":
+      - /url: /members/1030966
+    - text: "1030966"
+  - term: Beneficiaries
+  - definition: None designated
+  - heading "Transactions · 5" [level=2]
+  - form "Filter transactions":
+    - text: From
+    - textbox "From"
+    - text: To
+    - textbox "To"
+    - text: Show
+    - combobox "Show":
+      - option "All transactions" [selected]
+      - option "Credits only"
+      - option "Debits only"
+    - text: "Description or check #"
+    - 'textbox "Description or check #"'
+    - button "Apply"
+    - button "Reset"
+  - table:
+    - rowgroup:
+      - row "Posted (ET) Description Type Debits Credits Balance":
+        - columnheader "Posted (ET)"
+        - columnheader "Description"
+        - columnheader "Type"
+        - columnheader "Debits"
+        - columnheader "Credits"
+        - columnheader "Balance"
+    - rowgroup:
+      - row "[date] 7:00 AM ONLINE TRANSFER FROM 1030966-D01 Transfer in Online banking [money] [money]":
+        - cell "[date] 7:00 AM"
+        - cell "ONLINE TRANSFER FROM 1030966-D01"
+        - cell "Transfer in Online banking"
+        - cell
+        - cell "[money]"
+        - cell "[money]"
+      - row "[date] 11:00 PM DIVIDEND EARNED 08/01–08/31 Dividend System [money] [money]":
+        - cell "[date] 11:00 PM"
+        - cell "DIVIDEND EARNED 08/01–08/31"
+        - cell "Dividend System"
+        - cell
+        - cell "[money]"
+        - cell "[money]"
+      - row "[date] 7:00 AM ONLINE TRANSFER FROM 1030966-D01 Transfer in Online banking [money] [money]":
+        - cell "[date] 7:00 AM"
+        - cell "ONLINE TRANSFER FROM 1030966-D01"
+        - cell "Transfer in Online banking"
+        - cell
+        - cell "[money]"
+        - cell "[money]"
+      - row "[date] 11:00 PM DIVIDEND EARNED 07/01–07/31 Dividend System [money] [money]":
+        - cell "[date] 11:00 PM"
+        - cell "DIVIDEND EARNED 07/01–07/31"
+        - cell "Dividend System"
+        - cell
+        - cell "[money]"
+        - cell "[money]"
+      - row "[date] 7:00 AM ONLINE TRANSFER FROM 1030966-D01 Transfer in Online banking [money] [money]":
+        - cell "[date] 7:00 AM"
+        - cell "ONLINE TRANSFER FROM 1030966-D01"
+        - cell "Transfer in Online banking"
+        - cell
+        - cell "[money]"
+        - cell "[money]"
+      - row "[date] Balance forward [money]":
+        - cell "[date]"
+        - cell "Balance forward"
+        - cell "[money]"

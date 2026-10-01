@@ -1,0 +1,16 @@
+{
+  "runId": "replay-2026-09-24T21-28-47",
+  "capability": "rfcu.member.savings-balance@v1",
+  "recoveries": [
+    {
+      "stepId": "s7",
+      "condition": "maintenance_notice"
+    }
+  ],
+  "handoffs": [],
+  "status": "success",
+  "outputs": {
+    "current_savings_balance": "[redacted]"
+  },
+  "durationMs": 4042
+}

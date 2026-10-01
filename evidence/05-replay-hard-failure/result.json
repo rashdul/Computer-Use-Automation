@@ -1,0 +1,17 @@
+{
+  "runId": "replay-2026-09-24T21-29-40",
+  "capability": "rfcu.member.savings-balance@v1",
+  "recoveries": [],
+  "handoffs": [],
+  "status": "failed",
+  "error": {
+    "code": "TARGET_NOT_FOUND",
+    "stepId": "s7",
+    "expected": "exactly one link \"Regular Share Savings\"",
+    "observed": "matches per strategy: [0, 0, 0] on http://localhost:5173/members/1000021",
+    "url": "http://localhost:5173/members/1000021",
+    "screenshot": "failure.png",
+    "snapshot": "failure.aria.txt"
+  },
+  "durationMs": 18827
+}

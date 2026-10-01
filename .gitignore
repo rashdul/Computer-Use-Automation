@@ -4,6 +4,8 @@
 !.env.example
 *.local
 *.local.*
+# RFCU is not an actual app, so its synthetic staff credentials are committed on purpose
+!target-app/STAFF_CREDENTIALS.local.md
 **/.generated/
 
 # Node
@@ -24,3 +26,9 @@ target-app/test-output/
 Thumbs.db
 .vscode/
 .idea/
+
+# Automation run output (curated runs are copied to evidence/)
+runs/
+
+# Local scratch: debug logs, screenshots, throwaway checkouts
+.runtime/

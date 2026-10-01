@@ -1,0 +1,19 @@
+[run.start] mode=replay capability=rfcu.member.savings-balance@v1 origin=http://localhost:5173 inputs={"member_number":"9999999"}
+[step.start] stepId=s1 intent=fill label "Username"
+[step.action] stepId=s1 action=fill strategy=0 value={{secret.username}}
+[step.done] stepId=s1 url=http://localhost:5173/login
+[step.start] stepId=s2 intent=fill label "Password"
+[step.action] stepId=s2 action=fill strategy=0 value={{secret.password}}
+[step.done] stepId=s2 url=http://localhost:5173/login
+[step.start] stepId=s3 intent=click button "Sign in"
+[step.action] stepId=s3 action=click strategy=0
+[step.done] stepId=s3 url=http://localhost:5173/members
+[step.start] stepId=s4 intent=fill searchbox "Search"
+[step.action] stepId=s4 action=fill strategy=0 value={{member_number}}
+[step.done] stepId=s4 url=http://localhost:5173/members
+[step.start] stepId=s5 intent=click button "Search"
+[step.action] stepId=s5 action=click strategy=0
+[step.done] stepId=s5 url=http://localhost:5173/members?q=9999999
+[step.start] stepId=s6 intent=click link "{{member_number}}"
+[condition.detected] stepId=s6 condition=member_not_found kind=business
+[run.end] status=business_outcome outcome=member_not_found durationMs=2735

@@ -3,7 +3,8 @@
 Locators use only what a person sees — labels, roles, and visible text —
 because the console deliberately has no test IDs.
 
-Passwords are read from target-app/STAFF_CREDENTIALS.local.md (git-ignored)
+Passwords are read from target-app/STAFF_CREDENTIALS.local.md (in GitHub on purpose:
+RFCU is not an actual app)
 and are never printed.
 """
 

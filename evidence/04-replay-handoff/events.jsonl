@@ -1,0 +1,34 @@
+{"t":"2026-09-24T21:29:22.562Z","type":"run.start","mode":"replay","capability":"rfcu.member.savings-balance@v1","origin":"http://localhost:5173","inputs":{"member_number":"1057101"}}
+{"t":"2026-09-24T21:29:24.108Z","type":"step.start","stepId":"s1","intent":"fill label \"Username\""}
+{"t":"2026-09-24T21:29:24.191Z","type":"step.action","stepId":"s1","action":"fill","strategy":0,"value":"{{secret.username}}"}
+{"t":"2026-09-24T21:29:24.219Z","type":"step.done","stepId":"s1","url":"http://localhost:5173/login"}
+{"t":"2026-09-24T21:29:24.220Z","type":"step.start","stepId":"s2","intent":"fill label \"Password\""}
+{"t":"2026-09-24T21:29:24.264Z","type":"step.action","stepId":"s2","action":"fill","strategy":0,"value":"{{secret.password}}"}
+{"t":"2026-09-24T21:29:24.292Z","type":"step.done","stepId":"s2","url":"http://localhost:5173/login"}
+{"t":"2026-09-24T21:29:24.293Z","type":"step.start","stepId":"s3","intent":"click button \"Sign in\""}
+{"t":"2026-09-24T21:29:24.343Z","type":"step.action","stepId":"s3","action":"click","strategy":0}
+{"t":"2026-09-24T21:29:24.981Z","type":"step.done","stepId":"s3","url":"http://localhost:5173/members"}
+{"t":"2026-09-24T21:29:24.982Z","type":"step.start","stepId":"s4","intent":"fill searchbox \"Search\""}
+{"t":"2026-09-24T21:29:25.030Z","type":"step.action","stepId":"s4","action":"fill","strategy":0,"value":"{{member_number}}"}
+{"t":"2026-09-24T21:29:25.076Z","type":"step.done","stepId":"s4","url":"http://localhost:5173/members"}
+{"t":"2026-09-24T21:29:25.077Z","type":"step.start","stepId":"s5","intent":"click button \"Search\""}
+{"t":"2026-09-24T21:29:25.131Z","type":"step.action","stepId":"s5","action":"click","strategy":0}
+{"t":"2026-09-24T21:29:25.201Z","type":"step.done","stepId":"s5","url":"http://localhost:5173/members?q=1057101"}
+{"t":"2026-09-24T21:29:25.203Z","type":"step.start","stepId":"s6","intent":"click link \"{{member_number}}\""}
+{"t":"2026-09-24T21:29:25.571Z","type":"step.action","stepId":"s6","action":"click","strategy":0}
+{"t":"2026-09-24T21:29:25.626Z","type":"step.done","stepId":"s6","url":"http://localhost:5173/members/1057101"}
+{"t":"2026-09-24T21:29:25.627Z","type":"step.start","stepId":"s7","intent":"click link \"Regular Share Savings\""}
+{"t":"2026-09-24T21:29:25.678Z","type":"condition.detected","stepId":"s7","condition":"compliance_attestation","kind":"escalate"}
+{"t":"2026-09-24T21:29:26.706Z","type":"handoff.requested","requestId":"replay-2026-09-24T21-29-22-handoff-1","stepId":"s7","reason":"compliance_attestation: BSA/AML attestation is a personal compliance statement; automation must not attest or defer it on a person's behalf.","url":"http://localhost:5173/members/1057101"}
+{"t":"2026-09-24T21:29:27.292Z","type":"click","role":"button","name":"Attest now","path":"/members/1057101"}
+{"t":"2026-09-24T21:29:27.359Z","type":"click","role":"input","name":"I completed Bank Secrecy Act / Anti-Money Laundering Training 2026 and understan","path":"/members/1057101"}
+{"t":"2026-09-24T21:29:27.363Z","type":"change","value":"true","role":"input","name":"I completed Bank Secrecy Act / Anti-Money Laundering Training 2026 and understan","path":"/members/1057101"}
+{"t":"2026-09-24T21:29:27.425Z","type":"click","role":"button","name":"Submit attestation","path":"/members/1057101"}
+{"t":"2026-09-24T21:29:27.728Z","type":"handoff.resumed","requestId":"replay-2026-09-24T21-29-22-handoff-1","resumedBy":"resume-file: scripted operator (demo): completed BSA/AML attestation in the live session","humanActions":4,"url":"http://localhost:5173/members/1057101"}
+{"t":"2026-09-24T21:29:27.791Z","type":"step.action","stepId":"s7","action":"click","strategy":0}
+{"t":"2026-09-24T21:29:27.843Z","type":"step.done","stepId":"s7","url":"http://localhost:5173/members/1057101/accounts/1057101-S01"}
+{"t":"2026-09-24T21:29:27.844Z","type":"step.start","stepId":"s8","intent":"extract value of \"Current balance\" -> current_savings_balance"}
+{"t":"2026-09-24T21:29:28.284Z","type":"step.action","stepId":"s8","action":"extract","strategy":0}
+{"t":"2026-09-24T21:29:28.292Z","type":"step.done","stepId":"s8","url":"http://localhost:5173/members/1057101/accounts/1057101-S01"}
+{"t":"2026-09-24T21:29:28.302Z","type":"success.verified","checkpoints":3,"outputs":["current_savings_balance"]}
+{"t":"2026-09-24T21:29:28.305Z","type":"run.end","status":"success","durationMs":5742}

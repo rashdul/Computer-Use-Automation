@@ -1,0 +1,3 @@
+operator: received replay-2026-09-24T21-29-22-handoff-1: compliance_attestation: BSA/AML attestation is a personal compliance statement; automation must not attest or defer it on a person's behalf.
+operator: attached to live page http://localhost:5173/members/1057101
+operator: attestation submitted; handing control back

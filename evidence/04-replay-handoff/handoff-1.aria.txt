@@ -1,0 +1,142 @@
+- link "Skip to main content":
+  - /url: "#main"
+- complementary "Primary":
+  - link "Rashed Federal Credit Union — Member search":
+    - /url: /members
+    - text: Rashed FEDERAL CREDIT UNION
+  - navigation:
+    - text: Members
+    - link "Member search":
+      - /url: /members
+    - link "Open sub-account":
+      - /url: /open-account
+    - text: Reference
+    - link "Product rates":
+      - /url: /products
+    - link "My activity":
+      - /url: /activity
+  - strong: BAL · Baltimore Main Office
+  - text: BAL-MSR-04
+  - button "Collapse navigation" [expanded]: Collapse
+- banner:
+  - navigation "Breadcrumb":
+    - link "Members":
+      - /url: /members
+    - text: Garcia, Mei V.
+  - search:
+    - text: Find a member
+    - textbox "Find a member"
+    - text: /
+  - text: UAT User acceptance testing · synthetic member data Thu, Sep 24 · 5:29 PM ET
+  - button "Adaeze Okafor Member Service Representative"
+- main:
+  - region "Member":
+    - heading "Mei V. Garcia" [level=1]
+    - text: Member number 1057101
+    - button "Copy member number"
+    - text: Active Individual Member since
+    - strong: Nov 5, 2006
+    - text: Branch
+    - strong: SSP
+    - text: · Silver Spring CIP Verified
+    - button "Add note"
+    - button "Open sub-account"
+  - navigation "Member record":
+    - link "Overview":
+      - /url: /members/1057101
+    - link "Accounts 11":
+      - /url: /members/1057101/accounts
+    - link "Notes 1":
+      - /url: /members/1057101/notes
+  - heading "Identity" [level=2]
+  - term: Legal name
+  - definition: Mei V. Garcia
+  - term: Date of birth
+  - definition: [date] · age 53
+  - term: SSN
+  - definition:
+    - text: •••-••-6450
+    - button "Reveal"
+  - term: ID on file
+  - definition: U.S. passport · ••••2147 Expires Dec 26, 2034
+  - term: CIP status
+  - definition: Verified · Mar 31, 2008
+  - term: Risk rating
+  - definition: Low
+  - heading "Contact" [level=2]
+  - term: Mailing address
+  - definition: 8786 Perring Pkwy, Apt 10D Silver Spring, MD 20904
+  - term: Mobile
+  - definition: [phone]
+  - term: Home
+  - definition: —
+  - term: Email
+  - definition: [email]
+  - term: Preferred contact
+  - definition: Mail
+  - term: Statements
+  - definition: Paper (mailed)
+  - term: Employer
+  - definition: Home Depot
+  - term: Occupation
+  - definition: Accountant
+  - heading "Relationship" [level=2]
+  - term: Deposits
+  - definition: [money]
+  - term: Available
+  - definition: [money]
+  - term: Loans & lines
+  - definition: [money]
+  - term: Sub-accounts
+  - definition: 11 open
+  - term: Last activity
+  - definition: Sep 21, 2026
+  - list:
+    - listitem:
+      - text: S00
+      - link "Membership Share":
+        - /url: /members/1057101/accounts/1057101-S00
+      - text: [money]
+    - listitem:
+      - text: S01
+      - link "Regular Share Savings":
+        - /url: /members/1057101/accounts/1057101-S01
+      - text: [money]
+    - listitem:
+      - text: D01
+      - link "Basic Checking":
+        - /url: /members/1057101/accounts/1057101-D01
+      - text: [money]
+    - listitem:
+      - text: D02
+      - link "Rainy day":
+        - /url: /members/1057101/accounts/1057101-D02
+      - text: [money]
+    - listitem:
+      - text: S25
+      - link "Vacation Club":
+        - /url: /members/1057101/accounts/1057101-S25
+      - text: [money]
+    - listitem:
+      - text: C01
+      - link "24-Month Share Certificate":
+        - /url: /members/1057101/accounts/1057101-C01
+      - text: [money]
+  - link "All accounts":
+    - /url: /members/1057101/accounts
+  - heading "Recent notes · 1" [level=2]
+  - link "Add note":
+    - /url: /members/1057101/notes?compose=1
+  - article:
+    - text: Account maintenance Olivia Washington · Sep 3, 2026, 11:23 AM
+    - paragraph: Stopped automatic Holiday Club transfer effective next cycle, per member request.
+  - heading "Related members" [level=2]
+  - text: No related members Spouses, custodians, and business partners linked to this membership show here.
+- alertdialog "Annual BSA/AML attestation due":
+  - heading "Annual BSA/AML attestation due" [level=2]
+  - paragraph:
+    - text: Your annual Bank Secrecy Act training attestation is due
+    - strong: September 30
+    - text: . You'll be reminded at each sign-in until it's done.
+  - button "Remind me later"
+  - button "Attest now"

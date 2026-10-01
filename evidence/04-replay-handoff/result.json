@@ -1,0 +1,18 @@
+{
+  "runId": "replay-2026-09-24T21-29-22",
+  "capability": "rfcu.member.savings-balance@v1",
+  "recoveries": [],
+  "handoffs": [
+    {
+      "requestId": "replay-2026-09-24T21-29-22-handoff-1",
+      "reason": "compliance_attestation: BSA/AML attestation is a personal compliance statement; automation must not attest or defer it on a person's behalf.",
+      "humanActions": 4,
+      "resumedBy": "resume-file: scripted operator (demo): completed BSA/AML attestation in the live session"
+    }
+  ],
+  "status": "success",
+  "outputs": {
+    "current_savings_balance": "[redacted]"
+  },
+  "durationMs": 5742
+}

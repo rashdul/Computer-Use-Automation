@@ -1,0 +1,30 @@
+{
+  "id": "youtube-public",
+  "policy": {
+    "allowedOrigins": ["https://www.youtube.com", "https://youtube.com", "https://consent.youtube.com"],
+    "allowedActions": ["click", "fill", "press", "extract"],
+    "riskyTargetPatterns": [
+      "sign in",
+      "subscribe",
+      "like",
+      "comment",
+      "share",
+      "save",
+      "report",
+      "join",
+      "download",
+      "create",
+      "upload",
+      "notification"
+    ]
+  },
+  "secrets": [],
+  "conditions": [
+    {
+      "id": "no_results",
+      "kind": "business",
+      "when": { "by": "text", "text": "No results found" },
+      "message": "The search returned no videos."
+    }
+  ]
+}

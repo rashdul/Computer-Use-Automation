@@ -1,0 +1,140 @@
+http://localhost:5173/members/1030966
+Cunningham, Renee S. (1030966) · RFCU Member Services
+
+- link "Skip to main content":
+  - /url: "#main"
+- complementary "Primary":
+  - link "Rashed Federal Credit Union — Member search":
+    - /url: /members
+    - text: Rashed FEDERAL CREDIT UNION
+  - navigation:
+    - text: Members
+    - link "Member search":
+      - /url: /members
+    - link "Open sub-account":
+      - /url: /open-account
+    - text: Reference
+    - link "Product rates":
+      - /url: /products
+    - link "My activity":
+      - /url: /activity
+  - strong: BAL · Baltimore Main Office
+  - text: BAL-MSR-04
+  - button "Collapse navigation" [expanded]: Collapse
+- banner:
+  - navigation "Breadcrumb":
+    - link "Members":
+      - /url: /members
+    - text: Cunningham, Renee S.
+  - search:
+    - text: Find a member
+    - textbox "Find a member"
+    - text: /
+  - text: UAT User acceptance testing · synthetic member data Thu, Sep 24 · 5:25 PM ET
+  - button "Adaeze Okafor Member Service Representative"
+- main:
+  - region "Member":
+    - heading "Renee S. Cunningham" [level=1]
+    - text: Member number 1030966
+    - button "Copy member number"
+    - text: Active Individual Member since
+    - strong: Sep 14, 1998
+    - text: Branch
+    - strong: ANP
+    - text: · Annapolis CIP Verified
+    - button "Add note"
+    - button "Open sub-account"
+  - navigation "Member record":
+    - link "Overview":
+      - /url: /members/1030966
+    - link "Accounts 5":
+      - /url: /members/1030966/accounts
+    - link "Notes 4":
+      - /url: /members/1030966/notes
+  - heading "Identity" [level=2]
+  - term: Legal name
+  - definition: Renee S. Cunningham
+  - term: Date of birth
+  - definition: [date] · age 61
+  - term: SSN
+  - definition:
+    - text: •••-••-4298
+    - button "Reveal"
+  - term: ID on file
+  - definition: Driver license · MD · ••••3952 Expires May 7, 2028
+  - term: CIP status
+  - definition: Verified · Mar 29, 2003
+  - term: Risk rating
+  - definition: Low
+  - heading "Contact" [level=2]
+  - term: Mailing address
+  - definition: 2649 Fayette St Salisbury, MD 21801
+  - term: Mobile
+  - definition: [phone]
+  - term: Home
+  - definition: [phone]
+  - term: Email
+  - definition: [email]
+  - term: Preferred contact
+  - definition: Mobile phone
+  - term: Statements
+  - definition: Electronic
+  - term: Employer
+  - definition: U.S. Postal Service
+  - term: Occupation
+  - definition: Physical Therapist
+  - heading "Relationship" [level=2]
+  - term: Deposits
+  - definition: [money]
+  - term: Available
+  - definition: [money]
+  - term: Loans & lines
+  - definition: [money]
+  - term: Sub-accounts
+  - definition: 5 open
+  - term: Last activity
+  - definition: Sep 22, 2026
+  - list:
+    - listitem:
+      - text: S00
+      - link "Membership Share":
+        - /url: /members/1030966/accounts/1030966-S00
+      - text: [money]
+    - listitem:
+      - text: S01
+      - link "Regular Share Savings":
+        - /url: /members/1030966/accounts/1030966-S01
+      - text: [money]
+    - listitem:
+      - text: D01
+      - link "Rainy day":
+        - /url: /members/1030966/accounts/1030966-D01
+      - text: [money]
+    - listitem:
+      - text: D02
+      - link "Basic Checking":
+        - /url: /members/1030966/accounts/1030966-D02
+      - text: [money]
+    - listitem:
+      - text: L01
+      - link "Visa Platinum Credit Card":
+        - /url: /members/1030966/accounts/1030966-L01
+      - text: [money]
+  - link "All accounts":
+    - /url: /members/1030966/accounts
+  - heading "Recent notes · 4" [level=2]
+  - link "Add note":
+    - /url: /members/1030966/notes?compose=1
+  - article:
+    - text: Service Adaeze Okafor · Sep 22, 2026, 5:07 PM
+    - paragraph: Member asked about 12-month certificate rates; quoted 4.25% APY. Will call back Friday.
+  - article:
+    - text: Service Adaeze Okafor · Sep 22, 2026, 4:56 PM
+    - paragraph: Member asked about 12-month certificate rates; quoted 4.25% APY. Will call back Friday.
+  - article:
+    - text: Service Adaeze Okafor · Sep 22, 2026, 4:50 PM
+    - paragraph: Member asked about 12-month certificate rates; quoted 4.25% APY. Will call back Friday.
+  - link "All 4 notes":
+    - /url: /members/1030966/notes
+  - heading "Related members" [level=2]
+  - text: No related members Spouses, custodians, and business partners linked to this membership show here.

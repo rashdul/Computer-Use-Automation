@@ -1,0 +1,18 @@
+http://localhost:5173/login
+Sign in · RFCU Member Services
+
+- complementary:
+  - text: Rashed FEDERAL CREDIT UNION UAT User acceptance testing · synthetic member data
+  - heading "Member Services Console" [level=1]
+  - paragraph: Member lookup, account servicing, and sub-account opening for branch and contact-center staff.
+  - paragraph: Authorized use only. Activity in this system is recorded and reviewed under RFCU Information Security Policy 4.2 and the Bank Secrecy Act. Federally insured by NCUA. This is a user-acceptance environment containing synthetic member data.
+- main:
+  - heading "Sign in" [level=2]
+  - paragraph: Use your RFCU network username and password.
+  - text: Username
+  - textbox "Username"
+  - text: Password
+  - textbox "Password"
+  - button "Show password"
+  - button "Sign in"
+  - paragraph: Locked out or forgot your password? Call the IT Help Desk at ext. 4400. Passwords are managed through your Windows account.

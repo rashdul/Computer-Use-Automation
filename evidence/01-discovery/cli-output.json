@@ -1,0 +1,8 @@
+{
+  "runId": "discovery-2026-09-24T21-25-19",
+  "status": "success",
+  "steps": 8,
+  "llmCalls": 11,
+  "durationMs": 49742,
+  "artifact": "artifacts\\rfcu.member.savings-balance.v1.json"
+}

@@ -1,0 +1,19 @@
+{"t":"2026-09-24T21:29:16.051Z","type":"run.start","mode":"replay","capability":"rfcu.member.savings-balance@v1","origin":"http://localhost:5173","inputs":{"member_number":"9999999"}}
+{"t":"2026-09-24T21:29:17.399Z","type":"step.start","stepId":"s1","intent":"fill label \"Username\""}
+{"t":"2026-09-24T21:29:17.455Z","type":"step.action","stepId":"s1","action":"fill","strategy":0,"value":"{{secret.username}}"}
+{"t":"2026-09-24T21:29:17.474Z","type":"step.done","stepId":"s1","url":"http://localhost:5173/login"}
+{"t":"2026-09-24T21:29:17.474Z","type":"step.start","stepId":"s2","intent":"fill label \"Password\""}
+{"t":"2026-09-24T21:29:17.502Z","type":"step.action","stepId":"s2","action":"fill","strategy":0,"value":"{{secret.password}}"}
+{"t":"2026-09-24T21:29:17.520Z","type":"step.done","stepId":"s2","url":"http://localhost:5173/login"}
+{"t":"2026-09-24T21:29:17.521Z","type":"step.start","stepId":"s3","intent":"click button \"Sign in\""}
+{"t":"2026-09-24T21:29:17.546Z","type":"step.action","stepId":"s3","action":"click","strategy":0}
+{"t":"2026-09-24T21:29:18.181Z","type":"step.done","stepId":"s3","url":"http://localhost:5173/members"}
+{"t":"2026-09-24T21:29:18.183Z","type":"step.start","stepId":"s4","intent":"fill searchbox \"Search\""}
+{"t":"2026-09-24T21:29:18.218Z","type":"step.action","stepId":"s4","action":"fill","strategy":0,"value":"{{member_number}}"}
+{"t":"2026-09-24T21:29:18.233Z","type":"step.done","stepId":"s4","url":"http://localhost:5173/members"}
+{"t":"2026-09-24T21:29:18.234Z","type":"step.start","stepId":"s5","intent":"click button \"Search\""}
+{"t":"2026-09-24T21:29:18.277Z","type":"step.action","stepId":"s5","action":"click","strategy":0}
+{"t":"2026-09-24T21:29:18.328Z","type":"step.done","stepId":"s5","url":"http://localhost:5173/members?q=9999999"}
+{"t":"2026-09-24T21:29:18.329Z","type":"step.start","stepId":"s6","intent":"click link \"{{member_number}}\""}
+{"t":"2026-09-24T21:29:18.665Z","type":"condition.detected","stepId":"s6","condition":"member_not_found","kind":"business"}
+{"t":"2026-09-24T21:29:18.786Z","type":"run.end","status":"business_outcome","outcome":"member_not_found","durationMs":2735}

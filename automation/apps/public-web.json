@@ -1,0 +1,23 @@
+{
+  "id": "public-web",
+  "policy": {
+    "allowedOrigins": ["https://www.amazon.com", "https://amazon.com", "https://www.google.com", "https://google.com", "https://www.wikipedia.org", "https://en.wikipedia.org", "https://www.github.com", "https://github.com", "https://www.geico.com"],
+    "allowedActions": ["click", "fill", "select", "press", "extract"],
+    "riskyTargetPatterns": [
+      "sign in",
+      "sign out",
+      "log in",
+      "account",
+      "add to cart",
+      "buy",
+      "checkout",
+      "place.*order",
+      "pay",
+      "subscribe",
+      "delete",
+      "submit"
+    ]
+  },
+  "secrets": [],
+  "conditions": []
+}

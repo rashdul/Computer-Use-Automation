@@ -1,0 +1,27 @@
+{"t":"2026-09-24T21:29:09.168Z","type":"run.start","mode":"replay","capability":"rfcu.member.savings-balance@v1","origin":"http://localhost:5173","inputs":{"member_number":"1057101"}}
+{"t":"2026-09-24T21:29:10.835Z","type":"step.start","stepId":"s1","intent":"fill label \"Username\""}
+{"t":"2026-09-24T21:29:10.907Z","type":"step.action","stepId":"s1","action":"fill","strategy":0,"value":"{{secret.username}}"}
+{"t":"2026-09-24T21:29:10.961Z","type":"step.done","stepId":"s1","url":"http://localhost:5173/login"}
+{"t":"2026-09-24T21:29:10.962Z","type":"step.start","stepId":"s2","intent":"fill label \"Password\""}
+{"t":"2026-09-24T21:29:10.999Z","type":"step.action","stepId":"s2","action":"fill","strategy":0,"value":"{{secret.password}}"}
+{"t":"2026-09-24T21:29:11.024Z","type":"step.done","stepId":"s2","url":"http://localhost:5173/login"}
+{"t":"2026-09-24T21:29:11.025Z","type":"step.start","stepId":"s3","intent":"click button \"Sign in\""}
+{"t":"2026-09-24T21:29:11.058Z","type":"step.action","stepId":"s3","action":"click","strategy":0}
+{"t":"2026-09-24T21:29:11.752Z","type":"step.done","stepId":"s3","url":"http://localhost:5173/members"}
+{"t":"2026-09-24T21:29:11.753Z","type":"step.start","stepId":"s4","intent":"fill searchbox \"Search\""}
+{"t":"2026-09-24T21:29:11.795Z","type":"step.action","stepId":"s4","action":"fill","strategy":0,"value":"{{member_number}}"}
+{"t":"2026-09-24T21:29:11.818Z","type":"step.done","stepId":"s4","url":"http://localhost:5173/members"}
+{"t":"2026-09-24T21:29:11.819Z","type":"step.start","stepId":"s5","intent":"click button \"Search\""}
+{"t":"2026-09-24T21:29:11.881Z","type":"step.action","stepId":"s5","action":"click","strategy":0}
+{"t":"2026-09-24T21:29:11.945Z","type":"step.done","stepId":"s5","url":"http://localhost:5173/members?q=1057101"}
+{"t":"2026-09-24T21:29:11.946Z","type":"step.start","stepId":"s6","intent":"click link \"{{member_number}}\""}
+{"t":"2026-09-24T21:29:12.320Z","type":"step.action","stepId":"s6","action":"click","strategy":0}
+{"t":"2026-09-24T21:29:12.382Z","type":"step.done","stepId":"s6","url":"http://localhost:5173/members/1057101"}
+{"t":"2026-09-24T21:29:12.383Z","type":"step.start","stepId":"s7","intent":"click link \"Regular Share Savings\""}
+{"t":"2026-09-24T21:29:12.789Z","type":"step.action","stepId":"s7","action":"click","strategy":0}
+{"t":"2026-09-24T21:29:12.863Z","type":"step.done","stepId":"s7","url":"http://localhost:5173/members/1057101/accounts/1057101-S01"}
+{"t":"2026-09-24T21:29:12.864Z","type":"step.start","stepId":"s8","intent":"extract value of \"Current balance\" -> current_savings_balance"}
+{"t":"2026-09-24T21:29:13.278Z","type":"step.action","stepId":"s8","action":"extract","strategy":0}
+{"t":"2026-09-24T21:29:13.291Z","type":"step.done","stepId":"s8","url":"http://localhost:5173/members/1057101/accounts/1057101-S01"}
+{"t":"2026-09-24T21:29:13.306Z","type":"success.verified","checkpoints":3,"outputs":["current_savings_balance"]}
+{"t":"2026-09-24T21:29:13.308Z","type":"run.end","status":"success","durationMs":4140}

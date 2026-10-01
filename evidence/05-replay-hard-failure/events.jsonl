@@ -1,0 +1,21 @@
+{"t":"2026-09-24T21:29:40.215Z","type":"run.start","mode":"replay","capability":"rfcu.member.savings-balance@v1","origin":"http://localhost:5173","inputs":{"member_number":"1000021"}}
+{"t":"2026-09-24T21:29:41.688Z","type":"step.start","stepId":"s1","intent":"fill label \"Username\""}
+{"t":"2026-09-24T21:29:41.744Z","type":"step.action","stepId":"s1","action":"fill","strategy":0,"value":"{{secret.username}}"}
+{"t":"2026-09-24T21:29:41.785Z","type":"step.done","stepId":"s1","url":"http://localhost:5173/login"}
+{"t":"2026-09-24T21:29:41.786Z","type":"step.start","stepId":"s2","intent":"fill label \"Password\""}
+{"t":"2026-09-24T21:29:41.813Z","type":"step.action","stepId":"s2","action":"fill","strategy":0,"value":"{{secret.password}}"}
+{"t":"2026-09-24T21:29:41.833Z","type":"step.done","stepId":"s2","url":"http://localhost:5173/login"}
+{"t":"2026-09-24T21:29:41.834Z","type":"step.start","stepId":"s3","intent":"click button \"Sign in\""}
+{"t":"2026-09-24T21:29:41.865Z","type":"step.action","stepId":"s3","action":"click","strategy":0}
+{"t":"2026-09-24T21:29:42.509Z","type":"step.done","stepId":"s3","url":"http://localhost:5173/members"}
+{"t":"2026-09-24T21:29:42.510Z","type":"step.start","stepId":"s4","intent":"fill searchbox \"Search\""}
+{"t":"2026-09-24T21:29:42.639Z","type":"step.action","stepId":"s4","action":"fill","strategy":0,"value":"{{member_number}}"}
+{"t":"2026-09-24T21:29:42.661Z","type":"step.done","stepId":"s4","url":"http://localhost:5173/members"}
+{"t":"2026-09-24T21:29:42.662Z","type":"step.start","stepId":"s5","intent":"click button \"Search\""}
+{"t":"2026-09-24T21:29:42.725Z","type":"step.action","stepId":"s5","action":"click","strategy":0}
+{"t":"2026-09-24T21:29:42.797Z","type":"step.done","stepId":"s5","url":"http://localhost:5173/members?q=1000021"}
+{"t":"2026-09-24T21:29:42.798Z","type":"step.start","stepId":"s6","intent":"click link \"{{member_number}}\""}
+{"t":"2026-09-24T21:29:43.197Z","type":"step.action","stepId":"s6","action":"click","strategy":0}
+{"t":"2026-09-24T21:29:43.243Z","type":"step.done","stepId":"s6","url":"http://localhost:5173/members/1000021"}
+{"t":"2026-09-24T21:29:43.244Z","type":"step.start","stepId":"s7","intent":"click link \"Regular Share Savings\""}
+{"t":"2026-09-24T21:29:59.042Z","type":"run.end","status":"failed","error":"TARGET_NOT_FOUND","durationMs":18827}

@@ -1,0 +1,15 @@
+{
+  "id": "replay-2026-09-24T21-29-22-handoff-1",
+  "capability": "rfcu.member.savings-balance@v1",
+  "stepId": "s7",
+  "stepIntent": "click link \"Regular Share Savings\"",
+  "reason": "compliance_attestation: BSA/AML attestation is a personal compliance statement; automation must not attest or defer it on a person's behalf.",
+  "url": "http://localhost:5173/members/1057101",
+  "screenshot": "handoff-1.png",
+  "snapshot": "handoff-1.aria.txt",
+  "requestedAt": "2026-09-24T21:29:26.705Z",
+  "session": {
+    "attach": "http://127.0.0.1:9333",
+    "resume": "create RESUME in the run directory, or press Enter in the terminal"
+  }
+}

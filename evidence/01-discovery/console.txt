@@ -1,0 +1,24 @@
+[run.start] mode=discovery url=http://localhost:5173/login goal=Log in, find member 1030966, and return their current savings balance.
+[llm.decision] turn=1 reason=Enter the username to log in. action=fill target=label "Username" value={{secret.username}}
+[action.done] turn=1 action=fill target=label "Username" fallbacks=1 url=http://localhost:5173/login
+[llm.decision] turn=2 reason=Enter the password to continue signing in. action=fill target=label "Password" value={{secret.password}}
+[action.done] turn=2 action=fill target=label "Password" fallbacks=1 url=http://localhost:5173/login
+[llm.decision] turn=3 reason=Submit the filled credentials to log in. action=click target=button "Sign in"
+[action.done] turn=3 action=click target=button "Sign in" fallbacks=1 url=http://localhost:5173/login
+[llm.decision] turn=4 reason=Search for the member by number so the flow works for any member. action=fill target=searchbox "Search" value=1030966
+[action.done] turn=4 action=fill target=searchbox "Search" fallbacks=1 url=http://localhost:5173/members
+[llm.decision] turn=5 reason=Submit the member number search to find member 1030966. action=click target=button "Search"
+[action.done] turn=5 action=click target=button "Search" fallbacks=1 url=http://localhost:5173/members?q=1030966
+[llm.decision] turn=6 reason=Open the member's record to find the savings balance. action=click target=link "1030966"
+[action.done] turn=6 action=click target=link "1030966" fallbacks=2 url=http://localhost:5173/members/1030966
+[llm.decision] turn=7 reason=Open the savings sub-account to read its current balance. action=click target=link "Regular Share Savings"
+[action.done] turn=7 action=click target=link "Regular Share Savings" fallbacks=2 url=http://localhost:5173/members/1030966/accounts/1030966-S01
+[llm.decision] turn=8 reason=The savings account page shows the current balance, which the goal asks for. action=extract target=value of "Current balance [money]" output={"name":"savings_balance","type":"money"}
+[action.error] turn=8 action=extract value of "Current balance [money]" error=target matched 0 elements; it must match exactly one
+[llm.decision] turn=9 reason=The caption is "Current balance" in the Account summary region; retry with the exact caption without the type suffix. action=extract target=value of "Current balance" output={"name":"current_savings_balance","type":"money"}
+[action.done] turn=9 action=extract target=value of "Current balance" fallbacks=0 url=http://localhost:5173/members/1030966/accounts/1030966-S01
+[llm.decision] turn=10 reason=The current savings balance was extracted from the Regular Share Savings account page for member 1030966. action=done
+[done.rejected] turn=10 error=success target heading "Account summary" is not uniquely visible
+[llm.decision] turn=11 reason=The current savings balance has been extracted from the account page; success targets use the actual region and heading roles. action=done
+[artifact.saved] file=artifacts\rfcu.member.savings-balance.v1.json id=rfcu.member.savings-balance version=1
+[run.end] status=success artifact=artifacts\rfcu.member.savings-balance.v1.json llmCalls=11

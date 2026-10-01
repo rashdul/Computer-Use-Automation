@@ -7,7 +7,8 @@ bcrypt (the format Supabase Auth verifies), and writes:
     matching core.staff profiles (hashes only — no plaintext), and
   * a credentials file for the people running the UAT environment.
 
-Both outputs are git-ignored. Plaintext passwords never leave this machine.
+The SQL file is git-ignored. The credentials file will be in GitHub because RFCU
+is not an actual app: its staff accounts are synthetic test accounts.
 
 Usage:
     python target-app/scripts/provision_staff.py \
@@ -167,7 +168,7 @@ commit;
 
 def credentials_markdown(credentials: list[tuple[Staff, str]]) -> str:
     lines = [
-        "# Staff sign-ins — UAT (LOCAL ONLY, DO NOT COMMIT)",
+        "# Staff sign-ins — UAT (in GitHub on purpose: RFCU is not an actual app)",
         "",
         f"Generated {date.today().isoformat()} by `target-app/scripts/provision_staff.py`.",
         "Sign in with the **username** (the console adds the internal email domain).",

@@ -15,6 +15,10 @@ All people, SSNs, phone numbers, and emails are synthetic: SSNs start with 9 and
 are not ITINs, phone numbers use the 555 exchange, and emails use the reserved
 `example.*` domains.
 
+**Try it without installing anything:** <https://rashed-federal-credit-union.netlify.app>.
+Sign in with any account from [Staff sign-ins](#staff-sign-ins). The rest of
+this README is for running your own copy.
+
 > The UI has no `data-testid` or other automation-only hooks by design. Anything
 > automating it has to go by what a person sees: labels, roles, and visible text.
 
@@ -30,31 +34,39 @@ are not ITINs, phone numbers use the 555 exchange, and emails use the reserved
 ## Run it
 
 Requires Node 22 LTS (Node 20.19+ also works for the dev server) and a Supabase
-project with the schema and seed data below.
+project loaded with the [schema and seed data](#database).
 
 ```bash
 cd target-app
 npm install
-cp .env.example .env.local   # then fill in the project URL and publishable key
+cp .env.example .env.local   # then fill in the two values below
 npm run dev                  # http://localhost:5173
 ```
 
-`npm run build` type-checks and produces `dist/`. `npm run typecheck` runs the type check on its own.
+| Variable in `.env.local` | What it is |
+| --- | --- |
+| `VITE_SUPABASE_URL` | The Supabase project URL, `https://<project-ref>.supabase.co` |
+| `VITE_SUPABASE_PUBLISHABLE_KEY` | The project's publishable key (`sb_publishable_…`). It is safe in a browser bundle because every table is closed to the Data API and each RPC checks the caller's session and role. |
+
+`.env.local` is git-ignored. The Python test scripts and the automation's `demo:env` helper read the same file.
+
+| Script | What it does |
+| --- | --- |
+| `npm run dev` | Vite dev server on port 5173 |
+| `npm run build` | Type-checks, then builds to `dist/` |
+| `npm run preview` | Serves the built `dist/` locally |
+| `npm run typecheck` | Type check only |
+
+A deployed copy runs at `https://rashed-federal-credit-union.netlify.app`. Netlify builds it with the repository root's `netlify.toml` (base `target-app`, Node 22, SPA redirect to `index.html`).
 
 ### Staff sign-ins
 
-The 25 staff accounts get strong random passwords when they're provisioned.
-The passwords are never committed:
+Sign in with the username alone, for example `aokafor`; the console adds the
+internal email domain. Passwords are in
+[`STAFF_CREDENTIALS.local.md`](STAFF_CREDENTIALS.local.md).
 
-```bash
-python target-app/scripts/provision_staff.py \
-  --sql target-app/supabase/seed/.generated/02_staff.sql \
-  --credentials target-app/STAFF_CREDENTIALS.local.md
-```
-
-The script writes bcrypt hashes into the SQL file and the plaintext passwords
-into `STAFF_CREDENTIALS.local.md`. Both files are git-ignored. Sign in with the
-username alone, for example `aokafor`.
+> That file is committed on purpose. RFCU is not a real app, and its 25 staff
+> accounts are synthetic test accounts.
 
 | Username | Role | Use it for |
 | --- | --- | --- |
@@ -65,11 +77,28 @@ username alone, for example `aokafor`.
 
 Compliance officers and the other staff are listed in the credentials file.
 
+#### Re-provisioning staff
+
+To generate new random passwords (for example, for a fresh Supabase project):
+
+```bash
+pip install bcrypt
+python target-app/scripts/provision_staff.py   --sql target-app/supabase/seed/.generated/02_staff.sql   --credentials target-app/STAFF_CREDENTIALS.local.md
+```
+
+| Argument | Required | What it does |
+| --- | --- | --- |
+| `--sql <file>` | yes | Where to write the seed SQL that creates the `auth.users` / `auth.identities` rows and `core.staff` profiles. It holds bcrypt hashes only. The `.generated/` folder is git-ignored. |
+| `--credentials <file>` | yes | Where to write the plaintext username/password table. Overwrites the existing file. |
+
+Then load the new SQL file as seed step 02 (see below).
+
 ## Database
 
-The SQL files in `supabase/migrations/` build the schema. The files in
-`supabase/seed/` load the data; run them in numeric order, with
-`seed/.generated/02_staff.sql` second.
+The SQL files in `supabase/migrations/` build the schema; apply them in
+filename order. The files in `supabase/seed/` load the data; run them in
+numeric order, with `seed/.generated/02_staff.sql` (from
+[re-provisioning](#re-provisioning-staff)) second.
 
 | Table | Rows |
 | --- | ---: |
@@ -137,10 +166,9 @@ listed under **Administration → Test data**.
 | Duplicate product | 1001544 | `aokafor` | Second 12-month certificate asks for confirmation |
 | Large relationship | 1057101 | `aokafor` | Long account list and history |
 
-Put these members back to their seeded state with
-`python tests/ui/reset_scenarios.py` (add `--environment` to also reset
-Environment controls). The reset reverses accounts opened from the console
-and refunds their transfers.
+To put these members back to their seeded state, run
+`python tests/ui/reset_scenarios.py` (see [Tests](#tests)). The reset reverses
+accounts opened from the console and refunds their transfers.
 
 ## Error states and how to trigger them
 
@@ -168,9 +196,9 @@ that browser tab.
 
 ## Tests
 
-The Python Playwright walkthroughs sign in as the personas above. They use
-only roles, labels, and visible text, take 1440×900 screenshots into
-`test-output/screenshots/` (git-ignored), and make 127 checks in total:
+Python Playwright walkthroughs sign in as the personas above. They use only
+roles, labels, and visible text, take 1440×900 screenshots into
+`test-output/screenshots/` (git-ignored), and make 127 checks in total.
 
 | Script | Covers |
 | --- | --- |
@@ -180,18 +208,21 @@ only roles, labels, and visible text, take 1440×900 screenshots into
 | `walk_admin.py` | Teller and admin denials, password confirmation, each Administration section, manager access |
 | `walk_faults.py` | Slow loading, timeout, outage, all five dialogs, banner, timeout while opening with a safe retry, admin-ended session and resume, idle timeout |
 
-Run everything with the dev server started for you. `run_all.py` resets the
-scenario data before and after:
+The walkthroughs expect the dev server on `http://localhost:5173`. They read
+passwords from `STAFF_CREDENTIALS.local.md` and never print them.
 
 ```bash
-pip install playwright bcrypt && python -m playwright install chromium
-python <path-to>/webapp-testing/scripts/with_server.py --server "npm run dev" --port 5173 --timeout 60 \
-  -- python tests/ui/run_all.py
+pip install playwright bcrypt
+python -m playwright install chromium
+
+npm run dev                          # terminal 1, in target-app/
+python tests/ui/run_all.py           # terminal 2, in target-app/
 ```
 
-Pass script names to `run_all.py` to run only some of them, for example
-`python tests/ui/run_all.py walk_faults.py`. The walkthroughs read passwords
-from `STAFF_CREDENTIALS.local.md` and never print them.
+| Command | Arguments | What it does |
+| --- | --- | --- |
+| `python tests/ui/run_all.py [script ...]` | Optional walkthrough file names, for example `walk_faults.py`. Default: all five, in the order above. | Resets scenario data and environment controls, runs the walkthroughs, resets again, and exits non-zero if any failed |
+| `python tests/ui/reset_scenarios.py [--environment]` | `--environment` also turns off every Environment control. Without it, only the scenario members are reset. | Signs in as `dwhitfield` and calls the audited `admin_reset_scenarios` RPC |
 
 ## Layout
 
@@ -207,6 +238,6 @@ src/
 supabase/
   migrations/    schema, helpers, member / opening / admin APIs, public wrappers
   seed/          reproducible seed SQL (staff SQL is generated, git-ignored)
-scripts/         staff provisioning
+scripts/         staff provisioning (provision_staff.py)
 tests/ui/        Playwright walkthroughs and scenario reset
 ```

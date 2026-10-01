@@ -1,0 +1,116 @@
+{
+  "id": "rfcu-member-services",
+  "policy": {
+    "allowedOrigins": ["http://localhost:5173", "http://127.0.0.1:5173", "https://rashed-federal-credit-union.netlify.app"],
+    "allowedActions": ["click", "fill", "select", "press", "extract"],
+    "riskyTargetPatterns": [
+      "sign out",
+      "reveal",
+      "open sub-account",
+      "open account",
+      "add note",
+      "save",
+      "submit",
+      "delete",
+      "remove",
+      "transfer",
+      "approve",
+      "attest",
+      "report to help desk",
+      "end .*session",
+      "close"
+    ]
+  },
+  "secrets": ["username", "password"],
+  "conditions": [
+    {
+      "id": "member_not_found",
+      "kind": "business",
+      "when": { "by": "text", "text": "No members match" },
+      "message": "No member matches the given member number."
+    },
+    {
+      "id": "member_not_found",
+      "kind": "business",
+      "when": { "by": "role", "role": "heading", "name": "Member not found" },
+      "message": "No member matches the given member number."
+    },
+    {
+      "id": "permission_denied",
+      "kind": "business",
+      "when": { "by": "text", "text": "Error 403 · Permission denied" },
+      "message": "The signed-in staff role may not open this record (restricted record or missing permission)."
+    },
+    {
+      "id": "sign_in_rejected",
+      "kind": "fatal",
+      "when": { "by": "text", "text": "The username or password is incorrect." },
+      "message": "The console rejected the staff credentials."
+    },
+    {
+      "id": "maintenance_notice",
+      "kind": "recoverable",
+      "when": { "by": "role", "role": "alertdialog", "name": "Scheduled maintenance tonight" },
+      "message": "Informational maintenance notice; acknowledged automatically.",
+      "recover": [{ "by": "role", "role": "button", "name": "Acknowledge", "within": { "role": "alertdialog", "name": "Scheduled maintenance tonight" } }]
+    },
+    {
+      "id": "password_expiry_notice",
+      "kind": "recoverable",
+      "when": { "by": "role", "role": "alertdialog", "name": "Your password expires in 3 days" },
+      "message": "Informational password-expiry notice; acknowledged automatically.",
+      "recover": [{ "by": "role", "role": "button", "name": "OK, got it", "within": { "role": "alertdialog", "name": "Your password expires in 3 days" } }]
+    },
+    {
+      "id": "printer_offline",
+      "kind": "recoverable",
+      "when": { "by": "role", "role": "alertdialog", "name": "Receipt printer not responding" },
+      "message": "Receipt printer notice is irrelevant to a read-only lookup; dismissed.",
+      "recover": [{ "by": "role", "role": "button", "name": "Dismiss", "within": { "role": "alertdialog", "name": "Receipt printer not responding" } }]
+    },
+    {
+      "id": "request_timeout",
+      "kind": "recoverable",
+      "when": { "by": "text", "text": "The request timed out" },
+      "message": "Transient core-banking timeout; retried with the console's own Try again.",
+      "recover": [{ "by": "role", "role": "button", "name": "Try again" }],
+      "maxRecoveries": 2
+    },
+    {
+      "id": "compliance_attestation",
+      "kind": "escalate",
+      "when": { "by": "role", "role": "alertdialog", "name": "Annual BSA/AML attestation due" },
+      "message": "BSA/AML attestation is a personal compliance statement; automation must not attest or defer it on a person's behalf."
+    },
+    {
+      "id": "duplicate_session",
+      "kind": "escalate",
+      "when": { "by": "role", "role": "alertdialog", "name": "Signed in on another workstation" },
+      "message": "Possible credential misuse; a person must decide whether to report it."
+    },
+    {
+      "id": "session_ended",
+      "kind": "escalate",
+      "when": { "by": "text", "text": "Your session has ended" },
+      "message": "The session was ended; a person must sign in again."
+    },
+    {
+      "id": "session_idle_timeout",
+      "kind": "escalate",
+      "when": { "by": "text", "text": "You were signed out after a period of inactivity" },
+      "message": "The session timed out; a person must sign in again."
+    },
+    {
+      "id": "service_unavailable",
+      "kind": "fatal",
+      "when": { "by": "text", "text": "Core banking service unavailable" },
+      "message": "The core banking service is down (SVC reference shown on screen)."
+    },
+    {
+      "id": "no_connection",
+      "kind": "fatal",
+      "when": { "by": "text", "text": "No connection to the core banking service" },
+      "message": "The console cannot reach the core banking service."
+    }
+  ]
+}

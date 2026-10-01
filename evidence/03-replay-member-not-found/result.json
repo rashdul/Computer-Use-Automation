@@ -1,0 +1,12 @@
+{
+  "runId": "replay-2026-09-24T21-29-16",
+  "capability": "rfcu.member.savings-balance@v1",
+  "recoveries": [],
+  "handoffs": [],
+  "status": "business_outcome",
+  "outcome": {
+    "id": "member_not_found",
+    "message": "No member matches the given member number."
+  },
+  "durationMs": 2735
+}

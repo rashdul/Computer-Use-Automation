@@ -1,0 +1,114 @@
+http://localhost:5173/members
+Member search · RFCU Member Services
+
+- link "Skip to main content":
+  - /url: "#main"
+- complementary "Primary":
+  - link "Rashed Federal Credit Union — Member search":
+    - /url: /members
+    - text: Rashed FEDERAL CREDIT UNION
+  - navigation:
+    - text: Members
+    - link "Member search":
+      - /url: /members
+    - link "Open sub-account":
+      - /url: /open-account
+    - text: Reference
+    - link "Product rates":
+      - /url: /products
+    - link "My activity":
+      - /url: /activity
+  - strong: BAL · Baltimore Main Office
+  - text: BAL-MSR-04
+  - button "Collapse navigation" [expanded]: Collapse
+- banner:
+  - navigation "Breadcrumb": Members
+  - search:
+    - text: Find a member
+    - textbox "Find a member"
+    - text: /
+  - text: UAT User acceptance testing · synthetic member data Thu, Sep 24 · 5:25 PM ET
+  - button "Adaeze Okafor Member Service Representative"
+- main:
+  - heading "Member search" [level=1]
+  - paragraph: Find a membership by name, member number, SSN, phone, or email.
+  - search:
+    - text: Search
+    - searchbox "Search"
+    - text: Status
+    - combobox "Status":
+      - option "Any status" [selected]
+      - option "Active"
+      - option "Dormant"
+      - option "Closed"
+      - option "Deceased"
+    - text: Branch
+    - combobox "Branch":
+      - option "All branches" [selected]
+      - option "BAL · Baltimore Main Office"
+      - option "TWS · Towson"
+      - option "COL · Columbia"
+      - option "ANP · Annapolis"
+      - option "SSP · Silver Spring"
+      - option "DCK · Washington K Street"
+      - option "ARL · Arlington"
+      - option "GLB · Glen Burnie"
+    - text: Sort by
+    - combobox "Sort by":
+      - option "Best match" [selected]
+      - option "Name (A–Z)"
+      - option "Member number"
+      - option "Newest members"
+    - button "Search"
+  - heading "Recently viewed" [level=2]
+  - list:
+    - listitem:
+      - link "Garcia, Mei V. 1057101 · Silver Spring, MD 5 min ago":
+        - /url: /members/1057101
+    - listitem:
+      - link "Foster, Santiago 1000021 · Baltimore, MD 7 min ago":
+        - /url: /members/1000021
+    - listitem:
+      - link "Cunningham, Renee S. 1030966 · Salisbury, MD 8 min ago":
+        - /url: /members/1030966
+    - listitem:
+      - link "Adams, Alexis A. 1007271 · Crofton, MD 3 hr ago":
+        - /url: /members/1007271
+    - listitem:
+      - link "Alexander, David D. 1013997 · Brooklyn Park, MD 22 hr ago":
+        - /url: /members/1013997
+    - listitem:
+      - link "Adams, Amber L. 1080566 · Baltimore, MD 1 day ago":
+        - /url: /members/1080566
+    - listitem:
+      - link "Kang, Minh G. 1068311 · Silver Spring, MD 2 days ago":
+        - /url: /members/1068311
+    - listitem:
+      - link "Reyes, Jacob A. 1000204 · Brooklyn Park, MD 2 days ago":
+        - /url: /members/1000204
+  - heading "Search tips" [level=2]
+  - term: Name
+  - definition:
+    - text: "Last name, first name, or both:"
+    - code: okafor
+    - text: ","
+    - code: renee cunningham
+  - term: Member number
+  - definition:
+    - text: "All 7 digits:"
+    - code: "1030966"
+    - text: . An account number like
+    - code: 1030966-S01
+    - text: also works.
+  - term: SSN
+  - definition:
+    - text: Last 4 digits
+    - code: "4298"
+    - text: or all 9
+    - code: [ssn]
+    - text: . SSN searches are logged.
+  - term: Phone or email
+  - definition:
+    - text: 10-digit phone
+    - code: [phone]
+    - text: or the full email address.
