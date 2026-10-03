@@ -32,3 +32,6 @@ runs/
 
 # Local scratch: debug logs, screenshots, throwaway checkouts
 .runtime/
+
+# Capabilities you discover locally (the reviewed example lives in evidence/01-discovery/capability.json)
+artifacts/
