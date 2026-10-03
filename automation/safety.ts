@@ -92,8 +92,32 @@ export function locatorName(l: Locator): string {
       return l.text;
     case "field":
       return l.field;
+    case "content":
+      return `${l.position ?? "single"} ${l.kind}`;
     case "cell":
-      return `${l.row} / ${l.column}`;
+      return `${l.row ?? (l.rowKey ? `${l.rowKey.column} = ${l.rowKey.value}` : "")} / ${l.column}`;
+  }
+}
+
+/** Human-readable target, used in logs, step intents and artifacts. */
+export function describeLocator(l: Locator): string {
+  const scope = l.within ? ` in ${l.within.role}${l.within.name === undefined ? "" : ` "${l.within.name}"`}` : "";
+  const ordinal = (p: string | number | undefined) => (p === undefined ? "single" : typeof p === "number" ? `#${p}` : p);
+  switch (l.by) {
+    case "link":
+      return `${ordinal(l.position)} link to ${l.hrefPrefix}*${scope}`;
+    case "content":
+      return `${ordinal(l.position)} ${l.kind}${scope}`;
+    case "role":
+      if (l.namePattern !== undefined) return `${l.role} /${l.namePattern}/${scope}`;
+      if (l.name !== undefined) return `${l.role} "${l.name}"${scope}`;
+      return `${l.position === undefined ? "the single" : ordinal(l.position)} ${l.role}${l.level ? ` (level ${l.level})` : ""}${scope}`;
+    case "cell":
+      return l.rowKey ? `cell [${l.column}] in the row whose ${l.rowKey.column} is "${l.rowKey.value}"` : `cell [${l.row}] / [${l.column}]`;
+    case "field":
+      return `value of "${l.field}"`;
+    default:
+      return `${l.by} "${locatorName(l)}"`;
   }
 }
 
@@ -111,22 +135,30 @@ export function classifyRisk(profile: AppProfile, action: string, target: Locato
 }
 
 /** Throws unless the action is on the allow-list and not risky. */
-export function assertActionAllowed(profile: AppProfile, action: string, target: Locator): Risk {
+export function assertActionAllowed(profile: AppProfile, action: string, target: Locator, opts: { allowWrites?: boolean } = {}): Risk {
   if (!(profile.policy.allowedActions as string[]).includes(action)) {
     throw new PolicyViolation(`action "${action}" is not on the allow-list`);
   }
   const risk = classifyRisk(profile, action, target);
-  if (risk === "risky") {
-    throw new PolicyViolation(`"${locatorName(target)}" is classified risky/irreversible; automation may not ${action} it`);
+  // Read-only by default. With --allow-writes a risky action is allowed, but the caller must get
+  // a person's approval in the live session before performing it (see Handoff.approve).
+  if (risk === "risky" && !opts.allowWrites) {
+    throw new PolicyViolation(
+      `"${locatorName(target)}" changes data or is irreversible; this run is read-only (writes need --allow-writes --operator, and a person approves each one)`,
+    );
   }
   return risk;
 }
 
 /** Load-time review of an artifact against the current policy (it may have changed since recording). */
-export function assertCapabilityAllowed(profile: AppProfile, cap: Capability, origin: string): void {
+export function assertCapabilityAllowed(profile: AppProfile, cap: Capability, origin: string, opts: { allowWrites?: boolean } = {}): void {
   if (!isAllowedUrl(profile, origin)) throw new PolicyViolation(`origin ${origin} is not on the allow-list`);
   for (const step of cap.steps) {
-    for (const l of step.target.locators) assertActionAllowed(profile, step.action, l);
+    for (const l of step.target.locators) {
+      const risk = assertActionAllowed(profile, step.action, l, { allowWrites: opts.allowWrites && step.approval === true });
+      // A risky step must carry the approval flag, so an edited artifact cannot skip the human.
+      if (risk === "risky" && !step.approval) throw new PolicyViolation(`${step.id} changes data but is not marked for approval`);
+    }
   }
 }
 

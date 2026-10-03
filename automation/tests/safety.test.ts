@@ -18,7 +18,7 @@ import {
   resolveTemplate,
 } from "../safety.js";
 import { Capability } from "../schema.js";
-import { counterPattern } from "../surface.js";
+import { counterPattern, redactedMatcher } from "../surface.js";
 import { mixesInputWithContent, wildcardInputForms } from "../discover.js";
 
 const rfcu = loadAppProfile("rfcu");
@@ -99,8 +99,8 @@ test("typed output parsing", () => {
   assert.equal(parseOutput("text", "  Active "), "Active");
 });
 
-test("the committed artifact validates, respects policy, and holds no literal inputs", () => {
-  const cap = Capability.parse(JSON.parse(readFileSync("artifacts/rfcu.member.savings-balance.v1.json", "utf8")));
+test("the committed example capability validates, respects policy, and holds no literal inputs", () => {
+  const cap = Capability.parse(JSON.parse(readFileSync("evidence/01-discovery/capability.json", "utf8")));
   for (const step of cap.steps) for (const l of step.target.locators) assertActionAllowed(rfcu, step.action, l);
   assert.ok(!JSON.stringify(cap.steps).includes("1030966"), "discovery member number must be parameterized");
   assert.deepEqual(cap.secrets.sort(), ["password", "username"]);
@@ -148,4 +148,18 @@ test("controls named after a typed value plus page text are flagged; plain match
   assert.equal(mixesInputWithContent("1030966", ["1030966"]), null);
   assert.equal(mixesInputWithContent("Search", ["Artificial intelligence"]), null);
   assert.equal(mixesInputWithContent("Open 1030966", ["1030966"]), null, "a short verb is not page content");
+});
+
+test("redaction tokens in a target match the real value's pattern; plain names stay exact strings", () => {
+  const row = redactedMatcher("Total deposits [money] [money]", true) as RegExp;
+  assert.ok(row.test("Total deposits $2,915.86 $2,915.86") && row.test("Total deposits $47,718.14 $47,718.14"));
+  assert.ok(!row.test("Total loans $1.00 $1.00") && !row.test("Total deposits $1.00"));
+  assert.ok((redactedMatcher("Born [date]", true) as RegExp).test("Born 04/16/1965"));
+  assert.equal(redactedMatcher("Search", true), "Search");
+});
+
+test("an input placeholder in a URL check accepts the site's URL forms of the value", () => {
+  assert.ok(urlMatches("/wiki/{{t}}", "https://en.wikipedia.org/wiki/Machine_learning", { t: "machine learning" }));
+  assert.ok(urlMatches("/search?q={{t}}", "https://x.test/search?q=machine-learning", { t: "Machine learning" }));
+  assert.ok(!urlMatches("/wiki/{{t}}", "https://en.wikipedia.org/wiki/Machine_vision", { t: "machine learning" }));
 });

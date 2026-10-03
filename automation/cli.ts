@@ -36,12 +36,17 @@ async function main() {
       "cdp-port": { type: "string" },
       "max-steps": { type: "string" },
       llm: { type: "string" },
+      "allow-writes": { type: "boolean", default: false },
     },
   });
   loadDotEnv();
   // A run only ever holds the secrets its app profile declares (none for public sites).
   const secretsFor = loadSecrets;
   const cdpPort = values["cdp-port"] ? Number(values["cdp-port"]) : undefined;
+  const allowWrites = values["allow-writes"];
+  if (allowWrites && !values.operator) {
+    throw new Error("--allow-writes needs --operator: a person must approve every data-changing step (add --headed to watch the browser)");
+  }
 
   if (command === "discover") {
     if (!values.url || !values.goal) throw new Error("discover needs --url and --goal");
@@ -63,6 +68,7 @@ async function main() {
       headed: values.headed,
       operator: values.operator,
       cdpPort,
+      allowWrites,
       maxSteps: values["max-steps"] ? Number(values["max-steps"]) : undefined,
     });
     const { capability: _omit, ...summary } = result;
@@ -95,6 +101,7 @@ async function main() {
       headed: values.headed,
       operator: values.operator,
       cdpPort,
+      allowWrites,
     });
     console.log(JSON.stringify(result, null, 2));
     process.exitCode = EXIT[result.status];

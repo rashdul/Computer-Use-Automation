@@ -11,7 +11,7 @@
     "replay": "tsx automation/cli.ts replay",
     "demo:env": "tsx automation/demo/environment.ts",
     "demo:operator": "tsx automation/demo/operator.ts",
-    "test": "tsx --test automation/tests/safety.test.ts automation/tests/llm.test.ts automation/tests/flow.test.ts automation/tests/search.test.ts",
+    "test": "tsx --test automation/tests/safety.test.ts automation/tests/llm.test.ts automation/tests/flow.test.ts automation/tests/search.test.ts automation/tests/portability.test.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

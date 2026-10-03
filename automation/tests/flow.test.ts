@@ -289,3 +289,59 @@ test("a server redirect off the allow-list is caught, and discovery goes back in
   const rr = await replay({ profile: fixtureProfile(fx.origin), capability: risky, inputs: { member_id: "1000001" }, secrets: SECRETS, outDir: path.join(tmp, "redirect-replay"), runId: "redirect-replay" });
   assert.equal(rr.error?.code, "POLICY_VIOLATION");
 });
+
+test("writes: blocked by default; with --allow-writes every data-changing step needs a person's approval, in discovery and on every replay", async () => {
+  const answer = (dir: string, file: "APPROVE" | "DENY") =>
+    (async () => {
+      while (!existsSync(path.join(dir, "approval-1.json"))) await new Promise((r) => setTimeout(r, 100));
+      writeFileSync(path.join(dir, file), "test operator");
+    })();
+  const decisions = (): Decision[] => [
+    ...DISCOVERY.slice(0, 3),
+    { reason: "find", action: "fill", target: { by: "role", role: "searchbox", name: "Search" }, value: "1000001" },
+    { reason: "search", action: "click", target: { by: "role", role: "button", name: "Search" } },
+    { reason: "open", action: "click", target: { by: "role", role: "link", name: "1000001" } },
+    { reason: "apply", action: "click", target: { by: "role", role: "button", name: "Submit application" } },
+    {
+      reason: "done",
+      action: "done",
+      capability: { id: "fixture.member.apply", name: "Apply", description: "Submit an application for a member", inputs: [{ name: "member_id", description: "7-digit member number", example: "1000001" }], outputs: [] },
+      success: [{ by: "role", role: "heading", name: "Application received" }],
+    },
+  ];
+  const run = (name: string, extra: Partial<Parameters<typeof discover>[0]>) =>
+    discover({ profile: fixtureProfile(fx.origin), url: `${fx.origin}/login`, goal: "Find member 1000001 and submit an application", secrets: SECRETS, outDir: path.join(tmp, name), runId: name, artifactsDir: path.join(tmp, "artifacts"), decide: scripted(decisions()), ...extra });
+
+  // Read-only (default): the submit is blocked and never happens.
+  const readOnly = await run("writes-readonly", { maxSteps: 7 });
+  assert.notEqual(readOnly.status, "success");
+  assert.match(readFileSync(path.join(tmp, "writes-readonly", "events.jsonl"), "utf8"), /policy\.blocked.*read-only/);
+
+  // --allow-writes: the operator approves the submit in the live session.
+  const approved = answer(path.join(tmp, "writes-discovery"), "APPROVE");
+  const d = await run("writes-discovery", { allowWrites: true, operator: true });
+  await approved;
+  assert.equal(d.status, "success", d.reason);
+  const cap = d.capability!;
+  assert.deepEqual(cap.steps.filter((s) => s.approval).map((s) => s.intent), ['click button "Submit application"']);
+  assert.match(d.replay!, /--allow-writes --operator/);
+
+  const replayWrites = (name: string, extra: Partial<Parameters<typeof replay>[0]>) =>
+    replay({ profile: fixtureProfile(fx.origin), capability: cap, inputs: { member_id: "1000004" }, secrets: SECRETS, outDir: path.join(tmp, name), runId: name, ...extra });
+  assert.equal((await replayWrites("writes-no-flag", {})).error?.code, "POLICY_VIOLATION", "a write capability is refused without --allow-writes");
+
+  const yes = answer(path.join(tmp, "writes-yes"), "APPROVE");
+  const ok = await replayWrites("writes-yes", { allowWrites: true, operator: true });
+  await yes;
+  assert.equal(ok.status, "success", JSON.stringify(ok.error));
+  assert.deepEqual(ok.approvals.map((a) => a.decision), ["approved"]);
+
+  const no = answer(path.join(tmp, "writes-no"), "DENY");
+  const denied = await replayWrites("writes-no", { allowWrites: true, operator: true });
+  await no;
+  assert.equal(denied.error?.code, "APPROVAL_DENIED");
+
+  const unattended = await replayWrites("writes-unattended", { allowWrites: true });
+  assert.equal(unattended.status, "needs_human");
+  assert.match(unattended.intervention!.reason, /approval needed/);
+});

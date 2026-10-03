@@ -64,6 +64,13 @@ export async function startFixture(): Promise<Fixture> {
         <a href="/away">Partner site</a>
         <iframe title="ad" src="https://ads.example.test/slot"></iframe>`); // off-origin ad frame, like real sites
     }
+    const applied = url.pathname.match(/^\/members\/(\d{7})\/apply$/)?.[1];
+    if (applied && req.method === "POST") {
+      // A data-changing action, like opening an account.
+      res.writeHead(303, { Location: `/members/${applied}/applied` });
+      return res.end();
+    }
+    if (/^\/members\/\d{7}\/applied$/.test(url.pathname)) return send("<h1>Application received</h1>");
     const member = url.pathname.match(/^\/members\/(\d{7})$/)?.[1];
     if (member && MEMBERS[member]) {
       const dialog =
@@ -73,7 +80,8 @@ export async function startFixture(): Promise<Fixture> {
             ? `<div role="alertdialog" aria-labelledby="d"><h2 id="d">Customer survey</h2><button onclick="this.parentElement.remove()">Close survey</button></div>`
             : "";
       const tab = `<a href="#accounts">Accounts ${Number(member.slice(-1))}</a>`; // count differs per member
-      return send(`<h1>Member ${member}</h1>${tab}<section><div>Current balance</div><div>${MEMBERS[member].balance}</div></section>${dialog}`);
+      return send(`<h1>Member ${member}</h1>${tab}<section><div>Current balance</div><div>${MEMBERS[member].balance}</div></section>
+        <form method="post" action="/members/${member}/apply"><button>Submit application</button></form>${dialog}`);
     }
     send("<h1>Not found</h1>", 404);
   });

@@ -1,0 +1,135 @@
+{
+  "schemaVersion": "1.0",
+  "id": "youtube.search.first-video-link",
+  "version": 1,
+  "name": "Get first video link from YouTube search",
+  "description": "Searches YouTube for a given query and extracts the URL of the first video result.",
+  "app": {
+    "id": "youtube-public",
+    "surface": "web",
+    "recordedOrigin": "https://www.youtube.com",
+    "entryPath": "/"
+  },
+  "inputs": [
+    {
+      "name": "search_query",
+      "type": "string",
+      "description": "The search phrase to look up on YouTube"
+    }
+  ],
+  "secrets": [],
+  "outputs": [
+    {
+      "name": "first_video_link",
+      "type": "text",
+      "description": "The link/URL of the first video result in the search results"
+    }
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "intent": "fill combobox \"Search\"",
+      "action": "fill",
+      "target": {
+        "description": "combobox \"Search\"",
+        "locators": [
+          {
+            "by": "role",
+            "role": "combobox",
+            "name": "Search"
+          }
+        ]
+      },
+      "value": "{{search_query}}",
+      "expect": [],
+      "timeoutMs": 15000
+    },
+    {
+      "id": "s2",
+      "intent": "press label \"Search\"",
+      "action": "press",
+      "target": {
+        "description": "label \"Search\"",
+        "locators": [
+          {
+            "by": "label",
+            "label": "Search"
+          }
+        ]
+      },
+      "value": "Enter",
+      "expect": [
+        {
+          "kind": "url",
+          "pattern": "/results?search_query={{search_query}}"
+        }
+      ],
+      "timeoutMs": 15000
+    },
+    {
+      "id": "s3",
+      "intent": "extract URL of first video result -> first_video_link",
+      "action": "extract",
+      "target": {
+        "description": "first video title link",
+        "locators": [
+          {
+            "by": "link",
+            "hrefPrefix": "/watch?",
+            "position": "first",
+            "within": {
+              "role": "heading"
+            }
+          }
+        ]
+      },
+      "output": "first_video_link",
+      "expect": [],
+      "timeoutMs": 15000,
+      "extract": "href"
+    }
+  ],
+  "success": [
+    {
+      "kind": "url",
+      "pattern": "/results?search_query={{search_query}}"
+    },
+    {
+      "kind": "visible",
+      "target": {
+        "description": "first video title link",
+        "locators": [
+          {
+            "by": "link",
+            "hrefPrefix": "/watch?",
+            "position": "first",
+            "within": {
+              "role": "heading"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "conditions": [
+    {
+      "id": "no_results",
+      "kind": "business",
+      "when": {
+        "by": "text",
+        "text": "No results found"
+      },
+      "message": "The search returned no videos."
+    }
+  ],
+  "usage": {
+    "replay": "npm run replay -- --artifact artifacts/youtube.search.first-video-link.v1.json --input \"search_query=<search_query>\""
+  },
+  "provenance": {
+    "discoveredAt": "2026-09-28T02:38:33.585Z",
+    "runId": "discovery-2026-09-28T02-37-43",
+    "goal": "Search for the best excercises for chest and return the link for the first video.",
+    "model": "claude-sonnet-5",
+    "llmCalls": 5
+  }
+}

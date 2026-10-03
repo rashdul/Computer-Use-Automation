@@ -9,6 +9,7 @@
  * instead of surfacing as a generic "element not found".
  */
 import { Handoff } from "./handoff.js";
+import { assertCapabilityContract, assertPortableTarget } from "./portability.js";
 import { RunLog } from "./runlog.js";
 import {
   assertActionAllowed,
@@ -34,9 +35,11 @@ export interface ReplayOptions {
   headed?: boolean;
   operator?: boolean;
   cdpPort?: number;
+  /** Allow steps marked for approval; each still needs the operator to approve it in the live session. */
+  allowWrites?: boolean;
 }
 
-type Outcome = Omit<RunResult, "runId" | "capability" | "recoveries" | "handoffs" | "durationMs">;
+type Outcome = Omit<RunResult, "runId" | "capability" | "recoveries" | "handoffs" | "approvals" | "durationMs">;
 
 /** Ends the run with a classified result. */
 class Stop extends Error {
@@ -69,11 +72,14 @@ export function pathWithQuery(url: string): string {
 /** URL checkpoint match: {{inputs}} are substituted literally and "*" stands for one path or query value. */
 export function urlMatches(pattern: string, url: string, inputs: Record<string, string>): boolean {
   const escape = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  // Sites write an input into URLs in their own way ("Machine learning" -> /wiki/Machine_learning),
+  // so a placeholder accepts the usual forms: spaces as _, -, + or %20, any letter case.
+  const forms = (value: string) => [...new Set(["", "_", "-", "+", "%20"].map((sep) => (sep ? value.replace(/ /g, sep) : value)))].map(escape).join("|");
   const source = pattern
     .split(/(\{\{[^}]+\}\}|\*)/)
-    .map((part) => (part === "*" ? "[^/?&=]+" : part.startsWith("{{") ? escape(resolveTemplate(part, inputs)) : escape(part)))
+    .map((part) => (part === "*" ? "[^/?&=]+" : part.startsWith("{{") ? `(?:${forms(resolveTemplate(part, inputs))})` : escape(part)))
     .join("");
-  return new RegExp(`^${source}$`).test(pathWithQuery(url));
+  return new RegExp(`^${source}$`, "i").test(pathWithQuery(url));
 }
 
 export function validateInputs(cap: Capability, inputs: Record<string, string>): string | null {
@@ -91,7 +97,7 @@ export async function replay(opts: ReplayOptions): Promise<RunResult> {
   const capId = `${cap.id}@v${cap.version}`;
   const origin = opts.origin ?? cap.app.recordedOrigin;
   const log = new RunLog(opts.runId, opts.outDir, new Redactor(secrets));
-  const base = { runId: opts.runId, capability: capId, recoveries: [] as RunResult["recoveries"], handoffs: [] as RunResult["handoffs"] };
+  const base = { runId: opts.runId, capability: capId, recoveries: [] as RunResult["recoveries"], handoffs: [] as RunResult["handoffs"], approvals: [] as RunResult["approvals"] };
   const finish = (r: Outcome): RunResult => {
     const result: RunResult = { ...base, ...r, durationMs: Date.now() - log.startedAt };
     // The caller receives outputs; evidence keeps only their shape.
@@ -103,13 +109,25 @@ export async function replay(opts: ReplayOptions): Promise<RunResult> {
 
   log.event("run.start", { mode: "replay", capability: capId, origin, inputs });
 
-  // Contract checks happen before the UI is touched.
+  // Contract checks happen before the UI is touched. A malformed or non-portable artifact
+  // (undeclared templates, bad regexes, copied page text as a selector) is rejected outright.
+  try {
+    assertCapabilityContract(cap);
+    const goal = cap.provenance.goal;
+    for (const step of cap.steps) {
+      assertPortableTarget(step.target, goal, step.action === "extract" ? "extract" : "action");
+      for (const cp of step.expect) if (cp.kind === "visible") assertPortableTarget(cp.target, goal, "checkpoint");
+    }
+    for (const cp of cap.success) if (cp.kind === "visible") assertPortableTarget(cp.target, goal, "checkpoint");
+  } catch (e) {
+    return finish({ status: "failed", error: { code: "INVALID_ARTIFACT", stepId: null, expected: "a well-formed, portable capability", observed: (e as Error).message, url: "" } });
+  }
   const inputError = validateInputs(cap, inputs);
   if (inputError) {
     return finish({ status: "failed", error: { code: "INVALID_INPUT", stepId: null, expected: "inputs matching the capability contract", observed: inputError, url: "" } });
   }
   try {
-    assertCapabilityAllowed(profile, cap, origin);
+    assertCapabilityAllowed(profile, cap, origin, { allowWrites: opts.allowWrites });
   } catch (e) {
     return finish({ status: "failed", error: { code: "POLICY_VIOLATION", stepId: null, expected: "artifact within policy", observed: (e as Error).message, url: "" } });
   }
@@ -235,6 +253,13 @@ export async function replay(opts: ReplayOptions): Promise<RunResult> {
       current = step;
       log.event("step.start", { stepId: step.id, intent: step.intent });
       const found = await waitForTarget(step, step.target);
+      if (step.approval) {
+        // Data-changing step: a person approves it now, with the screen in front of them.
+        const approval = await handoff.approve({ capability: capId, stepId: step.id, stepIntent: step.intent, action: step.intent });
+        if (approval.decision === "unavailable") throw new Stop({ status: "needs_human", intervention: approval.request });
+        base.approvals.push({ stepId: step.id, decision: approval.decision, by: approval.by });
+        if (approval.decision === "denied") throw await failure("APPROVAL_DENIED", step, "a person's approval to change data", `denied (${approval.by})`);
+      }
       handoff.assertAutomationInControl();
       const value = step.value === undefined ? undefined : resolveTemplate(step.value, inputs, secrets);
       // Log the template ({{member_id}}, {{secret.password}}), never the resolved value.

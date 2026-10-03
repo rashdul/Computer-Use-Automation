@@ -10,8 +10,9 @@ import { mkdtempSync, rmSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { chromium, type BrowserContext, type Locator as PwLocator, type Page } from "playwright";
-import { isAllowedUrl, PolicyViolation, resolveTemplate, SENSITIVE_PATTERNS, type AppProfile } from "./safety.js";
-import type { ActionType, Condition, ExtractionSource, Locator, Target } from "./schema.js";
+import { assertRequestedPosition } from "./portability.js";
+import { describeLocator, isAllowedUrl, PolicyViolation, resolveTemplate, SENSITIVE_PATTERNS, type AppProfile } from "./safety.js";
+import type { ActionType, Condition, ExtractionSource, Locator, Position, Target } from "./schema.js";
 
 type AriaRole = Parameters<Page["getByRole"]>[0];
 type Inputs = Record<string, string>;
@@ -34,6 +35,12 @@ export interface LaunchOptions {
 
 export class WebSurface {
   readonly blockedNavigations: string[] = [];
+  private marks = 0;
+
+  /** A run-unique attribute value for elements a locator resolved in the page. */
+  private nextMark(): string {
+    return `m${Date.now().toString(36)}${++this.marks}`;
+  }
 
   private constructor(
     readonly context: BrowserContext,
@@ -122,47 +129,232 @@ export class WebSurface {
   }
 
   async build(l: Locator, inputs: Inputs = {}): Promise<PwLocator | null> {
-    const r = (s: string) => resolveTemplate(s, inputs);
+    // Names may contain redaction tokens copied from the masked tree ("Total deposits [money]");
+    // those match the real value, whatever it is.
+    const t = (s: string) => resolveTemplate(s, inputs);
+    const r = (s: string) => redactedMatcher(t(s), true);
     const root = l.within
       ? this.page.getByRole(l.within.role as AriaRole, { name: l.within.name === undefined ? undefined : r(l.within.name), exact: true })
       : this.page;
     switch (l.by) {
       case "link": {
-        const prefix = r(l.hrefPrefix);
+        const prefix = t(l.hrefPrefix);
         const prefixes = prefix.startsWith("/") && !prefix.startsWith("//")
           ? [prefix, new URL(prefix, this.url()).href]
           : [prefix];
         // Match the published destination, not site-specific classes or IDs.
         const quote = (s: string) => `"${s.replace(/[\\"\n\r\f]/g, (c) => `\\${c.charCodeAt(0).toString(16)} `)}"`;
         const links = root.getByRole("link").and(this.page.locator(prefixes.map((p) => `[href^=${quote(p)}]`).join(","))).filter({ visible: true });
-        return l.position === "first" ? links.first() : links;
+        return atPosition(links, l.position);
       }
-      case "role":
-        if (l.namePattern !== undefined) return root.getByRole(l.role as AriaRole, { name: new RegExp(l.namePattern) });
-        return l.name === undefined
-          ? root.getByRole(l.role as AriaRole)
-          : root.getByRole(l.role as AriaRole, { name: r(l.name), exact: l.exact ?? true });
+      case "content": {
+        // Never guess the region: two <main>s (or none) stay ambiguous (or missing).
+        const region = l.within ? (root as PwLocator) : this.page.locator("body");
+        if ((await region.count()) !== 1) return region;
+        const token = this.nextMark();
+        await region.evaluate(
+          (scope, mark) => {
+            const chrome = "nav,header,footer,aside,table,figure,figcaption,form,[role=navigation],[role=banner],[role=contentinfo],[role=complementary],[role=search],[aria-hidden=true]";
+            for (const el of Array.from(scope.querySelectorAll<HTMLElement>("p,[role=paragraph]"))) {
+              if (el.closest(chrome)) continue; // navigation, infoboxes, sidebars, captions
+              if (!el.getClientRects().length || getComputedStyle(el).visibility === "hidden") continue;
+              if (!el.innerText.trim()) continue; // empty, or only hidden text
+              el.setAttribute("data-cua-mark", mark);
+            }
+          },
+          token,
+        );
+        return atPosition(this.page.locator(`[data-cua-mark="${token}"]`), l.position);
+      }
+      case "role": {
+        const level = l.level !== undefined ? { level: l.level } : {};
+        const byRole =
+          l.namePattern !== undefined
+            ? root.getByRole(l.role as AriaRole, { name: new RegExp(l.namePattern), ...level })
+            : l.name === undefined
+              ? root.getByRole(l.role as AriaRole, level)
+              : root.getByRole(l.role as AriaRole, { name: redactedMatcher(t(l.name), l.exact ?? true), exact: l.exact ?? true, ...level });
+        return atPosition(byRole, l.position);
+      }
       case "label":
         return root.getByLabel(r(l.label), { exact: true }).filter({ visible: true });
       case "text":
-        return root.getByText(r(l.text)).filter({ visible: true });
+        return root.getByText(redactedMatcher(t(l.text), false)).filter({ visible: true });
       case "field":
         // The caption must be unique; the value is the element that follows it in reading order.
         return root.getByText(r(l.field), { exact: true }).filter({ visible: true }).locator("xpath=following-sibling::*[1]");
       case "cell": {
-        // Column index comes from the header text at run time, so a reordered or
-        // extra column does not shift the value we read.
+        if (l.rowKey) {
+          // The row whose KEY column holds the value (usually an input), then the value column.
+          // Both are found by header text, so reordered or extra columns do not matter;
+          // duplicate keys or several matching tables stay ambiguous.
+          const region = l.within ? (root as PwLocator) : this.page.locator("body");
+          if ((await region.count()) !== 1) return region;
+          const token = this.nextMark();
+          await region.evaluate(
+            (scope, a) => {
+              for (const table of Array.from(scope.querySelectorAll("table"))) {
+                const rows = Array.from(table.rows);
+                const header = rows.find((row) => row.querySelector("th"));
+                if (!header) continue;
+                let position = 0;
+                let keyAt = -1;
+                let valueAt = -1;
+                for (const th of Array.from(header.cells)) {
+                  const text = th.innerText.trim();
+                  if (text === a.key) keyAt = position;
+                  if (text === a.column) valueAt = position;
+                  position += th.colSpan || 1;
+                }
+                if (keyAt < 0 || valueAt < 0) continue;
+                for (const row of rows) {
+                  if (row === header) continue;
+                  let at = 0;
+                  let keyCell: HTMLTableCellElement | null = null;
+                  let valueCell: HTMLTableCellElement | null = null;
+                  for (const cell of Array.from(row.cells)) {
+                    const span = cell.colSpan || 1;
+                    if (at === keyAt && span === 1) keyCell = cell;
+                    if (at === valueAt && span === 1) valueCell = cell;
+                    at += span;
+                  }
+                  if (keyCell && valueCell && keyCell.innerText.trim() === a.value) valueCell.setAttribute("data-cua-mark", a.mark);
+                }
+              }
+            },
+            { key: t(l.rowKey.column), value: t(l.rowKey.value), column: t(l.column), mark: token },
+          );
+          return this.page.locator(`[data-cua-mark="${token}"]`);
+        }
+        if (l.row === undefined) return null;
         const row = root.getByRole("row", { name: r(l.row), exact: true });
-        const headers = await root
-          .getByRole("table")
-          .filter({ has: row })
-          .first()
-          .getByRole("columnheader")
-          .allInnerTexts();
-        const index = headers.map((h) => h.trim()).indexOf(r(l.column));
-        return index < 0 ? null : row.getByRole("cell").nth(index);
+        if ((await row.count()) !== 1) return row; // 0 = missing, 2+ = ambiguous: never pick one
+        // Column position comes from the table's header row (by text) at run time, so reordered or
+        // extra columns do not shift the value. Read from the table itself: plain tables often
+        // expose no "columnheader" role. Totals and subtotal rows merge leading cells ("Total
+        // deposits" spanning six columns), so the position is mapped onto cells by colSpan.
+        const column = r(l.column);
+        const cellIndex = await row.evaluate(
+          (tr, c) => {
+            const table = tr.closest("table");
+            const header = table ? Array.from(table.rows).find((h) => h.querySelector("th")) : undefined;
+            if (!header || header === tr) return -1;
+            const pattern = c.pattern ? new RegExp(c.pattern) : null;
+            let position = 0;
+            let col = -1;
+            for (const th of Array.from(header.cells)) {
+              const text = th.innerText.trim();
+              if (pattern ? pattern.test(text) : text === c.text) {
+                col = position;
+                break;
+              }
+              position += th.colSpan || 1;
+            }
+            if (col < 0) return -1;
+            let at = 0;
+            const cells = Array.from((tr as HTMLTableRowElement).cells);
+            for (let i = 0; i < cells.length; i++) {
+              const span = cells[i].colSpan || 1;
+              if (col < at + span) return at === col && span === 1 ? i : -1; // inside a merged cell: no single value
+              at += span;
+            }
+            return -1;
+          },
+          typeof column === "string" ? { text: column, pattern: "" } : { text: "", pattern: column.source },
+        );
+        return cellIndex < 0 ? null : row.locator(":scope > *").nth(cellIndex);
       }
     }
+  }
+
+  /**
+   * Turns a target the model copied from the page into one that holds for every record, when the
+   * element allows it:
+   *   - literal paragraph text -> the prose paragraph at the position the goal asked for;
+   *   - a named heading / paragraph / list item / row -> the same role, unnamed, in the same scope;
+   *   - a table row named after its values -> the row whose key column holds an input.
+   * A candidate is used only if it resolves to the SAME single element; otherwise the original
+   * target is kept (and the portability checks decide whether it is acceptable).
+   */
+  async reusableTarget(
+    original: Locator,
+    element: PwLocator,
+    context: "extract" | "checkpoint" | "action",
+    goal: string,
+    inputValues: string[],
+  ): Promise<Target> {
+    const keep: Target = { description: describeLocator(original), locators: [original] };
+    if (context === "action") return keep;
+    const handle = await element.elementHandle().catch(() => null);
+    if (!handle) return keep;
+    const sameElement = async (candidate: Locator): Promise<boolean> => {
+      const loc = await this.build(candidate).catch(() => null);
+      if (!loc || (await loc.count()) !== 1) return false;
+      return loc.evaluate((el, h) => el === h, handle).catch(() => false);
+    };
+    const use = (candidate: Locator): Target => ({ description: describeLocator(candidate), locators: [candidate] });
+    try {
+      const info = await element.evaluate((el) => ({ tag: el.tagName.toLowerCase(), role: el.getAttribute("role") ?? "" }));
+
+      // 1. Paragraph text -> its position among the prose paragraphs, if the goal names that position.
+      const isParagraph = info.tag === "p" || info.role === "paragraph";
+      if (isParagraph && (original.by === "text" || (original.by === "role" && original.role === "paragraph"))) {
+        const within = (await this.page.getByRole("main").count()) === 1 ? { role: "main" } : undefined;
+        const all = await this.build({ by: "content", kind: "paragraph", ...(within && { within }) });
+        const count = all ? await all.count() : 0;
+        const index = all ? await all.evaluateAll((els, h) => (els as Element[]).indexOf(h as unknown as Element), handle) : -1;
+        if (index >= 0) {
+          const positions: Position[] = [...(index === 0 ? (["first"] as const) : []), ...(index === count - 1 ? (["last"] as const) : []), index + 1];
+          for (const position of positions) {
+            const candidate: Locator = { by: "content", kind: "paragraph", position, ...(within && { within }) };
+            try {
+              assertRequestedPosition(candidate, goal);
+            } catch {
+              continue; // the goal did not ask for this position
+            }
+            if (await sameElement(candidate)) return use(candidate);
+          }
+        }
+      }
+
+      // 2. A named page-data role (its name is the data) -> the same role, unnamed, in the same scope.
+      if (original.by === "role" && (original.name !== undefined || original.namePattern !== undefined) && DATA_ROLES.includes(original.role)) {
+        const level = await element.evaluate((el) => Number(el.getAttribute("aria-level") ?? el.tagName.match(/^H([1-6])$/)?.[1] ?? 0));
+        const candidates: Locator[] = [{ by: "role", role: original.role, ...(original.within && { within: original.within }) }];
+        if (level) candidates.push({ by: "role", role: original.role, level, ...(original.within && { within: original.within }) });
+        for (const candidate of candidates) if (await sameElement(candidate)) return use(candidate);
+      }
+
+      // 3. A row named after its values -> the row whose key column holds one of the inputs.
+      if (original.by === "cell" && original.row !== undefined && inputValues.length) {
+        const keys = await element.evaluate(
+          (cell, values) => {
+            const row = cell.closest("tr");
+            const table = row?.closest("table");
+            const header = table ? Array.from(table.rows).find((r) => r.querySelector("th")) : undefined;
+            if (!row || !header || header === row) return [];
+            const headers: string[] = [];
+            for (const th of Array.from(header.cells)) for (let i = 0; i < (th.colSpan || 1); i++) headers.push(th.innerText.trim());
+            const found: { column: string; value: string }[] = [];
+            let at = 0;
+            for (const c of Array.from(row.cells)) {
+              const text = c.innerText.trim();
+              if ((c.colSpan || 1) === 1 && values.includes(text) && headers[at]) found.push({ column: headers[at], value: text });
+              at += c.colSpan || 1;
+            }
+            return found;
+          },
+          inputValues,
+        );
+        for (const rowKey of keys) {
+          const candidate: Locator = { by: "cell", column: original.column, rowKey, ...(original.within && { within: original.within }) };
+          if (await sameElement(candidate)) return use(candidate);
+        }
+      }
+    } finally {
+      await handle.dispose().catch(() => {});
+    }
+    return keep;
   }
 
   /** First strategy that identifies exactly one element wins. Never guesses between several. */
@@ -246,6 +438,37 @@ export class WebSurface {
     await this.page.screenshot({ path: file, style: "[data-cua-redact], td, dd, input { filter: blur(7px) !important; }" });
     return file;
   }
+}
+
+/** Roles whose accessible name is page data (a title, a row's values), not a fixed control label. */
+const DATA_ROLES = ["heading", "paragraph", "listitem", "cell", "row", "article", "main"];
+
+/** Applies an ordinal the goal asked for; without one the locator must match exactly one element. */
+function atPosition(loc: PwLocator, position: Position | undefined): PwLocator {
+  if (position === undefined) return loc;
+  if (position === "first") return loc.first();
+  if (position === "last") return loc.last();
+  return loc.nth(position - 1);
+}
+
+const REDACTION_TOKEN = new RegExp(`(${SENSITIVE_PATTERNS.map(([, label]) => label.replace(/[[\]]/g, "\\$&")).join("|")})`);
+
+/**
+ * The model sees amounts, dates, SSNs, phones and emails masked ("[money]"). When it copies such
+ * a token into a target, match it against the real value's pattern, so "Total deposits [money]"
+ * finds "Total deposits $2,915.86" and keeps working for every record. Text without tokens is
+ * returned unchanged (Playwright's normal string matching).
+ */
+export function redactedMatcher(text: string, exact: boolean): string | RegExp {
+  if (!REDACTION_TOKEN.test(text)) return text;
+  const source = text
+    .split(REDACTION_TOKEN)
+    .map((part) => {
+      const pattern = SENSITIVE_PATTERNS.find(([, label]) => label === part)?.[0];
+      return pattern ? `(?:${pattern.source})` : part.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    })
+    .join("");
+  return new RegExp(exact ? `^${source}$` : source);
 }
 
 /**

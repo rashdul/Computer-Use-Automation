@@ -14,7 +14,7 @@
  * The human uses the headed browser window, or attaches to the same session over
  * CDP (127.0.0.1:<cdpPort>) from an operator tool.
  */
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, rmSync } from "node:fs";
 import readline from "node:readline";
 import type { InterventionRequest } from "./schema.js";
 import type { RunLog } from "./runlog.js";
@@ -54,6 +54,10 @@ export interface HandoffOptions {
   cdpPort?: number;
   timeoutMs?: number;
 }
+
+export type ApprovalOutcome =
+  | { decision: "approved" | "denied"; request: InterventionRequest; by: string }
+  | { decision: "unavailable"; request: InterventionRequest };
 
 export type HandoffOutcome =
   | { resumed: true; request: InterventionRequest; humanActions: number; resumedBy: string }
@@ -147,6 +151,65 @@ export class Handoff {
     });
   }
 
+  /**
+   * Asks the operator to approve ONE data-changing action in the live session (they can look at
+   * the browser first). Approve: type y + Enter, or create APPROVE in the run directory.
+   * Anything else, a DENY file, or no answer within the timeout denies. Without an operator
+   * the request is returned unanswered, so the caller can route it (needs_human).
+   */
+  async approve(ctx: { capability: string; stepId: string | null; stepIntent: string | null; action: string }): Promise<ApprovalOutcome> {
+    this.count += 1;
+    const n = this.count;
+    const obs = await this.surface.observe();
+    const shot = await this.surface.screenshot(this.log.file(`approval-${n}.png`)).catch(() => null);
+    const snap = this.log.writeText(`approval-${n}.aria.txt`, obs.tree);
+    const request: InterventionRequest = {
+      id: `${this.log.runId}-approval-${n}`,
+      capability: ctx.capability,
+      stepId: ctx.stepId,
+      stepIntent: ctx.stepIntent,
+      reason: `approval needed to change data: ${ctx.action}`,
+      url: obs.url,
+      screenshot: shot ? this.log.rel(shot) : null,
+      snapshot: this.log.rel(snap),
+      requestedAt: new Date().toISOString(),
+    };
+    this.log.writeJson(`approval-${n}.json`, { ...request, decide: "type y + Enter in the terminal, or create APPROVE (or DENY) in the run directory" });
+    this.log.event("approval.requested", { requestId: request.id, stepId: ctx.stepId, action: ctx.action, url: obs.url });
+    if (!this.opts.operator) return { decision: "unavailable", request };
+
+    console.error(
+      `\n=== APPROVAL REQUIRED (${request.id}) ===\nAbout to: ${ctx.action}\nOn: ${obs.url}\n` +
+        `Check the browser, then type y and Enter to approve (anything else denies),\nor create ${this.log.file("APPROVE")} (or DENY).\n`,
+    );
+    const { approved, by } = await this.waitForApproval(this.opts.timeoutMs ?? 15 * 60_000);
+    const decision = approved ? "approved" : "denied";
+    this.log.event(approved ? "approval.granted" : "approval.denied", { requestId: request.id, stepId: ctx.stepId, by });
+    return { decision, request, by };
+  }
+
+  private waitForApproval(timeoutMs: number): Promise<{ approved: boolean; by: string }> {
+    const approveFile = this.log.file("APPROVE");
+    const denyFile = this.log.file("DENY");
+    return new Promise((resolve) => {
+      const rl = process.stdin.isTTY ? readline.createInterface({ input: process.stdin }) : null;
+      const done = (approved: boolean, by: string) => {
+        clearInterval(poll);
+        clearTimeout(timer);
+        rl?.close();
+        // Consume the signal files: the next approval needs a new answer.
+        for (const f of [approveFile, denyFile]) rmSync(f, { force: true });
+        resolve({ approved, by });
+      };
+      rl?.once("line", (line) => done(/^\s*y(es)?\s*$/i.test(line), "terminal"));
+      const poll = setInterval(() => {
+        if (existsSync(denyFile)) done(false, "deny-file");
+        else if (existsSync(approveFile)) done(true, `approve-file: ${readFileSync(approveFile, "utf8").trim().slice(0, 120) || "approved"}`);
+      }, 500);
+      const timer = setTimeout(() => done(false, `no answer within ${timeoutMs / 1000}s`), timeoutMs);
+    });
+  }
+
   private waitForResume(timeoutMs: number): Promise<string> {
     const file = this.log.file("RESUME");
     return new Promise((resolve, reject) => {
@@ -161,6 +224,7 @@ export class Handoff {
       const poll = setInterval(() => {
         if (!existsSync(file)) return;
         const note = readFileSync(file, "utf8").trim();
+        rmSync(file, { force: true }); // consumed: a later handoff needs a new signal
         done(note ? `resume-file: ${note.slice(0, 120)}` : "resume-file");
       }, 500);
       const timer = setTimeout(() => done(new Error(`no operator response within ${timeoutMs / 1000}s`)), timeoutMs);

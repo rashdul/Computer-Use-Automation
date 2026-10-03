@@ -95,7 +95,7 @@ test("discovery records first-link and href semantics, replay uses a different s
 });
 
 test("repaired YouTube artifact returns a URL and classifies empty search results", async () => {
-  const capability = Capability.parse(JSON.parse(readFileSync("artifacts/youtube.search.first-video-link.v1.json", "utf8")));
+  const capability = Capability.parse(JSON.parse(readFileSync("automation/tests/fixtures/youtube-first-video-link.json", "utf8")));
   assert.equal(capability.app.id, profile.id);
   assert.deepEqual(capability.conditions, profile.conditions);
   for (const query of ["Donald Trump", "no matches"]) {
