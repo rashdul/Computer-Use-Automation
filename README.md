@@ -44,6 +44,8 @@ replay:    artifact + typed inputs ─► deterministic steps + checkpoints (no 
 - Node 20.19+
 - For discovery only: one LLM provider. The default is the [Claude Code](https://claude.com/claude-code) CLI, installed and logged in. Replay and the tests never call a model.
 
+**Without live services:** `npm install && npx playwright install chromium && npm test` runs the whole system (discovery with a scripted model, replay in every result category, the human handoff) against local fixture apps. It needs no LLM, Supabase, credentials or network.
+
 **1. Install**
 
 ```bash
@@ -308,7 +310,7 @@ For a recoverable interruption instead, run `npm run demo:env -- maintenance`. R
 ## Tests
 
 ```bash
-npm test             # 45 tests, about 2 min, no LLM, Supabase or network
+npm test             # 46 tests, about 2 min, no LLM, Supabase or network
 npm run typecheck
 ```
 

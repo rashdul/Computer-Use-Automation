@@ -61,6 +61,7 @@ export async function startFixture(): Promise<Fixture> {
       return send(`<h1>Member search</h1><form role="search" action="/search">
         <label for="q">Search</label><input id="q" name="q" type="search" value="${esc(q)}">
         <button type="submit">Search</button></form>${results}
+        <p>Tip: search by member number, e.g. <code>1000001</code></p>
         <a href="/away">Partner site</a>
         <iframe title="ad" src="https://ads.example.test/slot"></iframe>`); // off-origin ad frame, like real sites
     }

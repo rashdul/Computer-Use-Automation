@@ -67,6 +67,9 @@ export interface RecordedStep {
 const pathOf = pathWithQuery;
 
 
+/** A form control and its accessible name in the accessibility tree: `- button "Search"`. */
+const FIXED_CONTROL = /^\s*- (?:button|tab|menuitem|checkbox|radio|switch|option|textbox|searchbox|combobox|spinbutton|slider) "((?:[^"\\]|\\.)*)"/gm;
+
 /** True if a (fallback) locator passes the portability checks; non-portable fallbacks are dropped. */
 function isPortable(l: Locator, goal: string, context: "extract" | "checkpoint" | "action"): boolean {
   try {
@@ -264,7 +267,9 @@ export async function discover(opts: DiscoverOptions): Promise<DiscoverResult> {
         if (generalized) log.event("target.generalized", { turn, from: describeLocator(decision.target), to: describeLocator(primary) });
         const fallbacks = generalized ? [] : (await fallbacksFor(surface, decision.target, res.locator)).filter((l) => isPortable(l, opts.goal, context));
         if (decision.action === "fill" && decision.value && !decision.value.includes("{{secret.")) {
-          fixedNames[decision.value] ??= [...obs.tree.matchAll(/"((?:[^"\\]|\\.)*)"/g)].map((m) => m[1]);
+          // Only form controls (buttons, fields, tabs...): page text and links named after the
+          // value are data (a search tip, a result) and must still become {{placeholders}}.
+          fixedNames[decision.value] ??= [...obs.tree.matchAll(FIXED_CONTROL)].map((m) => m[1]);
         }
         if (risk === "risky") {
           // Data-changing step: a person approves it in the live session, or it does not happen.
