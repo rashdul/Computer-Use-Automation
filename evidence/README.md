@@ -4,7 +4,7 @@ These runs were recorded on 2026-09-24 against the RFCU console (`target-app/`) 
 
 | Run | What it shows | Result |
 | --- | --- | --- |
-| [`01-discovery`](01-discovery/) | A real LLM discovery run (Claude Sonnet 5 through `claude -p`). The goal was *"Log in, find member 1030966, and return their current savings balance."* | `success` after 11 model calls. It wrote [`artifacts/rfcu.member.savings-balance.v1.json`](../artifacts/rfcu.member.savings-balance.v1.json) |
+| [`01-discovery`](01-discovery/) | A real LLM discovery run (Claude Sonnet 5 through `claude -p`). The goal was *"Log in, find member 1030966, and return their current savings balance."* | `success` after 11 model calls. It wrote [`01-discovery/capability.json`](01-discovery/capability.json) |
 | [`02-replay-success`](02-replay-success/) | Deterministic replay for a *different* member (1057101), with no model involved | `success`. 8 steps and 3 success checkpoints verified in about 4 s |
 | [`03-replay-member-not-found`](03-replay-member-not-found/) | Replay with member 9999999 | `business_outcome` / `member_not_found`, exit code 2 |
 | [`04-replay-handoff`](04-replay-handoff/) | The console showed the BSA/AML attestation dialog during replay. It needs human judgement, so replay escalated and a human took over the same live session, then handed control back | `success`, with 1 handoff and 4 recorded human actions |

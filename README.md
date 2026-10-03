@@ -35,7 +35,7 @@ replay:    artifact + typed inputs ─► deterministic steps + checkpoints (no 
 | `success` | Goal reached, all outputs read and typed | `0` |
 | `business_outcome` | A valid answer that isn't the happy path, such as `member_not_found` | `2` |
 | `needs_human` | Something that needs judgement, such as a compliance attestation dialog | `3` |
-| `failed` | Hard failure, such as `TARGET_NOT_FOUND`, `INVALID_INPUT` or `POLICY_VIOLATION` | `1` |
+| `failed` | Hard failure, such as `TARGET_NOT_FOUND`, `INVALID_INPUT`, `INVALID_ARTIFACT` or `POLICY_VIOLATION` | `1` |
 
 ## Quick start
 
@@ -63,11 +63,11 @@ CUA_PASSWORD=<password from the credentials file>
 **3. Replay the committed capability** against the hosted console:
 
 ```bash
-npm run replay -- --artifact artifacts/rfcu.member.savings-balance.v1.json --input member_number=1057101 \
+npm run replay -- --artifact evidence/01-discovery/capability.json --input member_number=1057101 \
   --origin https://rashed-federal-credit-union.netlify.app
 ```
 
-You should get `"status": "success"` with `current_savings_balance` on stdout. The v1 artifact was recorded on a local copy of the console, so `--origin` points it at the hosted one.
+You should get `"status": "success"` with `current_savings_balance` on stdout. That capability was recorded on a local copy of the console, so `--origin` points it at the hosted one. Capabilities you discover yourself are saved in `artifacts/`, which is git-ignored.
 
 **4. Discover a new capability** with the LLM:
 
@@ -100,6 +100,7 @@ Runs the LLM against a live site until it reaches the goal, then compiles the ve
 | `--out <dir>` | no | `runs/<run-id>` | Where evidence is written: event log, observations, screenshots, result. |
 | `--headed` | no | off (headless) | Shows the browser window. |
 | `--operator` | no | off | If the run gets stuck, pause and wait for a human instead of stopping. See [Human handoff](#human-handoff). |
+| `--allow-writes` | no | off | Allow data-changing actions (open an account, submit a form). Needs `--operator`: a person approves each one. See [Data-changing goals](#data-changing-goals). |
 | `--cdp-port <port>` | no | off | Opens the browser's DevTools protocol on `127.0.0.1:<port>`, so an operator tool can attach to the same live session. Only use it together with `--operator`. |
 
 **Output.** The artifact is written to `artifacts/<id>.v<N>.json`, where `N` is the next free version, so existing artifacts are never overwritten. The summary JSON on stdout includes the `outputs` the model read (partial values too, if the run stops early) and a ready-to-run `replay` command, which is also saved in the artifact as `usage.replay`.
@@ -112,13 +113,14 @@ Runs a saved artifact deterministically, with no model.
 
 | Argument | Required | Default | What it does |
 | --- | --- | --- | --- |
-| `--artifact <file>` | yes | – | Path to the capability JSON, for example `artifacts/rfcu.member.savings-balance.v1.json`. |
+| `--artifact <file>` | yes | – | Path to the capability JSON, for example `evidence/01-discovery/capability.json`. |
 | `--input name=value` | per artifact | – | One value for each input the artifact declares. Repeat the flag for several inputs. Values are checked against the input's pattern before a browser opens. A missing, unknown or malformed input fails with `INVALID_INPUT`. Quote values that contain spaces: `--input "member_name=Mei V. Garcia"`. |
 | `--origin <url>` | no | the artifact's recorded origin | Runs the same capability against another deployment of the app, for example `https://rashed-federal-credit-union.netlify.app` for an artifact recorded on a local copy. The origin must be in the app profile's allow-list. |
 | `--app <profile>` | no | the profile whose `id` matches the artifact | App profile to use, by file name in `automation/apps/` without `.json`. |
 | `--out <dir>` | no | `runs/<run-id>` | Where evidence is written. Output values are masked there. |
 | `--headed` | no | off (headless) | Shows the browser window. Needed if a person will take over in that window. |
 | `--operator` | no | off | On an escalation, pause for up to 15 minutes while a human works in the same session, then resume. Without it, the run ends with `needs_human` and an intervention request. |
+| `--allow-writes` | no | off | Required to replay a capability with data-changing steps. Needs `--operator`: each such step waits for approval. |
 | `--cdp-port <port>` | no | off | Opens the browser's DevTools protocol on `127.0.0.1:<port>`, so an operator tool can attach. Only use it together with `--operator`. |
 
 **Output channels.**
@@ -197,10 +199,10 @@ All three providers get the same prompt and schema and return the same validated
 
 ## Demo walkthrough
 
-Every command below replays the committed v1 artifact against the hosted console. Each outcome matches a recorded run in [`evidence/`](evidence/README.md).
+Every command below replays the committed example capability ([`evidence/01-discovery/capability.json`](evidence/01-discovery/capability.json), from the recorded discovery run) against the hosted console. Each outcome matches a recorded run in [`evidence/`](evidence/README.md).
 
 ```bash
-npm run replay -- --artifact artifacts/rfcu.member.savings-balance.v1.json \
+npm run replay -- --artifact evidence/01-discovery/capability.json \
   --origin https://rashed-federal-credit-union.netlify.app --input member_number=<member>
 ```
 
@@ -218,7 +220,8 @@ The goal is free text, and the model decides which values in it become inputs. A
 npm run discover -- --url https://rashed-federal-credit-union.netlify.app/login \
   --goal "Log in, find member Amber L. Adams, and return their current total balance."
 
-npm run replay -- --artifact artifacts/rfcu.member.total-current-balance.v1.json --input "member_name=Mei V. Garcia"
+# Discovery prints the exact replay command. It looks like this:
+npm run replay -- --artifact artifacts/rfcu.member.current-total-balance.v1.json --input "member_name=Mei V. Garcia"
 ```
 
 Values the model *reads* on screen, such as the member number shown after a name search, are never baked into the artifact. On replay, a name that matches several members returns `business_outcome` / `multiple_matches`, and a name that matches nobody returns `member_not_found`.
@@ -226,10 +229,53 @@ Values the model *reads* on screen, such as the member number shown after a name
 The same engine works on public sites that have a profile in `automation/apps/`:
 
 ```bash
-npm run replay -- --artifact artifacts/youtube.search.first-video-link.v1.json --input "search_query=lofi study music"
+npm run discover -- --url https://www.youtube.com --goal "Search YouTube for lofi study music and return the link of the first video."
+# then run the replay command it prints with another search, e.g. --input "search_query=jazz piano"
+```
+
+Values that change per record are never used to find things. Instead of a title, a paragraph's text or an amount, the artifact records *where* the value is:
+
+| The model targeted | The artifact records | Replays for |
+| --- | --- | --- |
+| the text of the opening paragraph | `{"by":"content","kind":"paragraph","position":"first","within":{"role":"main"}}` | any article |
+| `heading "Iraq"` | `{"by":"role","role":"heading","level":1,"within":{"role":"main"}}` | any title |
+| the row `K1 42`, column `Balance` | `{"by":"cell","column":"Balance","rowKey":{"column":"Key","value":"{{key}}"}}` | any key, even if columns are reordered |
+| `Total deposits [money] [money]` (masked amounts) | the same row name; `[money]` matches any amount | any member |
+
+Ordinals such as "first" or "last" are only used when the goal asks for them. Every artifact is checked before replay opens a browser, and one with undeclared templates, invalid patterns or copied page text as a selector fails as `INVALID_ARTIFACT`.
+
+```bash
+npm run discover -- --url https://www.wikipedia.org --goal "Search Wikipedia for Iraq and return the first paragraph of the article."
+# then run the replay command it prints with another topic, e.g. --input "search_query=Machine learning"
 ```
 
 To automate a site that isn't covered, add its origin to a profile in `automation/apps/` or create a new profile.
+
+### Data-changing goals
+
+Runs are read-only by default: controls named like "open account", "submit" or "save" (see `riskyTargetPatterns` in the app profile) are blocked. To automate a goal that changes data, opt in with `--allow-writes`, which requires `--operator`:
+
+```bash
+npm run discover -- --url https://rashed-federal-credit-union.netlify.app/login   --goal "Log in, find member Amber L. Adams, and open a savings account for her" --headed --operator --allow-writes
+```
+
+Navigation and form filling run normally. Before each data-changing click, the run pauses:
+
+```
+=== APPROVAL REQUIRED ===
+About to: click button "Open account"
+Check the browser, then type y and Enter to approve (anything else denies)
+```
+
+- **On approval:** the step is recorded with `"approval": true`.
+- **On denial:** the model is told, and the action never happens.
+- **The approval goes with the artifact.** Every replay asks again before that step:
+  - Without `--allow-writes`, a write capability is refused (`POLICY_VIOLATION`).
+  - With `--allow-writes` but no operator, the run stops as `needs_human` with an approval request.
+  - A denial ends the run as `APPROVAL_DENIED`.
+- **Approving from another tool:** create `APPROVE` (or `DENY`) in the run directory.
+
+On the RFCU demo app, `python target-app/tests/ui/reset_scenarios.py` reverses accounts opened from the console.
 
 ### Human handoff
 
@@ -240,7 +286,7 @@ The attestation dialog is a real dialog in the console, and automation must not 
 ```bash
 npm run demo:env -- attestation
 
-npm run replay -- --artifact artifacts/rfcu.member.savings-balance.v1.json --input member_number=1057101 \
+npm run replay -- --artifact evidence/01-discovery/capability.json --input member_number=1057101 \
   --origin https://rashed-federal-credit-union.netlify.app --headed --operator --cdp-port 9333
 # Replay pauses and prints HUMAN INTERVENTION REQUIRED.
 # Complete the attestation in the browser window, then press Enter in the terminal.
@@ -252,7 +298,7 @@ npm run demo:env -- reset
 To run the handoff unattended, as in [`evidence/04-replay-handoff`](evidence/04-replay-handoff/), start these in two terminals:
 
 ```bash
-npm run replay -- --artifact artifacts/rfcu.member.savings-balance.v1.json --input member_number=1057101 \
+npm run replay -- --artifact evidence/01-discovery/capability.json --input member_number=1057101 \
   --origin https://rashed-federal-credit-union.netlify.app --operator --cdp-port 9333 --out runs/handoff
 npm run demo:operator -- --run runs/handoff --cdp http://127.0.0.1:9333
 ```
@@ -262,7 +308,7 @@ For a recoverable interruption instead, run `npm run demo:env -- maintenance`. R
 ## Tests
 
 ```bash
-npm test             # 32 tests, about 45 s, no LLM, Supabase or network
+npm test             # 45 tests, about 2 min, no LLM, Supabase or network
 npm run typecheck
 ```
 
@@ -272,6 +318,7 @@ npm run typecheck
 | `automation/tests/safety.test.ts` | Redaction, allow-list, risk classification, templates, output parsing and the committed artifact |
 | `automation/tests/llm.test.ts` | Provider selection, the OpenAI strict-mode schema, and the OpenAI transport with the network mocked |
 | `automation/tests/search.test.ts` | Search-style flows: first-result links, `href` extraction and empty results |
+| `automation/tests/portability.test.ts` | Reusable targets: paragraph positions, key-column rows, fixed labels that equal the input, short inputs, masked values and merged cells, and artifact contract validation |
 
 The target console has its own Python UI walkthroughs; see [`target-app/README.md`](target-app/README.md#tests).
 
@@ -290,9 +337,10 @@ automation/
   runlog.ts      evidence writer (everything is redacted before it is written)
   apps/          app profiles: rfcu.json, youtube.json, public-web.json
   demo/          demo-only helpers: environment.ts (fault injection), operator.ts (scripted operator)
-  tests/         offline tests against a fixture app
-artifacts/       capability artifacts (<id>.v<version>.json)
+  tests/         offline tests against fixture apps (tests/fixtures/ holds a known-good capability)
+artifacts/       capabilities you discover (<id>.v<version>.json, git-ignored)
 evidence/        curated recorded runs
 target-app/      the RFCU Member Services Console (React + Supabase)
 runs/            output of your own runs (git-ignored)
+cleanup.sh       removes run output, build leftovers and temp folders (dry run by default)
 ```
